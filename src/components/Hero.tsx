@@ -1,48 +1,53 @@
 import { useRef } from 'react'
-import shotBonjour from '../assets/media/shot-bonjour.webp'
 import shotFusee from '../assets/media/shot-fusee.webp'
+import shotNoel from '../assets/media/shot-noel.webp'
 import shotNouvelAn from '../assets/media/shot-nouvel-an.webp'
 import shotSirene from '../assets/media/shot-sirene.webp'
 import { product } from '../config/product'
-import { site } from '../config/site'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 import { Doodle } from './Doodle'
 import { HeroVideo } from './HeroVideo'
-import { Reveal } from './Reveal'
 import './Hero.css'
 
-// Photos qui surgissent autour de la vidéo une fois refermée.
+// Photos qui surgissent autour de la vidéo une fois refermée : le produit
+// entier, un visuel fournisseur par format.
 const SHOTS = [
   {
     id: 'fusee',
+    variantId: '12x12',
     src: shotFusee,
-    width: 398,
-    height: 392,
-    alt: 'Le petit format carré avec une fusée et des planètes dessinées, éclairé par sa base.',
+    width: 796,
+    height: 784,
+    alt: 'Le tableau carré avec une fusée et des planètes dessinées, éclairé par sa base.',
   },
   {
     id: 'nouvel-an',
+    variantId: '30x20',
     src: shotNouvelAn,
-    width: 540,
-    height: 372,
-    alt: 'Le format paysage avec des fanions et « Happy New Year » écrits aux feutres.',
+    width: 1080,
+    height: 744,
+    alt: 'Le tableau paysage avec des fanions et « Happy New Year » écrits aux feutres.',
   },
   {
-    id: 'bonjour',
-    src: shotBonjour,
-    width: 1000,
-    height: 430,
-    alt: 'Gros plan sur la base lumineuse posée sur un bureau, sous un « Good Morning » et une fleur rouge.',
+    id: 'noel',
+    variantId: '15x15',
+    src: shotNoel,
+    width: 800,
+    height: 800,
+    alt: 'Le tableau carré avec un père Noël, des cadeaux et des flocons dessinés.',
   },
   {
     id: 'sirene',
+    variantId: '20x20',
     src: shotSirene,
-    width: 372,
-    height: 372,
-    alt: 'Le format carré avec une sirène dessinée, allumé dans une pièce sombre.',
+    width: 744,
+    height: 744,
+    alt: 'Le tableau carré avec une sirène dessinée, allumé dans une pièce sombre.',
   },
 ]
+
+const formatLabel = (variantId: string) => product.variants.find((variant) => variant.id === variantId)?.label
 
 export function Hero() {
   const pinRef = useRef<HTMLDivElement>(null)
@@ -50,9 +55,10 @@ export function Hero() {
   useScrollProgress(pinRef, reducedMotion)
 
   return (
-    <section id="accueil" className="hero" aria-labelledby="hero-title">
-      {/* Écran 1 : la vidéo seule, plein écran. Elle reste épinglée pendant le
-          défilement, se referme en pastille, puis les photos surgissent autour. */}
+    <section id="accueil" className="hero" aria-label="Le tableau lumineux en vidéo et en photos">
+      {/* La vidéo seule, plein écran. Elle reste épinglée pendant le défilement,
+          se referme en pastille, puis les photos surgissent autour. Le titre et
+          les boutons suivent dans Intro. */}
       <div ref={pinRef} className="hero__pin">
         <div className="hero__stage">
           <HeroVideo />
@@ -61,6 +67,7 @@ export function Hero() {
             {SHOTS.map((shot) => (
               <li key={shot.id} className={`hero__shot hero__shot--${shot.id}`}>
                 <img src={shot.src} width={shot.width} height={shot.height} alt={shot.alt} decoding="async" />
+                <span className="hero__shot-label">{formatLabel(shot.variantId)}</span>
               </li>
             ))}
           </ul>
@@ -81,34 +88,6 @@ export function Hero() {
               />
             </svg>
           </a>
-        </div>
-      </div>
-
-      {/* Écran 2 : la promesse et les actions, sur fond clair. */}
-      <div id="decouvrir" className="hero__intro">
-        <div className="container hero__intro-inner">
-          <Doodle shape="squiggle" color="var(--pink)" className="hero__doodle hero__doodle--squiggle" />
-          <Doodle shape="sparkle" color="var(--blue)" filled className="hero__doodle hero__doodle--sparkle" />
-          <Doodle shape="loop" color="var(--green)" className="hero__doodle hero__doodle--loop" />
-
-          <Reveal className="hero__copy">
-            <p className="eyebrow">{product.name}</p>
-            <h1 id="hero-title" className="hero__title">
-              Leur imagination n’a jamais été aussi <span className="highlight">lumineuse</span>.
-            </h1>
-            <p className="lede hero__lede">
-              Une plaque d’acrylique, des feutres et une base LED : ils dessinent, la lumière révèle, on efface et on
-              recommence.
-            </p>
-            <div className="hero__actions">
-              <a className="btn btn--primary" href={site.primaryCta.href}>
-                {site.primaryCta.label}
-              </a>
-              <a className="btn btn--light" href="#demonstration">
-                Voir la démo
-              </a>
-            </div>
-          </Reveal>
         </div>
       </div>
     </section>

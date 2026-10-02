@@ -1,4 +1,4 @@
-/* --- Écran 1 : la vidéo plein écran, qui se referme au défilement ------------
+/* --- La vidéo plein écran, qui se referme au défilement ------------
    `.hero__pin` est plus haut que la fenêtre ; `.hero__stage` y reste collé
    pendant qu'on le traverse. `--p` (0 → 1, posé par useScrollProgress) pilote
    tout : la vidéo rétrécit en pastille, puis les photos surgissent autour. */
@@ -9,12 +9,17 @@
   --shrink: clamp(0, var(--p) / 0.6, 1);
 
   /* Taille de la vidéo une fois refermée : une pastille 2:1, assez large pour
-     que le cadrage `cover` montre le tableau en entier. */
-  --end-w: min(46vw, 92vh);
+     que le cadrage `cover` montre le tableau en entier, assez étroite pour
+     laisser la place aux photos produit de chaque côté. */
+  --end-w: min(38vw, 76vh);
   --end-h: calc(var(--end-w) / 2);
 
-  height: 240vh;
-  height: 240svh;
+  /* Côté des photos carrées : limité par la largeur des marges et par la
+     hauteur, puisque deux photos s'empilent de chaque côté. */
+  --shot: min(25vw, 38vh);
+
+  height: 220vh;
+  height: 220svh;
 }
 
 .hero__stage {
@@ -105,70 +110,85 @@
   object-fit: cover;
 }
 
+.hero__shot-label {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 0.6rem;
+  padding: 0.15rem 0.7rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--glow);
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 0.7rem + 0.4vw, 1rem);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Deux photos empilées de chaque côté, légèrement décalées et inclinées. */
 .hero__shot--fusee {
   --at: 0.5;
-  --tilt: -7deg;
+  --tilt: -5deg;
 
-  top: max(16%, 5.75rem);
-  left: 9%;
-  width: min(15vw, 26vh);
+  top: max(11%, 5.5rem);
+  left: 3%;
+  width: var(--shot);
   aspect-ratio: 1;
 }
 
 .hero__shot--nouvel-an {
   --at: 0.56;
-  --tilt: 5deg;
+  --tilt: 4deg;
 
-  top: max(14%, 5.75rem);
-  right: 5%;
-  width: min(20vw, 34vh);
+  top: max(12%, 5.75rem);
+  right: 2.5%;
+  width: calc(var(--shot) * 1.12);
   aspect-ratio: 3 / 2;
 }
 
-.hero__shot--bonjour {
+.hero__shot--noel {
   --at: 0.62;
   --tilt: 4deg;
 
-  bottom: 13%;
-  left: 4%;
-  width: min(23vw, 40vh);
-  aspect-ratio: 2 / 1;
+  bottom: 4%;
+  left: 5.5%;
+  width: var(--shot);
+  aspect-ratio: 1;
 }
 
 .hero__shot--sirene {
   --at: 0.68;
-  --tilt: -5deg;
+  --tilt: -4deg;
 
-  right: 10%;
-  bottom: 12%;
-  width: min(15vw, 26vh);
+  right: 5%;
+  bottom: 9%;
+  width: var(--shot);
   aspect-ratio: 1;
 }
 
 .hero__pop--star {
   --at: 0.6;
   --tilt: -14deg;
-  --size: 3.5rem;
+  --size: 3rem;
 
-  top: 47%;
-  left: 23%;
+  top: 24%;
+  left: 36%;
 }
 
 .hero__pop--sparkle {
   --at: 0.66;
-  --size: 2.75rem;
+  --size: 2.5rem;
 
-  top: 46%;
-  right: 22%;
+  right: 35%;
+  bottom: 22%;
 }
 
 .hero__pop--squiggle {
   --at: 0.72;
   --tilt: 8deg;
-  --size: 4.5rem;
+  --size: 4rem;
 
-  top: 7.5rem;
-  left: 36%;
+  top: 22%;
+  right: 36%;
 }
 
 /* --- Boutons posés sur la scène ---------------------------------------------- */
@@ -176,6 +196,8 @@
 .hero__scroll,
 .hero__toggle {
   position: absolute;
+  /* Toujours au-dessus des photos, qui peuvent frôler les bords de l'écran. */
+  z-index: 2;
   bottom: clamp(1rem, 3vh, 2rem);
   display: grid;
   place-items: center;
@@ -236,11 +258,13 @@
 
 @media (orientation: portrait) {
   .hero__pin {
-    --end-w: 88vw;
-    --end-h: calc(var(--end-w) * 0.56);
+    --end-w: 82vw;
+    --end-h: calc(var(--end-w) * 0.52);
+    /* Deux photos côte à côte au-dessus de la vidéo, deux en dessous. */
+    --shot: min(46vw, 24vh);
 
-    height: 220vh;
-    height: 220svh;
+    height: 200vh;
+    height: 200svh;
   }
 
   /* En plein écran, on cadre le lettrage et le bonhomme de neige ; le point de
@@ -251,27 +275,24 @@
   }
 
   .hero__shot--fusee {
-    top: 6rem;
-    left: 6%;
-    width: min(32vw, 17vh);
+    top: 5.25rem;
+    left: 3%;
   }
 
   .hero__shot--nouvel-an {
-    top: 6.75rem;
-    right: 5%;
-    width: min(44vw, 23vh);
+    top: 6.25rem;
+    right: 3%;
+    width: var(--shot);
   }
 
-  .hero__shot--bonjour {
-    bottom: 7rem;
-    left: 5%;
-    width: min(50vw, 26vh);
+  .hero__shot--noel {
+    bottom: 5.75rem;
+    left: 3%;
   }
 
   .hero__shot--sirene {
-    right: 6%;
+    right: 3%;
     bottom: 6.5rem;
-    width: min(31vw, 17vh);
   }
 
   /* Pas de place pour les tracés entre les photos sur un écran étroit. */
@@ -280,69 +301,19 @@
   }
 }
 
-/* --- Écran 2 : la promesse, sur fond clair ----------------------------------- */
+/* Écran large mais très bas (téléphone tenu en paysage) : photos plus petites,
+   pas de tracés décoratifs. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .hero__pin {
+    --shot: min(22vw, 33vh);
+  }
 
-.hero__intro {
-  padding-block: clamp(3rem, 2rem + 5vw, 6rem) clamp(2rem, 1rem + 4vw, 4rem);
-  overflow: hidden;
-}
+  .hero__shot--noel,
+  .hero__shot--sirene {
+    bottom: 3%;
+  }
 
-.hero__intro-inner {
-  position: relative;
-}
-
-.hero__copy {
-  position: relative;
-  display: grid;
-  gap: clamp(1.25rem, 2.5vw, 2rem);
-  justify-items: center;
-  text-align: center;
-}
-
-.hero__title {
-  font-size: var(--step-4);
-  line-height: 1.02;
-  max-width: 14ch;
-}
-
-.hero__lede {
-  max-width: 40ch;
-}
-
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.9rem;
-  margin-top: 0.25rem;
-}
-
-.hero__doodle--squiggle {
-  --size: 5.5rem;
-
-  top: 12%;
-  right: 5%;
-  transform: rotate(8deg);
-}
-
-.hero__doodle--sparkle {
-  --size: 3rem;
-
-  bottom: 20%;
-  left: 12%;
-}
-
-.hero__doodle--loop {
-  --size: 5rem;
-
-  right: 10%;
-  bottom: 4%;
-  transform: rotate(-6deg);
-}
-
-/* Sous 900 px les tracés gêneraient le texte. */
-@media (max-width: 900px) {
-  .hero__doodle {
+  .hero__pop {
     display: none;
   }
 }

@@ -1,19 +1,31 @@
 import { useEffect, type RefObject } from 'react'
 
 /**
- * Expose l'avancement du défilement à travers un élément « épinglé » dans la
- * variable CSS `--p` (0 quand son haut touche le haut de la fenêtre, 1 quand
- * son bas touche le bas). Toute l'animation est ensuite écrite en CSS.
- *
- * `frozen` fige l'état final (`--p: 1`), pour les animations réduites.
+ * Comment mesurer l'avancement :
+ * - `pin`  : l'élément est plus haut que la fenêtre et contient une scène
+ *   épinglée. 0 quand son haut touche le haut de la fenêtre, 1 quand son bas
+ *   touche le bas.
+ * - `view` : l'élément traverse simplement la fenêtre. 0 quand son haut entre
+ *   par le bas, 1 quand son bas sort par le haut.
  */
-export function useScrollProgress(ref: RefObject<HTMLElement | null>, frozen: boolean) {
+type ProgressMode = 'pin' | 'view'
+
+const clamp = (value: number) => Math.min(1, Math.max(0, value))
+
+/**
+ * Expose l'avancement du défilement dans la variable CSS `--p` de l'élément.
+ * Toute l'animation est ensuite écrite en CSS, à partir de `--p`.
+ *
+ * `frozen` (animations réduites) fige la valeur : l'état final pour `pin`,
+ * le milieu de course pour `view`.
+ */
+export function useScrollProgress(ref: RefObject<HTMLElement | null>, frozen: boolean, mode: ProgressMode = 'pin') {
   useEffect(() => {
     const node = ref.current
     if (!node) return
 
     if (frozen) {
-      node.style.setProperty('--p', '1')
+      node.style.setProperty('--p', mode === 'pin' ? '1' : '0.5')
       return
     }
 
@@ -21,8 +33,13 @@ export function useScrollProgress(ref: RefObject<HTMLElement | null>, frozen: bo
     const update = () => {
       frame = 0
       const rect = node.getBoundingClientRect()
-      const distance = rect.height - window.innerHeight
-      const progress = distance > 0 ? Math.min(1, Math.max(0, -rect.top / distance)) : 0
+      let progress: number
+      if (mode === 'pin') {
+        const distance = rect.height - window.innerHeight
+        progress = distance > 0 ? clamp(-rect.top / distance) : 0
+      } else {
+        progress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height))
+      }
       node.style.setProperty('--p', progress.toFixed(4))
     }
     // Une seule mise à jour par image, quel que soit le nombre d'événements.
@@ -38,5 +55,5 @@ export function useScrollProgress(ref: RefObject<HTMLElement | null>, frozen: bo
       window.removeEventListener('resize', schedule)
       cancelAnimationFrame(frame)
     }
-  }, [ref, frozen])
+  }, [ref, frozen, mode])
 }

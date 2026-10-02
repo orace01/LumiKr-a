@@ -1,0 +1,191 @@
+/* --- La promesse, puis les trois étapes qui montent par-dessus ----------------
+   Le bloc titre est en `position: sticky` sous le header ; les cartes suivent
+   dans le flux et passent donc devant lui au défilement. `--p`
+   (useScrollProgress) ne sert qu'à décaler leurs vitesses. */
+
+.rise {
+  --p: 0;
+
+  position: relative;
+}
+
+/* Le bloc ne fait pas toute la hauteur de l'écran : les cartes, qui le suivent
+   dans le flux, pointent déjà en bas quand il s'épingle. */
+.rise__title {
+  position: sticky;
+  top: var(--header-height);
+  display: grid;
+  place-content: center;
+  min-height: 74vh;
+  min-height: 74svh;
+  padding: clamp(1.5rem, 3vw, 2.5rem) var(--gutter);
+  overflow: hidden;
+}
+
+.rise__copy {
+  position: relative;
+  display: grid;
+  gap: clamp(1rem, 2.2vw, 1.75rem);
+  justify-items: center;
+  text-align: center;
+}
+
+.rise__heading {
+  font-size: var(--step-4);
+  line-height: 1.02;
+  max-width: 14ch;
+}
+
+.rise__lede {
+  max-width: 40ch;
+}
+
+.rise__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.rise__doodle--squiggle {
+  --size: 5.5rem;
+
+  top: 14%;
+  right: 12%;
+  rotate: 8deg;
+}
+
+.rise__doodle--sparkle {
+  --size: 3rem;
+
+  bottom: 30%;
+  left: 16%;
+}
+
+.rise__doodle--loop {
+  --size: 5rem;
+
+  right: 16%;
+  bottom: 16%;
+  rotate: -6deg;
+}
+
+/* Sous 900 px les tracés gêneraient le texte. */
+@media (max-width: 900px) {
+  .rise__doodle {
+    display: none;
+  }
+}
+
+/* --- Les cartes -------------------------------------------------------------- */
+
+.rise__track {
+  position: relative;
+  z-index: 1;
+  /* Une fois les cartes passées, le titre et ses boutons réapparaissent. */
+  padding-bottom: 32vh;
+  padding-bottom: 32svh;
+}
+
+.rise__cards {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.rise__card {
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: 0 0.5rem 0 var(--ink);
+}
+
+.rise__card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-bottom: 2px solid var(--ink);
+  background: var(--night-soft);
+}
+
+.rise__body {
+  display: grid;
+  gap: 0.6rem;
+  padding: clamp(1.25rem, 2.2vw, 2rem);
+}
+
+.rise__number {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.4rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  rotate: -6deg;
+}
+
+.rise__body h3 {
+  font-size: var(--step-2);
+}
+
+.rise__body p {
+  color: var(--ink-soft);
+}
+
+/* Petite étiquette sur fond plein : elle passe elle aussi devant le titre. */
+.rise__credit {
+  display: inline-block;
+  margin-top: 1.25rem;
+  padding: 0.2rem 0.8rem;
+  border-radius: 999px;
+  background: var(--ivory-deep);
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+@media (min-width: 820px) {
+  .rise__cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+    align-items: start;
+  }
+
+  .rise__card img {
+    aspect-ratio: 1;
+  }
+
+  /* Hauteurs de départ décalées, comme des cartes lancées l'une après l'autre. */
+  .rise__card--1 {
+    margin-top: 3.5rem;
+  }
+
+  .rise__card--2 {
+    margin-top: 8rem;
+  }
+}
+
+/* Chaque carte dérive à sa propre vitesse pendant la traversée. */
+@media (min-width: 820px) and (prefers-reduced-motion: no-preference) {
+  .rise__card {
+    transform: translateY(calc((0.5 - var(--p)) * var(--drift, 0vh)));
+    will-change: transform;
+  }
+
+  .rise__card--1 {
+    --drift: 12vh;
+  }
+
+  .rise__card--2 {
+    --drift: 38vh;
+  }
+
+  .rise__card--3 {
+    --drift: -16vh;
+  }
+}

@@ -1,0 +1,52 @@
+/* Bande compacte entre deux sections. `--p` suit sa traversée de l'écran
+   (0 : elle entre par le bas, 1 : elle sort par le haut) et fait glisser la
+   ligne de mots de droite à gauche ; à mi-course, la ligne est centrée. */
+.giant {
+  --p: 0.5;
+
+  padding-block: clamp(1rem, 3vw, 2.5rem);
+  overflow: hidden;
+  /* Fond en dégradé : de la couleur de la section précédente à la suivante. */
+  background: linear-gradient(to bottom, var(--ivory), var(--violet-soft));
+}
+
+.giant__line {
+  display: flex;
+  align-items: center;
+  gap: 0.22em;
+  width: max-content;
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 15vw, 14rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  transform: translateX(calc(60vw - var(--p) * (100% + 20vw)));
+}
+
+.giant__spark {
+  flex: none;
+  width: 0.45em;
+  height: 0.45em;
+  fill: var(--glow);
+  rotate: calc(var(--p) * 360deg);
+}
+
+/* Animations réduites : les mots tiennent dans la largeur, sans mouvement. */
+@media (prefers-reduced-motion: reduce) {
+  .giant {
+    padding-inline: var(--gutter);
+  }
+
+  .giant__line {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+    font-size: clamp(2.5rem, 9vw, 7rem);
+    transform: none;
+  }
+
+  .giant__spark {
+    rotate: none;
+  }
+}

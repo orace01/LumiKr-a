@@ -1,86 +1,130 @@
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import ambiance from '../assets/media/ambiance.webp'
 import packshot from '../assets/media/packshot.webp'
 import stillNuit from '../assets/media/still-nuit.webp'
-import { Reveal } from './Reveal'
+import { useMediaQuery } from '../hooks/useMediaQuery'
+import { useScrollProgress } from '../hooks/useScrollProgress'
 import './Usages.css'
 
+const USAGES = [
+  {
+    id: 'creer',
+    tag: 'Créer',
+    tagClass: 'eyebrow',
+    title: 'Un dessin aujourd’hui, un autre demain.',
+    text: 'Sirène, fusée ou prénom en couleurs : la plaque se remplit, s’illumine, puis repart de zéro pour l’idée suivante.',
+    image: packshot,
+    width: 1000,
+    height: 1000,
+    alt: 'Le tableau carré sur sa base lumineuse, avec une sirène, des poissons et des algues dessinés aux feutres de couleur.',
+  },
+  {
+    id: 'decorer',
+    tag: 'Décorer',
+    tagClass: 'eyebrow eyebrow--orange',
+    title: 'Une déco qui change avec vos envies.',
+    text: 'Sur un bureau ou une étagère, le tableau affiche le motif du moment : une saison, une fête, une humeur.',
+    image: ambiance,
+    width: 680,
+    height: 620,
+    alt: 'Le tableau posé sur un meuble, incliné sur son support, avec un dessin de fête éclairé par la base.',
+  },
+  {
+    id: 'annoncer',
+    tag: 'Annoncer',
+    tagClass: 'eyebrow eyebrow--green',
+    title: 'Votre message, visible même dans le noir.',
+    text: 'Menu du jour, mot d’accueil, suggestion du soir : au comptoir d’un bar ou d’une boutique, le message s’éclaire et se réécrit quand vous voulez.',
+    image: stillNuit,
+    width: 1600,
+    height: 900,
+    alt: 'Le tableau éclairé dans le noir : lettres multicolores, sapins verts et bonhomme de neige ressortent nettement.',
+  },
+]
+
 export function Usages() {
+  const cardsRef = useRef<HTMLDivElement>(null)
+  const [active, setActive] = useState(0)
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+  useScrollProgress(cardsRef, reducedMotion)
+
+  // L'usage « actif » est la carte du dessus : comme les cartes empilées restent
+  // toutes à l'écran, c'est la dernière de celles qui croisent le milieu.
+  useEffect(() => {
+    const cards = cardsRef.current?.querySelectorAll('.stack__card')
+    if (!cards) return
+
+    const atCenter = new Set<number>()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const index = Number((entry.target as HTMLElement).dataset.index)
+          if (entry.isIntersecting) atCenter.add(index)
+          else atCenter.delete(index)
+        }
+        if (atCenter.size) setActive(Math.max(...atCenter))
+      },
+      { rootMargin: '-50% 0px -50% 0px' },
+    )
+    cards.forEach((card) => observer.observe(card))
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section id="usages" className="section usages" aria-labelledby="usages-title">
-      <div className="container">
-        <Reveal className="usages__heading">
-          <p className="eyebrow">Usages</p>
-          <h2 id="usages-title" className="section-title">
-            Un tableau, <span className="highlight highlight--pink">trois façons</span> de s’en servir.
-          </h2>
-        </Reveal>
+    <section id="usages" className="stack" aria-labelledby="usages-title">
+      <div className="container stack__layout">
+        {/* Colonne fixe : le titre et le sommaire restent en place pendant que
+            les cartes défilent et s'empilent à droite. */}
+        <div className="stack__aside">
+          <div className="stack__heading">
+            <p className="eyebrow">Usages</p>
+            <h2 id="usages-title" className="section-title">
+              Un tableau, <span className="highlight highlight--pink">trois façons</span> de s’en servir.
+            </h2>
+          </div>
+          <nav className="stack__nav" aria-label="Les trois usages">
+            <ol>
+              {USAGES.map((usage, index) => (
+                <li key={usage.id}>
+                  <a
+                    href={`#usage-${usage.id}`}
+                    className={index === active ? 'is-active' : undefined}
+                    aria-current={index === active ? 'true' : undefined}
+                  >
+                    {usage.tag}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </div>
 
-        <div className="usages__grid">
-          <Reveal className="usage usage--create">
-            <article>
-              <div className="usage__media usage__media--packshot">
+        <div ref={cardsRef} className="stack__cards" style={{ '--count': USAGES.length } as CSSProperties}>
+          {USAGES.map((usage, index) => (
+            <article
+              key={usage.id}
+              id={`usage-${usage.id}`}
+              className={`stack__card stack__card--${usage.id}`}
+              data-index={index}
+              style={{ '--i': index } as CSSProperties}
+            >
+              <div className="stack__media">
                 <img
-                  src={packshot}
-                  width={1000}
-                  height={1000}
+                  src={usage.image}
+                  width={usage.width}
+                  height={usage.height}
                   loading="lazy"
                   decoding="async"
-                  alt="Le tableau carré sur sa base lumineuse, avec une sirène, des poissons et des algues dessinés aux feutres de couleur."
+                  alt={usage.alt}
                 />
               </div>
-              <div className="usage__body">
-                <p className="eyebrow">Créer</p>
-                <h3>Un dessin aujourd’hui, un autre demain.</h3>
-                <p>
-                  Sirène, fusée ou prénom en couleurs : la plaque se remplit, s’illumine, puis repart de zéro pour
-                  l’idée suivante.
-                </p>
+              <div className="stack__body">
+                <p className={usage.tagClass}>{usage.tag}</p>
+                <h3>{usage.title}</h3>
+                <p>{usage.text}</p>
               </div>
             </article>
-          </Reveal>
-
-          <Reveal className="usage usage--decorate" delay={100}>
-            <article>
-              <div className="usage__media">
-                <img
-                  src={ambiance}
-                  width={680}
-                  height={620}
-                  loading="lazy"
-                  decoding="async"
-                  alt="Le tableau posé sur un meuble, incliné sur son support, avec un dessin de fête éclairé par la base."
-                />
-              </div>
-              <div className="usage__body">
-                <p className="eyebrow eyebrow--orange">Décorer</p>
-                <h3>Une déco qui change avec vos envies.</h3>
-                <p>Sur un bureau ou une étagère, le tableau affiche le motif du moment : une saison, une fête, une humeur.</p>
-              </div>
-            </article>
-          </Reveal>
-
-          <Reveal className="usage usage--announce" delay={200}>
-            <article>
-              <div className="usage__media">
-                <img
-                  src={stillNuit}
-                  width={1600}
-                  height={900}
-                  loading="lazy"
-                  decoding="async"
-                  alt="Le tableau éclairé dans le noir : lettres multicolores, sapins verts et bonhomme de neige ressortent nettement."
-                />
-              </div>
-              <div className="usage__body">
-                <p className="eyebrow eyebrow--green">Annoncer</p>
-                <h3>Votre message, visible même dans le noir.</h3>
-                <p>
-                  Menu du jour, mot d’accueil, suggestion du soir : au comptoir d’un bar ou d’une boutique, le message
-                  s’éclaire et se réécrit quand vous voulez.
-                </p>
-              </div>
-            </article>
-          </Reveal>
+          ))}
         </div>
       </div>
     </section>

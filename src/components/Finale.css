@@ -1,0 +1,80 @@
+/* `--p` suit la traversée de l'écran par la section (0 : elle entre par le bas,
+   0,5 : elle est à l'écran, 1 : elle est sortie par le haut). Le titre et le
+   produit n'ont fini leur course qu'une fois la section bien installée. */
+.finale {
+  --p: 0.5;
+  /* 0 → 1 pendant la première moitié de la traversée, puis reste à 1. */
+  --in: clamp(0, var(--p) * 2.2, 1);
+
+  position: relative;
+  padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) clamp(3rem, 2rem + 3vw, 5rem);
+  overflow: hidden;
+  isolation: isolate;
+  /* Halo de couleur qui monte du bas de l'écran et grandit avec `--in`. C'est
+     le fond de la section elle-même : le packshot (fond blanc, mode multiply)
+     se mélange ainsi directement avec lui. */
+  background: radial-gradient(
+    ellipse calc(45% + var(--in) * 30%) calc(40% + var(--in) * 30%) at 50% 104%,
+    var(--pink) 0,
+    var(--glow) 42%,
+    rgb(255 210 51 / 0) 100%
+  );
+}
+
+.finale__inner {
+  display: grid;
+  justify-items: center;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  text-align: center;
+}
+
+.finale__title {
+  font-size: clamp(3.4rem, 1rem + 14vw, 15rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  transform: translateY(calc((1 - var(--in)) * 45%));
+}
+
+.finale__product {
+  position: relative;
+  width: min(78vw, 26rem);
+  margin-top: calc(-1 * clamp(0.5rem, 3vw, 3rem));
+}
+
+/* Le mouvement est porté par l'image elle-même : un parent transformé
+   isolerait le mélange et ferait réapparaître le carré blanc du packshot. */
+.finale__product img {
+  width: 100%;
+  mix-blend-mode: multiply;
+  transform: translateY(calc((1 - var(--in)) * 30%)) rotate(calc(-10deg + var(--in) * 13deg));
+}
+
+.finale__doodle--star {
+  --size: 3.5rem;
+
+  top: 6%;
+  left: -8%;
+  rotate: -14deg;
+}
+
+.finale__doodle--sparkle {
+  --size: 2.75rem;
+
+  top: 22%;
+  right: -6%;
+}
+
+.finale__doodle--squiggle {
+  --size: 4.5rem;
+
+  bottom: 18%;
+  left: -14%;
+  rotate: 8deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .finale {
+    --in: 1;
+  }
+}

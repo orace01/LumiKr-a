@@ -57,11 +57,15 @@ ff -i "$PICS/1_de0dc9d0-bd2a-446e-9602-340f24e10b1f.jpg" -vf "crop=680:620:320:9
 # de banque d'images et les textes religieux restent hors cadre.
 crop() { ff -i "$PICS/$1" -vf "crop=$2" -c:v libwebp -quality 84 "$OUT/$3"; }
 
-# Mosaïque du hero, autour de la vidéo refermée.
-crop 4_31054048-83dc-4633-b512-ec8216b9e830.jpg 398:392:566:556 shot-fusee.webp
-crop 6_1969f35c-f10e-48d0-bdbf-399702326d93.jpg 372:372:80:572 shot-sirene.webp
-crop 7_b19ab781-bccb-4742-8ace-d18605f75713.jpg 540:372:78:574 shot-nouvel-an.webp
-crop 2_a9eab77a-9f15-48cf-9ac6-5fa87790a4e9.jpg 1000:430:0:568 shot-bonjour.webp
+# Mosaïque du hero, autour de la vidéo refermée : le produit entier, un visuel
+# par format. Le tableau n'occupe que 370 à 540 px dans les originaux ; comme
+# ces photos sont affichées en grand, on les agrandit ×2 (Lanczos + netteté)
+# plutôt que de laisser le navigateur les étirer.
+shot() { ff -i "$PICS/$1" -vf "crop=$2,scale=iw*2:ih*2:flags=lanczos,unsharp=5:5:0.7" -c:v libwebp -quality 82 "$OUT/$3"; }
+shot 4_31054048-83dc-4633-b512-ec8216b9e830.jpg 398:392:566:556 shot-fusee.webp
+shot 5_23dcdc1e-3ba1-40f5-9a39-a7ac8f8a7609.jpg 400:400:82:550 shot-noel.webp
+shot 6_1969f35c-f10e-48d0-bdbf-399702326d93.jpg 372:372:80:572 shot-sirene.webp
+shot 7_b19ab781-bccb-4742-8ace-d18605f75713.jpg 540:372:78:574 shot-nouvel-an.webp
 
 # Les feutres, pour la carte « Dans la boîte ».
 crop 1_de0dc9d0-bd2a-446e-9602-340f24e10b1f.jpg 262:212:700:776 feutres.webp

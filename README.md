@@ -56,12 +56,24 @@ Le script `scripts/build-media.sh` :
   par format, les feutres, le packshot et une scène d'ambiance. Les bandeaux et cotes en
   anglais, les personnes de banque d'images et les textes religieux restent hors cadre.
 
-### Hero au défilement
+### Animations au défilement
 
-La vidéo occupe tout l'écran, puis reste épinglée pendant qu'on défile : son cadre se resserre
-en pastille au centre et les photos produit surgissent autour. `useScrollProgress` écrit
-l'avancement dans la variable CSS `--p` ; toute la chorégraphie est dans `Hero.css`. Avec
-« animations réduites », l'état final est affiché directement, sans épinglage.
+Le rythme des sections reprend celui du site de référence numa.uprock.pro. Tout repose sur
+`position: sticky` et sur une variable CSS `--p` (avancement de 0 à 1) écrite par le hook
+`useScrollProgress` ; la chorégraphie elle-même est en CSS, dans le fichier de chaque composant.
+
+| Section | Effet | Fichiers |
+| --- | --- | --- |
+| Hero | La vidéo plein écran reste épinglée, se referme en pastille, puis les photos des quatre formats surgissent autour | `Hero.tsx`, `Hero.css` |
+| Titre et étapes | Le titre principal et ses boutons restent épinglés, les trois étapes montent par-dessus à des vitesses différentes | `Intro.tsx`, `Intro.css` |
+| Transition | Des mots géants traversent l'écran à l'horizontale pendant que le fond change de couleur | `GiantWords.tsx`, `GiantWords.css` |
+| Usages | Le titre et le sommaire restent fixes à gauche, les cartes s'empilent à droite | `Usages.tsx`, `Usages.css` |
+| Questions | Les questions sont des onglets ; la réponse s'écrit mot à mot en néon sur un tableau lumineux, dans la couleur de feutre de la question | `Faq.tsx`, `Faq.css` |
+| Final | Un titre géant monte, le produit flotte dessous sur un halo de couleur | `Finale.tsx`, `Finale.css` |
+
+Les autres blocs apparaissent en fondu avec un léger flou (`.reveal` dans `global.css`).
+Avec « animations réduites », rien n'est épinglé ni animé : chaque section s'affiche dans son
+état final, en mise en page ordinaire.
 
 ## Reste à faire avant mise en ligne
 

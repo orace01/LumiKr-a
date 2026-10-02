@@ -20,7 +20,7 @@
   display: grid;
   gap: 1.25rem;
   justify-items: start;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: clamp(1.75rem, 3.5vw, 2.75rem);
 }
 
 .details__columns {
