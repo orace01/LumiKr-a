@@ -1,0 +1,22 @@
+.doodle {
+  position: absolute;
+  width: var(--size, 3.5rem);
+  height: var(--size, 3.5rem);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.doodle path {
+  stroke: var(--doodle);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Sur petit écran les tracés rétrécissent pour ne jamais toucher le texte. */
+@media (max-width: 720px) {
+  .doodle {
+    width: calc(var(--size, 3.5rem) * 0.7);
+    height: calc(var(--size, 3.5rem) * 0.7);
+  }
+}

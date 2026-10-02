@@ -1,0 +1,209 @@
+/* --- Écran 1 : la vidéo seule, plein écran ----------------------------------- */
+
+.hero__stage {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 22rem;
+  background: var(--night);
+  color: var(--on-night);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.hero__media img,
+.hero__media video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Le tableau est légèrement à gauche du centre dans le plan large. */
+  object-position: 42% 50%;
+}
+
+@media (orientation: portrait) {
+  .hero__media img,
+  .hero__media video {
+    object-position: 50% 50%;
+  }
+}
+
+/* Seuls voiles sur l'image : un dégradé derrière le header et un autre, très
+   court, derrière les deux boutons du bas. */
+.hero__stage::before,
+.hero__stage::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.hero__stage::before {
+  top: 0;
+  height: 8rem;
+  background: linear-gradient(to bottom, rgb(22 15 58 / 0.75), rgb(22 15 58 / 0));
+}
+
+.hero__stage::after {
+  bottom: 0;
+  height: 7rem;
+  background: linear-gradient(to top, rgb(22 15 58 / 0.6), rgb(22 15 58 / 0));
+}
+
+.hero__scroll,
+.hero__toggle {
+  position: absolute;
+  bottom: clamp(1rem, 3vh, 2rem);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--on-night);
+  cursor: pointer;
+}
+
+.hero__scroll {
+  left: 50%;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-left: -1.75rem;
+  border: 2px solid var(--on-night);
+  background: rgb(22 15 58 / 0.45);
+  backdrop-filter: blur(8px);
+  animation: hero-nudge 2.4s var(--ease-out) infinite;
+}
+
+.hero__scroll:hover {
+  background: var(--primary);
+}
+
+.hero__toggle {
+  right: var(--gutter);
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.4);
+  background: rgb(22 15 58 / 0.6);
+  backdrop-filter: blur(8px);
+  transition: background-color 0.2s;
+}
+
+.hero__toggle:hover {
+  background: rgb(22 15 58 / 0.9);
+}
+
+@keyframes hero-nudge {
+  0%,
+  55%,
+  100% {
+    transform: translateY(0);
+  }
+
+  75% {
+    transform: translateY(0.5rem);
+  }
+}
+
+/* --- Écran 2 : la promesse, sur fond clair ----------------------------------- */
+
+.hero__intro {
+  padding-block: clamp(4rem, 2.5rem + 7vw, 8rem) clamp(2rem, 1rem + 4vw, 4rem);
+  overflow: hidden;
+}
+
+.hero__intro-inner {
+  position: relative;
+}
+
+.hero__copy {
+  position: relative;
+  display: grid;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  justify-items: center;
+  text-align: center;
+}
+
+.hero__title {
+  font-size: var(--step-4);
+  line-height: 1.02;
+  max-width: 14ch;
+}
+
+.hero__lede {
+  max-width: 40ch;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.hero__doodle--star {
+  --size: 4.5rem;
+
+  top: -1rem;
+  left: 6%;
+  transform: rotate(-12deg);
+}
+
+.hero__doodle--squiggle {
+  --size: 5.5rem;
+
+  top: 12%;
+  right: 5%;
+  transform: rotate(8deg);
+}
+
+.hero__doodle--sparkle {
+  --size: 3rem;
+
+  bottom: 20%;
+  left: 12%;
+}
+
+.hero__doodle--loop {
+  --size: 5rem;
+
+  right: 10%;
+  bottom: 4%;
+  transform: rotate(-6deg);
+}
+
+/* Sous 900 px les tracés du milieu gêneraient le texte : on ne garde que ceux
+   des coins hauts. */
+@media (max-width: 900px) {
+  .hero__doodle--sparkle,
+  .hero__doodle--loop {
+    display: none;
+  }
+
+  .hero__doodle--star {
+    top: -2.5rem;
+    left: 0.75rem;
+  }
+
+  .hero__doodle--squiggle {
+    top: -2.75rem;
+    right: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__scroll {
+    animation: none;
+  }
+
+  .hero__toggle {
+    transition: none;
+  }
+}

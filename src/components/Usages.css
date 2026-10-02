@@ -1,0 +1,126 @@
+.usages {
+  background: var(--violet-soft);
+}
+
+.usages__heading {
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.usages__grid {
+  display: grid;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.usage {
+  display: grid;
+}
+
+/* Chaque usage est une carte « autocollant » : bord sombre, ombre pleine. */
+.usage article {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: 0 0.5rem 0 var(--ink);
+  transition: transform 0.35s var(--ease-bounce);
+}
+
+.usage:hover article {
+  transform: translateY(-0.35rem) rotate(-0.6deg);
+}
+
+.usage__media {
+  overflow: hidden;
+  border-bottom: 2px solid var(--ink);
+}
+
+.usage__media img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+/* Le packshot a un fond blanc : le mode multiply le fond dans l'aplat jaune. */
+.usage--create article,
+.usage__media--packshot {
+  background: var(--glow-soft);
+}
+
+.usage__media--packshot {
+  border-bottom: 0;
+}
+
+.usage__media--packshot img {
+  aspect-ratio: 1;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.usage__body {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+  justify-items: start;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.usage h3 {
+  font-size: var(--step-2);
+  line-height: 1.1;
+  max-width: 18ch;
+}
+
+.usage__body p:last-child {
+  color: var(--ink-soft);
+  max-width: 44ch;
+}
+
+.usage--announce article {
+  background: var(--night);
+  color: var(--on-night);
+}
+
+.usage--announce .usage__body p:last-child {
+  color: var(--on-night-soft);
+}
+
+@media (min-width: 900px) {
+  .usages__grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-rows: auto auto;
+  }
+
+  .usage--create {
+    grid-row: 1 / 3;
+  }
+
+  .usage--create article {
+    grid-template-rows: 1fr auto;
+  }
+
+  .usage--create .usage__media--packshot img {
+    aspect-ratio: auto;
+    min-height: 26rem;
+  }
+
+  .usage--create h3 {
+    font-size: var(--step-3);
+    max-width: 14ch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .usage article {
+    transition: none;
+  }
+
+  .usage:hover article {
+    transform: none;
+  }
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#100e0b" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- %BRAND% et %DESCRIPTION% viennent de src/config (voir vite.config.ts). -->
+    <title>%BRAND% · Le tableau lumineux à dessiner</title>
+    <meta name="description" content="%DESCRIPTION%" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="%BRAND%" />
+    <meta property="og:title" content="%BRAND% · Le tableau lumineux à dessiner" />
+    <meta property="og:description" content="%DESCRIPTION%" />
+    <!-- À CONFIRMER : passer en URL absolue une fois le domaine connu. -->
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

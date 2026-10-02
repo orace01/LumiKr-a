@@ -1,0 +1,146 @@
+.demo {
+  padding-top: clamp(3rem, 2rem + 5vw, 6rem);
+}
+
+.demo__intro {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.demo__text {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+}
+
+/* Deux images posées comme des photos : bord blanc, légère rotation, la petite
+   chevauche le coin de la grande. */
+.demo__stills {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: end;
+}
+
+.demo__still img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 0.45rem solid var(--paper);
+  border-radius: var(--radius);
+  background: var(--night-soft);
+  box-shadow: 0 0.5rem 0 var(--ink);
+}
+
+.demo__still--large {
+  grid-column: 1 / 10;
+  grid-row: 1;
+}
+
+.demo__still--large img {
+  rotate: -2deg;
+}
+
+.demo__still--small {
+  grid-column: 8 / 13;
+  grid-row: 1;
+  margin-bottom: -10%;
+}
+
+.demo__still--small img {
+  rotate: 4deg;
+}
+
+.demo__doodle {
+  --size: 5rem;
+
+  top: -2.5rem;
+  right: 4%;
+  rotate: 10deg;
+}
+
+.demo__credit {
+  grid-column: 1 / 8;
+  margin-top: 1.5rem;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+@media (min-width: 900px) {
+  .demo__intro {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  }
+}
+
+/* --- Les trois étapes -------------------------------------------------------- */
+
+.demo__steps {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: clamp(4.5rem, 9vw, 7.5rem);
+}
+
+.demo__steps > li {
+  display: grid;
+}
+
+.demo__step {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--sticker);
+}
+
+.demo__number {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.5rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  rotate: -6deg;
+}
+
+.demo__step h3 {
+  font-size: var(--step-2);
+}
+
+.demo__step p {
+  color: var(--ink-soft);
+}
+
+@media (min-width: 760px) {
+  .demo__steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+}
+
+/* --- La zone d'essai --------------------------------------------------------- */
+
+.demo__try {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin-top: clamp(4.5rem, 9vw, 7.5rem);
+}
+
+.demo__try-heading {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+}
+
+.demo__try-title {
+  font-size: var(--step-3);
+  max-width: 16ch;
+}

@@ -1,0 +1,204 @@
+/* Mobile : titre, schéma, puis choix. Desktop : schéma à gauche sur deux rangs. */
+.formats__layout {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+  grid-template-areas:
+    'intro'
+    'figure'
+    'chooser';
+}
+
+.formats__intro {
+  grid-area: intro;
+}
+
+.formats__figure {
+  grid-area: figure;
+}
+
+.formats__chooser {
+  grid-area: chooser;
+}
+
+@media (min-width: 900px) {
+  .formats__layout {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    grid-template-areas:
+      'figure intro'
+      'figure chooser';
+    column-gap: clamp(2.5rem, 6vw, 5.5rem);
+  }
+
+  .formats__figure {
+    align-self: center;
+  }
+
+  .formats__intro {
+    align-self: end;
+  }
+
+  .formats__chooser {
+    align-self: start;
+  }
+}
+
+/* --- Schéma à l'échelle ------------------------------------------------------ */
+
+.formats__figure {
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--blue-soft);
+  box-shadow: 0 0.5rem 0 var(--ink);
+}
+
+.scale {
+  width: 100%;
+  height: auto;
+  max-height: 34rem;
+  margin-inline: auto;
+}
+
+.scale__sheet {
+  fill: var(--paper);
+  stroke: var(--ink-soft);
+  stroke-width: 0.12;
+  stroke-dasharray: 0.6 0.4;
+}
+
+.scale__sheet-label {
+  font-family: var(--font-body);
+  font-size: 1.15px;
+  font-weight: 500;
+  fill: var(--ink-soft);
+}
+
+.scale__board {
+  fill: rgb(31 22 80 / 0.03);
+  stroke: rgb(31 22 80 / 0.45);
+  stroke-width: 0.14;
+  transition:
+    fill 0.35s,
+    stroke 0.35s;
+}
+
+.scale__board--selected {
+  fill: rgb(255 210 51 / 0.75);
+  stroke: var(--ink);
+  stroke-width: 0.26;
+}
+
+.scale__label {
+  font-family: var(--font-display);
+  font-size: 1.45px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.formats__figure-note {
+  margin-top: 1rem;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+/* --- Titre et choix ---------------------------------------------------------- */
+
+.formats__intro,
+.formats__chooser {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+}
+
+.formats__options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.formats__options legend {
+  margin-bottom: 0.75rem;
+  padding: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.formats__option {
+  cursor: pointer;
+}
+
+.formats__option-card {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.9rem 1.1rem;
+  border: 2px solid var(--ink);
+  border-radius: 1.25rem;
+  background: var(--paper);
+  transition:
+    transform 0.25s var(--ease-bounce),
+    background-color 0.2s,
+    box-shadow 0.25s var(--ease-bounce);
+}
+
+.formats__option:hover .formats__option-card {
+  background: var(--glow-soft);
+}
+
+.formats__option input:checked + .formats__option-card {
+  background: var(--glow);
+  box-shadow: var(--sticker);
+  transform: translateY(-0.2rem);
+}
+
+.formats__option input:focus-visible + .formats__option-card {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.formats__option-label {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 600;
+}
+
+.formats__option-shape {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+.formats__buy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  width: 100%;
+  padding-top: 1.5rem;
+  border-top: 2px dashed var(--line);
+}
+
+.formats__price {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 600;
+}
+
+.formats__price-label {
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.formats__notice {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scale__board,
+  .formats__option-card {
+    transition: none;
+  }
+}

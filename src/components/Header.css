@@ -1,0 +1,109 @@
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  color: var(--on-night);
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    box-shadow 0.3s;
+}
+
+/* Une fois la vidéo dépassée, le header prend le fond clair du site. */
+.header--scrolled {
+  background: rgb(255 248 236 / 0.92);
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--ink);
+  backdrop-filter: blur(14px) saturate(1.4);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  height: var(--header-height);
+}
+
+.header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.header__mark {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: var(--glow);
+  transition: transform 0.5s var(--ease-bounce);
+}
+
+.header__brand:hover .header__mark {
+  transform: rotate(90deg) scale(1.15);
+}
+
+.header__nav {
+  display: none;
+}
+
+.header__nav ul {
+  display: flex;
+  gap: clamp(0.25rem, 1vw, 0.75rem);
+}
+
+.header__nav a {
+  display: block;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.header__nav a:hover {
+  background: var(--glow);
+  color: var(--ink);
+}
+
+/* Sur la vidéo, le bouton n'a pas de bord sombre à poser : bord et ombre clairs. */
+.header:not(.header--scrolled) .header__cta {
+  border-color: #fff;
+  box-shadow: none;
+}
+
+@media (min-width: 900px) {
+  .header__nav {
+    display: block;
+  }
+}
+
+@media (max-width: 380px) {
+  .header__brand {
+    font-size: 1.35rem;
+  }
+
+  .header__cta {
+    padding-inline: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .header__mark,
+  .header__nav a {
+    transition: none;
+  }
+
+  .header__brand:hover .header__mark {
+    transform: none;
+  }
+}

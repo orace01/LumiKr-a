@@ -1,0 +1,96 @@
+.faq__layout {
+  display: grid;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+
+@media (min-width: 900px) {
+  .faq__layout {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+  }
+
+  .faq__heading {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+    align-self: start;
+  }
+}
+
+.faq__heading {
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
+}
+
+.faq__list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+/* Chaque question est une carte ; ouverte, elle prend la couleur du feutre jaune. */
+.faq__item {
+  border: 2px solid var(--ink);
+  border-radius: 1.5rem;
+  background: var(--paper);
+  transition:
+    background-color 0.25s,
+    box-shadow 0.25s var(--ease-bounce);
+}
+
+.faq__item[open] {
+  background: var(--glow-soft);
+  box-shadow: var(--sticker);
+}
+
+.faq__item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.1rem 1.4rem;
+  border-radius: inherit;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__item summary svg {
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0.45rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--glow);
+  transition: transform 0.35s var(--ease-bounce);
+}
+
+.faq__item[open] summary svg {
+  background: var(--pink);
+  transform: rotate(45deg);
+}
+
+.faq__answer {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0 1.4rem 1.4rem;
+  color: var(--ink-soft);
+  max-width: 60ch;
+}
+
+.faq__pending {
+  font-size: var(--step--1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq__item,
+  .faq__item summary svg {
+    transition: none;
+  }
+}
