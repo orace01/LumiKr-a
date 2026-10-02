@@ -80,6 +80,17 @@
 
 /* --- Les cartes -------------------------------------------------------------- */
 
+/* Titre des étapes : lu par les lecteurs d'écran partout, affiché en étiquette
+   sur téléphone seulement (ailleurs le titre épinglé en tient lieu). */
+.rise__steps-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .rise__track {
   position: relative;
   z-index: 1;
@@ -187,5 +198,59 @@
 
   .rise__card--3 {
     --drift: -16vh;
+  }
+}
+
+/* --- Téléphone : le premier écran du site ------------------------------------
+   Pas de vidéo au-dessus (voir Hero.tsx). Le bloc titre n'est plus épinglé : il
+   passe sous le header fixe, accueille les photos à faire défiler, et les
+   étapes le suivent normalement. Seuil partagé avec useIsMobile. */
+@media (max-width: 720px) {
+  .rise__title {
+    position: static;
+    display: block;
+    min-height: 0;
+    padding: calc(var(--header-height) + 1.25rem) var(--gutter) 1.75rem;
+  }
+
+  .rise__copy {
+    gap: 0.9rem;
+  }
+
+  /* Les deux boutons tiennent sur une ligne, sous les photos. */
+  .rise__actions {
+    flex-wrap: nowrap;
+    gap: 0.6rem;
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .rise__actions .btn {
+    flex: 1 1 auto;
+    padding-inline: 0.75rem;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .rise__track {
+    padding-bottom: var(--section);
+  }
+
+  .rise__steps-title {
+    position: static;
+    display: inline-block;
+    width: auto;
+    height: auto;
+    margin-bottom: 1rem;
+    padding: 0.3rem 0.9rem;
+    overflow: visible;
+    clip-path: none;
+    border-radius: 999px;
+    background: var(--pink);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transform: rotate(-2deg);
   }
 }

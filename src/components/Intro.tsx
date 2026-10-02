@@ -4,9 +4,11 @@ import stillFeutres from '../assets/media/still-feutres.webp'
 import stillGeste from '../assets/media/still-geste.webp'
 import { product } from '../config/product'
 import { site } from '../config/site'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 import { Doodle } from './Doodle'
+import { FormatCarousel } from './FormatCarousel'
 import { Reveal } from './Reveal'
 import './Intro.css'
 
@@ -44,9 +46,14 @@ const STEPS = [
  * La promesse et le principe en un seul mouvement : le titre principal et ses
  * boutons restent épinglés pendant que les trois étapes montent par-dessus,
  * chacune à sa vitesse, puis les laissent réapparaître.
+ *
+ * Sur téléphone, c'est le premier écran du site (pas de vidéo au-dessus) : les
+ * photos des quatre formats défilent du doigt entre le titre et les boutons,
+ * rien n'est épinglé et les étapes suivent simplement.
  */
 export function Intro() {
   const riseRef = useRef<HTMLElement>(null)
+  const mobile = useIsMobile()
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   useScrollProgress(riseRef, reducedMotion)
 
@@ -66,6 +73,7 @@ export function Intro() {
             Une plaque d’acrylique, des feutres et une base LED : ils dessinent, la lumière révèle, on efface et on
             recommence.
           </p>
+          {mobile && <FormatCarousel />}
           <div className="rise__actions">
             <a className="btn btn--primary" href={site.primaryCta.href}>
               {site.primaryCta.label}
@@ -78,7 +86,7 @@ export function Intro() {
       </div>
 
       <div className="container rise__track">
-        <h2 className="visually-hidden">Le principe en trois étapes</h2>
+        <h2 className="rise__steps-title">Le principe en trois étapes</h2>
         <ol className="rise__cards">
           {STEPS.map((step, index) => (
             <li key={step.title} className={`rise__card rise__card--${index + 1}`}>

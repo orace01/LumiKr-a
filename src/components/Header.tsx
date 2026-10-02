@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 import { site } from '../config/site'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import './Header.css'
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
-  // Avec les animations réduites, le hero s'affiche déjà refermé sur fond clair :
-  // le header ne survole jamais la vidéo plein écran.
+  // Le header n'est transparent que lorsqu'il survole la vidéo plein écran. Il
+  // n'y en a pas sur téléphone, et avec les animations réduites elle s'affiche
+  // déjà refermée sur fond clair.
+  const mobile = useIsMobile()
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
-  const solid = scrolled || reducedMotion
+  const solid = scrolled || reducedMotion || mobile
 
   useEffect(() => {
     // Transparent sur la vidéo plein écran ; dès qu'elle commence à se refermer,
@@ -22,7 +25,7 @@ export function Header() {
   return (
     <header className={`header${solid ? ' header--scrolled' : ' on-night'}`}>
       <div className="container header__inner">
-        <a className="header__brand" href="#accueil" aria-label={`${site.brand}, retour en haut de page`}>
+        <a className="header__brand" href="#contenu" aria-label={`${site.brand}, retour en haut de page`}>
           <svg className="header__mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
             <path d="M32 4c1.9 16.5 7.6 22.2 24 24-16.4 1.8-22.1 7.5-24 24-1.9-16.5-7.6-22.2-24-24 16.4-1.8 22.1-7.5 24-24z" />
           </svg>

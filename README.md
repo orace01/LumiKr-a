@@ -65,6 +65,7 @@ Le rythme des sections reprend celui du site de référence numa.uprock.pro. Tou
 | Section | Effet | Fichiers |
 | --- | --- | --- |
 | Hero | La vidéo plein écran reste épinglée, se referme en pastille, puis les photos des quatre formats surgissent autour | `Hero.tsx`, `Hero.css` |
+| Début de page sur téléphone | Pas de vidéo (elle n'est pas téléchargée) : sous le titre, les photos des quatre formats défilent du doigt, puis les boutons | `FormatCarousel.tsx`, `Intro.css`, `useIsMobile.ts` |
 | Titre et étapes | Le titre principal et ses boutons restent épinglés, les trois étapes montent par-dessus à des vitesses différentes | `Intro.tsx`, `Intro.css` |
 | Transition | Des mots géants traversent l'écran à l'horizontale pendant que le fond change de couleur | `GiantWords.tsx`, `GiantWords.css` |
 | Usages | Le titre et le sommaire restent fixes à gauche, les cartes s'empilent à droite | `Usages.tsx`, `Usages.css` |
