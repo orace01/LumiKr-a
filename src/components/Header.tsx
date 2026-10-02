@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react'
 import { site } from '../config/site'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import './Header.css'
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
+  // Avec les animations réduites, le hero s'affiche déjà refermé sur fond clair :
+  // le header ne survole jamais la vidéo plein écran.
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+  const solid = scrolled || reducedMotion
 
   useEffect(() => {
-    // Le header reste transparent tant qu'il survole la vidéo plein écran.
-    const onScroll = () => setScrolled(window.scrollY > window.innerHeight - 80)
+    // Transparent sur la vidéo plein écran ; dès qu'elle commence à se refermer,
+    // le fond clair apparaît autour et le header prend ses couleurs normales.
+    const onScroll = () => setScrolled(window.scrollY > 24)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-    }
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
-    <header className={`header${scrolled ? ' header--scrolled' : ' on-night'}`}>
+    <header className={`header${solid ? ' header--scrolled' : ' on-night'}`}>
       <div className="container header__inner">
         <a className="header__brand" href="#accueil" aria-label={`${site.brand}, retour en haut de page`}>
           <svg className="header__mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">

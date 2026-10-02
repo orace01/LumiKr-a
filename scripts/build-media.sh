@@ -31,18 +31,13 @@ loop_filter() { # $1 = recadrage et mise à l'échelle
 }
 X264=(-c:v libx264 -preset slow -profile:v high -pix_fmt yuv420p -an -movflags +faststart)
 
-# Écrans en paysage : toute la largeur, à la définition d'origine.
+# Un seul encodage pour tous les écrans, à la définition d'origine : c'est le
+# cadre CSS (object-fit: cover) qui choisit la partie visible.
 ff -i "$VIDEO" -filter_complex "$(loop_filter 'crop=1920:864:0:0')" \
-  -map "[o]" "${X264[@]}" -crf 27 "$OUT/hero-wide.mp4"
+  -map "[o]" "${X264[@]}" -crf 27 "$OUT/hero.mp4"
 
-# Écrans en portrait : tranche 3:4 centrée sur le lettrage et le bonhomme de
-# neige ; en plein écran, le plan large n'y montrerait qu'une bande mal centrée.
-ff -i "$VIDEO" -filter_complex "$(loop_filter 'crop=648:864:656:0,scale=720:960')" \
-  -map "[o]" "${X264[@]}" -crf 27 "$OUT/hero-portrait.mp4"
-
-# Posters : première image de chaque encodage.
-ff -i "$OUT/hero-wide.mp4" -frames:v 1 -c:v libwebp -quality 80 "$OUT/hero-poster-wide.webp"
-ff -i "$OUT/hero-portrait.mp4" -frames:v 1 -c:v libwebp -quality 80 "$OUT/hero-poster-portrait.webp"
+# Poster : première image de la vidéo.
+ff -i "$OUT/hero.mp4" -frames:v 1 -c:v libwebp -quality 80 "$OUT/hero-poster.webp"
 
 # --- Images extraites de la vidéo (au-dessus de la bande de sous-titres) -----
 ff -ss 0.5 -i "$VIDEO" -frames:v 1 -vf "crop=864:864:400:0" -c:v libwebp -quality 80 "$OUT/still-feutres.webp"
@@ -56,5 +51,27 @@ ff -ss 12.2 -i "$VIDEO" -frames:v 1 -vf "scale=1200:675,crop=1200:630" -q:v 4 "$
 ff -i "$PICS/8_5ab55467-06de-4d79-9119-f8ebc66883be.jpg" -c:v libwebp -quality 82 "$OUT/packshot.webp"
 # Scène d'ambiance : recadrage hors bandeaux et vignettes en anglais.
 ff -i "$PICS/1_de0dc9d0-bd2a-446e-9602-340f24e10b1f.jpg" -vf "crop=680:620:320:95" -c:v libwebp -quality 84 "$OUT/ambiance.webp"
+
+# --- Photos produit recadrées -------------------------------------------------
+# On ne garde que le tableau : les bandeaux et cotes en anglais, les personnes
+# de banque d'images et les textes religieux restent hors cadre.
+crop() { ff -i "$PICS/$1" -vf "crop=$2" -c:v libwebp -quality 84 "$OUT/$3"; }
+
+# Mosaïque du hero, autour de la vidéo refermée.
+crop 4_31054048-83dc-4633-b512-ec8216b9e830.jpg 398:392:566:556 shot-fusee.webp
+crop 6_1969f35c-f10e-48d0-bdbf-399702326d93.jpg 372:372:80:572 shot-sirene.webp
+crop 7_b19ab781-bccb-4742-8ace-d18605f75713.jpg 540:372:78:574 shot-nouvel-an.webp
+crop 2_a9eab77a-9f15-48cf-9ac6-5fa87790a4e9.jpg 1000:430:0:568 shot-bonjour.webp
+
+# Les feutres, pour la carte « Dans la boîte ».
+crop 1_de0dc9d0-bd2a-446e-9602-340f24e10b1f.jpg 262:212:700:776 feutres.webp
+
+# Une vignette 4:3 par format. Trois viennent de la planche des quatre tailles ;
+# celle du 20 × 20 y porte un texte religieux, on prend donc l'autre visuel.
+FORMATS="9_8d6c0245-b99f-4f8c-86be-f25f69710f08.jpg"
+crop "$FORMATS" 300:225:590:668 format-12x12.webp
+crop "$FORMATS" 380:285:20:628 format-15x15.webp
+crop 6_1969f35c-f10e-48d0-bdbf-399702326d93.jpg 496:372:72:570 format-20x20.webp
+crop "$FORMATS" 420:315:30:122 format-30x20.webp
 
 ls -lh "$OUT" "$PUBLIC/og-image.jpg"

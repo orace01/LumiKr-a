@@ -1,3 +1,4 @@
+import feutres from '../assets/media/feutres.webp'
 import { product, type Fact } from '../config/product'
 import { Reveal } from './Reveal'
 import { ToConfirm } from './ToConfirm'
@@ -34,6 +35,15 @@ export function Details() {
         <div className="details__columns">
           <Reveal className="details__card">
             <h3 className="details__subtitle">Dans la boîte</h3>
+            <img
+              className="details__photo"
+              src={feutres}
+              width={262}
+              height={212}
+              loading="lazy"
+              decoding="async"
+              alt="Sept feutres alignés : blanc, violet, vert, bleu, orange, rose et jaune."
+            />
             <FactList facts={product.inTheBox} />
           </Reveal>
           <Reveal className="details__card" delay={120}>

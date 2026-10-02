@@ -1,10 +1,22 @@
 import { useState } from 'react'
+import photo12 from '../assets/media/format-12x12.webp'
+import photo15 from '../assets/media/format-15x15.webp'
+import photo20 from '../assets/media/format-20x20.webp'
+import photo30 from '../assets/media/format-30x20.webp'
 import { formatPrice, product } from '../config/product'
 import { site } from '../config/site'
 import { Reveal } from './Reveal'
 import { ScaleDiagram } from './ScaleDiagram'
 import { ToConfirm } from './ToConfirm'
 import './Formats.css'
+
+// Photo fournisseur de chaque format, par identifiant de variante.
+const PHOTOS: Record<string, string | undefined> = {
+  '12x12': photo12,
+  '15x15': photo15,
+  '20x20': photo20,
+  '30x20': photo30,
+}
 
 export function Formats() {
   const [selectedId, setSelectedId] = useState(product.defaultVariantId)
@@ -45,8 +57,21 @@ export function Formats() {
                   onChange={() => setSelectedId(variant.id)}
                 />
                 <span className="formats__option-card">
-                  <span className="formats__option-label">{variant.label}</span>
-                  <span className="formats__option-shape">{variant.shape}</span>
+                  {PHOTOS[variant.id] && (
+                    <img
+                      className="formats__option-photo"
+                      src={PHOTOS[variant.id]}
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
+                      alt=""
+                    />
+                  )}
+                  <span className="formats__option-text">
+                    <span className="formats__option-label">{variant.label}</span>
+                    <span className="formats__option-shape">{variant.shape}</span>
+                  </span>
                 </span>
               </label>
             ))}

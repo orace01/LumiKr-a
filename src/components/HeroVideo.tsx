@@ -1,13 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import videoPortrait from '../assets/media/hero-portrait.mp4'
-import posterPortrait from '../assets/media/hero-poster-portrait.webp'
-import posterWide from '../assets/media/hero-poster-wide.webp'
-import videoWide from '../assets/media/hero-wide.mp4'
+import poster from '../assets/media/hero-poster.webp'
+import video from '../assets/media/hero.mp4'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 
-// Un cadrage dédié aux écrans en portrait : en plein écran, le plan large n'y
-// montrerait qu'une bande étroite et mal centrée du tableau.
-const PORTRAIT_QUERY = '(orientation: portrait)'
 const DESCRIPTION =
   'Un dessin de Noël tracé aux feutres de couleur s’illumine sur le tableau en acrylique, dans une pièce sombre.'
 
@@ -16,56 +11,54 @@ function prefersReducedData(): boolean {
   return connection?.saveData === true
 }
 
-/** Fond vidéo plein écran du hero : poster, vidéo et bouton lecture/pause. */
+/**
+ * Vidéo du hero : poster, vidéo et bouton lecture/pause. Un seul fichier pour
+ * tous les écrans : c'est le cadre (Hero.css) qui choisit ce qu'on en voit.
+ */
 export function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const pausedByUser = useRef(false)
   const [playing, setPlaying] = useState(false)
-  const portrait = useMediaQuery(PORTRAIT_QUERY)
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
-  const src = portrait ? videoPortrait : videoWide
 
   // Lecture automatique seulement quand la vidéo est à l'écran, et jamais si
   // l'utilisateur a demandé moins d'animations ou d'économiser ses données :
   // le fichier n'est alors téléchargé qu'au clic sur « Lire ».
   useEffect(() => {
-    const video = videoRef.current
-    if (!video || reducedMotion || prefersReducedData()) return
+    const node = videoRef.current
+    if (!node || reducedMotion || prefersReducedData()) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) video.pause()
+        if (!entry.isIntersecting) node.pause()
         // Si le navigateur bloque la lecture, le poster et le bouton restent.
-        else if (!pausedByUser.current) video.play().catch(() => {})
+        else if (!pausedByUser.current) node.play().catch(() => {})
       },
       { threshold: 0.2 },
     )
-    observer.observe(video)
+    observer.observe(node)
     return () => observer.disconnect()
-  }, [src, reducedMotion])
+  }, [reducedMotion])
 
   const toggle = () => {
-    const video = videoRef.current
-    if (!video) return
-    if (video.paused) {
+    const node = videoRef.current
+    if (!node) return
+    if (node.paused) {
       pausedByUser.current = false
-      video.play().catch(() => {})
+      node.play().catch(() => {})
     } else {
       pausedByUser.current = true
-      video.pause()
+      node.pause()
     }
   }
 
   return (
     <>
       <div className="hero__media">
-        <picture>
-          <source media={PORTRAIT_QUERY} srcSet={posterPortrait} width={720} height={960} />
-          <img src={posterWide} width={1920} height={864} alt={DESCRIPTION} fetchPriority="high" decoding="async" />
-        </picture>
+        <img src={poster} width={1920} height={864} alt={DESCRIPTION} fetchPriority="high" decoding="async" />
         <video
           ref={videoRef}
-          src={src}
+          src={video}
           muted
           loop
           playsInline

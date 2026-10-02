@@ -50,9 +50,18 @@ Le script `scripts/build-media.sh` :
 
 - recadre la vidéo au-dessus de la bande de sous-titres anglais incrustés, supprime l'audio,
   écarte le gros plan flou des feutres et fond la fin sur le début pour une boucle sans saut ;
-- produit le fond vidéo plein écran du hero en deux cadrages, paysage (1920 × 864) et portrait
-  (720 × 960), plus leurs posters ;
-- extrait trois images fixes de la vidéo et recadre deux photos fournisseur hors bandeaux.
+- produit la vidéo du hero (1920 × 864, un seul fichier pour tous les écrans) et son poster ;
+- extrait trois images fixes de la vidéo ;
+- recadre les photos fournisseur sur le tableau seul : quatre photos pour le hero, une vignette
+  par format, les feutres, le packshot et une scène d'ambiance. Les bandeaux et cotes en
+  anglais, les personnes de banque d'images et les textes religieux restent hors cadre.
+
+### Hero au défilement
+
+La vidéo occupe tout l'écran, puis reste épinglée pendant qu'on défile : son cadre se resserre
+en pastille au centre et les photos produit surgissent autour. `useScrollProgress` écrit
+l'avancement dans la variable CSS `--p` ; toute la chorégraphie est dans `Hero.css`. Avec
+« animations réduites », l'état final est affiché directement, sans épinglage.
 
 ## Reste à faire avant mise en ligne
 

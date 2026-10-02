@@ -1,20 +1,41 @@
-/* --- Écran 1 : la vidéo seule, plein écran ----------------------------------- */
+/* --- Écran 1 : la vidéo plein écran, qui se referme au défilement ------------
+   `.hero__pin` est plus haut que la fenêtre ; `.hero__stage` y reste collé
+   pendant qu'on le traverse. `--p` (0 → 1, posé par useScrollProgress) pilote
+   tout : la vidéo rétrécit en pastille, puis les photos surgissent autour. */
+
+.hero__pin {
+  --p: 0;
+  /* La vidéo se referme sur les 60 premiers % du trajet. */
+  --shrink: clamp(0, var(--p) / 0.6, 1);
+
+  /* Taille de la vidéo une fois refermée : une pastille 2:1, assez large pour
+     que le cadrage `cover` montre le tableau en entier. */
+  --end-w: min(46vw, 92vh);
+  --end-h: calc(var(--end-w) / 2);
+
+  height: 240vh;
+  height: 240svh;
+}
 
 .hero__stage {
-  position: relative;
+  position: sticky;
+  top: 0;
   height: 100vh;
   height: 100svh;
   min-height: 22rem;
-  background: var(--night);
-  color: var(--on-night);
+  background: var(--ivory);
   isolation: isolate;
   overflow: hidden;
 }
 
+/* Le cadre passe du plein écran à la pastille centrée ; la vidéo, en `cover`,
+   dézoome d'elle-même à mesure que le cadre change de proportions. */
 .hero__media {
   position: absolute;
-  inset: 0;
-  z-index: -2;
+  inset: calc(var(--shrink) * (100% - var(--end-h)) / 2) calc(var(--shrink) * (100% - var(--end-w)) / 2);
+  overflow: hidden;
+  border-radius: calc(var(--shrink) * var(--end-h) / 2);
+  background: var(--night);
 }
 
 .hero__media img,
@@ -24,39 +45,133 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Le tableau est légèrement à gauche du centre dans le plan large. */
-  object-position: 42% 50%;
-}
-
-@media (orientation: portrait) {
-  .hero__media img,
-  .hero__media video {
-    object-position: 50% 50%;
-  }
+  /* Le tableau est légèrement à gauche du centre du plan. */
+  object-position: 44% 50%;
 }
 
 /* Seuls voiles sur l'image : un dégradé derrière le header et un autre, très
-   court, derrière les deux boutons du bas. */
-.hero__stage::before,
-.hero__stage::after {
+   court, derrière les boutons du bas. Ils s'effacent quand la vidéo se referme. */
+.hero__media::before,
+.hero__media::after {
   content: '';
   position: absolute;
   inset-inline: 0;
-  z-index: -1;
+  z-index: 1;
+  opacity: calc(1 - var(--shrink));
   pointer-events: none;
 }
 
-.hero__stage::before {
+.hero__media::before {
   top: 0;
   height: 8rem;
   background: linear-gradient(to bottom, rgb(22 15 58 / 0.75), rgb(22 15 58 / 0));
 }
 
-.hero__stage::after {
+.hero__media::after {
   bottom: 0;
   height: 7rem;
   background: linear-gradient(to top, rgb(22 15 58 / 0.6), rgb(22 15 58 / 0));
 }
+
+/* --- Les photos autour de la vidéo refermée ---------------------------------- */
+
+.hero__collage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero__shot,
+.hero__pop {
+  /* Chaque élément surgit à son tour : `--at` est son point de départ sur `--p`. */
+  --q: clamp(0, (var(--p) - var(--at, 0.5)) / 0.22, 1);
+
+  position: absolute;
+  opacity: var(--q);
+  transform: translateY(calc((1 - var(--q)) * 3rem)) scale(calc(0.6 + 0.4 * var(--q))) rotate(var(--tilt, 0deg));
+}
+
+.hero__shot {
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: clamp(1.25rem, 2.5vw, 2.25rem);
+  background: var(--paper);
+  box-shadow: 0 0.4rem 0 var(--ink);
+}
+
+.hero__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__shot--fusee {
+  --at: 0.5;
+  --tilt: -7deg;
+
+  top: max(16%, 5.75rem);
+  left: 9%;
+  width: min(15vw, 26vh);
+  aspect-ratio: 1;
+}
+
+.hero__shot--nouvel-an {
+  --at: 0.56;
+  --tilt: 5deg;
+
+  top: max(14%, 5.75rem);
+  right: 5%;
+  width: min(20vw, 34vh);
+  aspect-ratio: 3 / 2;
+}
+
+.hero__shot--bonjour {
+  --at: 0.62;
+  --tilt: 4deg;
+
+  bottom: 13%;
+  left: 4%;
+  width: min(23vw, 40vh);
+  aspect-ratio: 2 / 1;
+}
+
+.hero__shot--sirene {
+  --at: 0.68;
+  --tilt: -5deg;
+
+  right: 10%;
+  bottom: 12%;
+  width: min(15vw, 26vh);
+  aspect-ratio: 1;
+}
+
+.hero__pop--star {
+  --at: 0.6;
+  --tilt: -14deg;
+  --size: 3.5rem;
+
+  top: 47%;
+  left: 23%;
+}
+
+.hero__pop--sparkle {
+  --at: 0.66;
+  --size: 2.75rem;
+
+  top: 46%;
+  right: 22%;
+}
+
+.hero__pop--squiggle {
+  --at: 0.72;
+  --tilt: 8deg;
+  --size: 4.5rem;
+
+  top: 7.5rem;
+  left: 36%;
+}
+
+/* --- Boutons posés sur la scène ---------------------------------------------- */
 
 .hero__scroll,
 .hero__toggle {
@@ -67,6 +182,8 @@
   border-radius: 50%;
   color: var(--on-night);
   cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background-color 0.2s;
 }
 
 .hero__scroll {
@@ -75,8 +192,7 @@
   height: 3.5rem;
   margin-left: -1.75rem;
   border: 2px solid var(--on-night);
-  background: rgb(22 15 58 / 0.45);
-  backdrop-filter: blur(8px);
+  background: rgb(31 22 80 / 0.9);
   animation: hero-nudge 2.4s var(--ease-out) infinite;
 }
 
@@ -90,13 +206,17 @@
   height: 2.75rem;
   padding: 0;
   border: 1px solid rgb(255 255 255 / 0.4);
-  background: rgb(22 15 58 / 0.6);
-  backdrop-filter: blur(8px);
-  transition: background-color 0.2s;
+  background: rgb(31 22 80 / 0.9);
 }
 
 .hero__toggle:hover {
-  background: rgb(22 15 58 / 0.9);
+  background: var(--primary);
+}
+
+.hero__scroll:focus-visible,
+.hero__toggle:focus-visible {
+  outline-color: var(--glow);
+  box-shadow: 0 0 0 6px var(--ink);
 }
 
 @keyframes hero-nudge {
@@ -111,10 +231,59 @@
   }
 }
 
+/* --- Écrans en portrait : pastille presque pleine largeur, deux photos
+   au-dessus, deux en dessous. ------------------------------------------------- */
+
+@media (orientation: portrait) {
+  .hero__pin {
+    --end-w: 88vw;
+    --end-h: calc(var(--end-w) * 0.56);
+
+    height: 220vh;
+    height: 220svh;
+  }
+
+  /* En plein écran, on cadre le lettrage et le bonhomme de neige ; le point de
+     visée revient vers le centre du tableau à mesure que le cadre s'élargit. */
+  .hero__media img,
+  .hero__media video {
+    object-position: calc(52% - var(--shrink) * 8%) 50%;
+  }
+
+  .hero__shot--fusee {
+    top: 6rem;
+    left: 6%;
+    width: min(32vw, 17vh);
+  }
+
+  .hero__shot--nouvel-an {
+    top: 6.75rem;
+    right: 5%;
+    width: min(44vw, 23vh);
+  }
+
+  .hero__shot--bonjour {
+    bottom: 7rem;
+    left: 5%;
+    width: min(50vw, 26vh);
+  }
+
+  .hero__shot--sirene {
+    right: 6%;
+    bottom: 6.5rem;
+    width: min(31vw, 17vh);
+  }
+
+  /* Pas de place pour les tracés entre les photos sur un écran étroit. */
+  .hero__pop {
+    display: none;
+  }
+}
+
 /* --- Écran 2 : la promesse, sur fond clair ----------------------------------- */
 
 .hero__intro {
-  padding-block: clamp(4rem, 2.5rem + 7vw, 8rem) clamp(2rem, 1rem + 4vw, 4rem);
+  padding-block: clamp(3rem, 2rem + 5vw, 6rem) clamp(2rem, 1rem + 4vw, 4rem);
   overflow: hidden;
 }
 
@@ -148,14 +317,6 @@
   margin-top: 0.25rem;
 }
 
-.hero__doodle--star {
-  --size: 4.5rem;
-
-  top: -1rem;
-  left: 6%;
-  transform: rotate(-12deg);
-}
-
 .hero__doodle--squiggle {
   --size: 5.5rem;
 
@@ -179,30 +340,31 @@
   transform: rotate(-6deg);
 }
 
-/* Sous 900 px les tracés du milieu gêneraient le texte : on ne garde que ceux
-   des coins hauts. */
+/* Sous 900 px les tracés gêneraient le texte. */
 @media (max-width: 900px) {
-  .hero__doodle--sparkle,
-  .hero__doodle--loop {
+  .hero__doodle {
     display: none;
-  }
-
-  .hero__doodle--star {
-    top: -2.5rem;
-    left: 0.75rem;
-  }
-
-  .hero__doodle--squiggle {
-    top: -2.75rem;
-    right: 0.75rem;
   }
 }
 
+/* Animations réduites : pas d'épinglage ni de mouvement. L'état final (vidéo en
+   pastille, photos autour) est affiché tel quel ; `--p` est figé à 1 par le hook. */
 @media (prefers-reduced-motion: reduce) {
+  .hero__pin {
+    --p: 1;
+
+    height: auto;
+  }
+
+  .hero__stage {
+    position: relative;
+  }
+
   .hero__scroll {
     animation: none;
   }
 
+  .hero__scroll,
   .hero__toggle {
     transition: none;
   }
