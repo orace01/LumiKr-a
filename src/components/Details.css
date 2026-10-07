@@ -69,3 +69,38 @@
   font-size: var(--step--1);
   color: var(--ink-soft);
 }
+
+/* Les trois vues du support, sous la liste du contenu de la boîte. */
+.details__support {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1.25rem 0 0;
+}
+
+.details__support-views {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.details__support-views li {
+  display: grid;
+  gap: 0.3rem;
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-align: center;
+}
+
+.details__support-views img {
+  width: 100%;
+  aspect-ratio: 274 / 150;
+  object-fit: contain;
+  border: 2px solid var(--ink);
+  border-radius: 0.9rem;
+  background: #fff;
+}
+
+.details__support figcaption {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}

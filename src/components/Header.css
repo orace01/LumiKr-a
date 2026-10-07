@@ -2,19 +2,20 @@
   position: fixed;
   inset: 0 0 auto;
   z-index: 50;
-  color: var(--on-night);
-  transition:
-    background-color 0.3s,
-    color 0.3s,
-    box-shadow 0.3s;
-}
-
-/* Une fois la vidéo dépassée, le header prend le fond clair du site. */
-.header--scrolled {
   background: rgb(255 248 236 / 0.92);
   color: var(--ink);
   box-shadow: 0 2px 0 var(--ink);
   backdrop-filter: blur(14px) saturate(1.4);
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
+}
+
+/* Posé sur la photo plein écran de l'accueil : sans fond ni filet. */
+.header--over {
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .header__inner {
@@ -74,10 +75,54 @@
   color: var(--ink);
 }
 
-/* Sur la vidéo, le bouton n'a pas de bord sombre à poser : bord et ombre clairs. */
-.header:not(.header--scrolled) .header__cta {
-  border-color: #fff;
-  box-shadow: none;
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.header__cart {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.header__cart:hover {
+  background: var(--glow);
+  color: var(--ink);
+}
+
+.header__cart-count {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  display: grid;
+  place-items: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.3rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--glow);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.header__secure {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
 }
 
 @media (min-width: 900px) {
@@ -86,13 +131,25 @@
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 420px) {
+  .header__inner {
+    gap: 0.75rem;
+  }
+
   .header__brand {
     font-size: 1.35rem;
   }
 
   .header__cta {
-    padding-inline: 0.9rem;
+    padding-inline: 0.8rem;
+    font-size: 0.9375rem;
+  }
+}
+
+/* Très petit écran : le panier reste, le bouton « Choisir » laisse la place. */
+@media (max-width: 349px) {
+  .header__cta {
+    display: none;
   }
 }
 

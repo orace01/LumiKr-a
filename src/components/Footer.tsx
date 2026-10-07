@@ -1,4 +1,5 @@
 import { site } from '../config/site'
+import { Link } from './Link'
 import { ToConfirm } from './ToConfirm'
 import './Footer.css'
 
@@ -18,22 +19,25 @@ export function Footer() {
           <ul className="footer__links">
             {site.nav.map((item) => (
               <li key={item.href}>
-                <a href={item.href}>{item.label}</a>
+                <Link to={item.href}>{item.label}</Link>
               </li>
             ))}
+            <li>
+              <Link to="/suivi">Suivre ma commande</Link>
+            </li>
           </ul>
         </nav>
 
         <div>
           <h2 className="footer__title">Informations</h2>
           <ul className="footer__links">
-            {site.legalLinks.map((link) => (
-              <li key={link.label}>
-                {link.href ? (
-                  <a href={link.href}>{link.label}</a>
-                ) : (
+            {site.legalPages.map((page) => (
+              <li key={page.path}>
+                <Link to={page.path}>{page.title}</Link>
+                {!page.body && (
                   <>
-                    {link.label} <ToConfirm />
+                    {' '}
+                    <ToConfirm />
                   </>
                 )}
               </li>

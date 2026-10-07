@@ -1,21 +1,21 @@
-/* --- La vidéo plein écran, qui se referme au défilement ------------
+/* --- La photo en grand, qui se resserre au défilement ------------------------
    `.hero__pin` est plus haut que la fenêtre ; `.hero__stage` y reste collé
    pendant qu'on le traverse. `--p` (0 → 1, posé par useScrollProgress) pilote
-   tout : la vidéo rétrécit en pastille, puis les photos surgissent autour. */
+   tout : la photo se resserre au centre, puis les photos des formats
+   surgissent autour. */
 
 .hero__pin {
   --p: 0;
-  /* La vidéo se referme sur les 60 premiers % du trajet. */
+  /* La photo se resserre sur les 60 premiers % du trajet. */
   --shrink: clamp(0, var(--p) / 0.6, 1);
 
-  /* Taille de la vidéo une fois refermée : une pastille 2:1, assez large pour
-     que le cadrage `cover` montre le tableau en entier, assez étroite pour
-     laisser la place aux photos produit de chaque côté. */
-  --end-w: min(38vw, 76vh);
-  --end-h: calc(var(--end-w) / 2);
+  /* Taille finale : un cadre aux proportions de la photo (1024 × 572), assez
+     petit pour laisser la place aux photos des formats de chaque côté. */
+  --end-w: min(38vw, 100vh);
+  --end-h: calc(var(--end-w) * 0.5586);
 
   /* Côté des photos carrées : limité par la largeur des marges et par la
-     hauteur, puisque deux photos s'empilent de chaque côté. */
+     hauteur, puisque deux photos s'empilent à gauche. */
   --shot: min(25vw, 38vh);
 
   height: 220vh;
@@ -33,52 +33,44 @@
   overflow: hidden;
 }
 
-/* Le cadre passe du plein écran à la pastille centrée ; la vidéo, en `cover`,
-   dézoome d'elle-même à mesure que le cadre change de proportions. */
+/* Le cadre part de tout l'écran, header compris, et finit centré. */
 .hero__media {
   position: absolute;
   inset: calc(var(--shrink) * (100% - var(--end-h)) / 2) calc(var(--shrink) * (100% - var(--end-w)) / 2);
   overflow: hidden;
-  border-radius: calc(var(--shrink) * var(--end-h) / 2);
-  background: var(--night);
+  border-radius: calc(var(--shrink) * var(--end-h) * 0.14);
+  background: var(--ivory-deep);
+  /* Bord et ombre « autocollant » qui apparaissent quand le cadre se resserre. */
+  box-shadow:
+    0 0 0 calc(var(--shrink) * 2px) var(--ink),
+    0 calc(var(--shrink) * 0.5rem) 0 calc(var(--shrink) * 2px) var(--ink);
 }
 
-.hero__media img,
-.hero__media video {
+/* La photo est en paysage : plein écran, seuls ses bords sont rognés, et le
+   tableau, au centre, reste entier. */
+.hero__photo {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Le tableau est légèrement à gauche du centre du plan. */
-  object-position: 44% 50%;
+  object-position: 50% 50%;
 }
 
-/* Seuls voiles sur l'image : un dégradé derrière le header et un autre, très
-   court, derrière les boutons du bas. Ils s'effacent quand la vidéo se referme. */
-.hero__media::before,
-.hero__media::after {
+/* Voile clair derrière le header transparent, qui s'efface dès que la photo
+   commence à se resserrer. */
+.hero__media::before {
   content: '';
   position: absolute;
-  inset-inline: 0;
+  inset: 0 0 auto;
   z-index: 1;
-  opacity: calc(1 - var(--shrink));
+  height: calc(var(--header-height) + 3rem);
+  background: linear-gradient(to bottom, rgb(255 248 236 / 0.85), rgb(255 248 236 / 0));
+  opacity: clamp(0, 1 - var(--shrink) * 4, 1);
   pointer-events: none;
 }
 
-.hero__media::before {
-  top: 0;
-  height: 8rem;
-  background: linear-gradient(to bottom, rgb(22 15 58 / 0.75), rgb(22 15 58 / 0));
-}
-
-.hero__media::after {
-  bottom: 0;
-  height: 7rem;
-  background: linear-gradient(to top, rgb(22 15 58 / 0.6), rgb(22 15 58 / 0));
-}
-
-/* --- Les photos autour de la vidéo refermée ---------------------------------- */
+/* --- Les photos des formats autour de la photo resserrée --------------------- */
 
 .hero__collage {
   position: absolute;
@@ -124,7 +116,9 @@
   line-height: 1.4;
 }
 
-/* Deux photos empilées de chaque côté, légèrement décalées et inclinées. */
+/* Les quatre formats, deux de chaque côté du cadre central, légèrement
+   décalés et inclinés. La largeur des photos de droite est bornée par
+   l'espace libre à droite du cadre. */
 .hero__shot--fusee {
   --at: 0.5;
   --tilt: -5deg;
@@ -135,51 +129,52 @@
   aspect-ratio: 1;
 }
 
-.hero__shot--nouvel-an {
+.hero__shot--bonjour {
   --at: 0.56;
   --tilt: 4deg;
 
-  top: max(12%, 5.75rem);
-  right: 2.5%;
-  width: calc(var(--shot) * 1.12);
-  aspect-ratio: 3 / 2;
-}
-
-.hero__shot--noel {
-  --at: 0.62;
-  --tilt: 4deg;
-
-  bottom: 4%;
-  left: 5.5%;
-  width: var(--shot);
-  aspect-ratio: 1;
+  top: max(14%, 6rem);
+  right: 3%;
+  width: min(calc(var(--shot) * 1.15), calc((100% - var(--end-w)) / 2 - 3% - 2rem));
+  aspect-ratio: 16 / 9;
 }
 
 .hero__shot--sirene {
-  --at: 0.68;
-  --tilt: -4deg;
+  --at: 0.62;
+  --tilt: 4deg;
 
-  right: 5%;
-  bottom: 9%;
+  bottom: 6%;
+  left: 5%;
   width: var(--shot);
   aspect-ratio: 1;
 }
 
+.hero__shot--fleurs {
+  --at: 0.68;
+  --tilt: -3deg;
+
+  right: 4%;
+  bottom: 8%;
+  width: min(calc(var(--shot) * 1.05), calc((100% - var(--end-w)) / 2 - 4% - 2rem));
+  aspect-ratio: 5 / 4;
+}
+
+/* Les tracés se placent par rapport au cadre central, dans les espaces libres. */
 .hero__pop--star {
   --at: 0.6;
   --tilt: -14deg;
   --size: 3rem;
 
-  top: 24%;
-  left: 36%;
+  top: calc(50% - var(--end-h) / 2 - 1.5rem);
+  left: calc(50% - var(--end-w) / 2 - 3.5rem);
 }
 
 .hero__pop--sparkle {
   --at: 0.66;
   --size: 2.5rem;
 
-  right: 35%;
-  bottom: 22%;
+  top: calc(50% + var(--end-h) / 2 + 1rem);
+  left: calc(50% + var(--end-w) / 2 - 4rem);
 }
 
 .hero__pop--squiggle {
@@ -187,56 +182,37 @@
   --tilt: 8deg;
   --size: 4rem;
 
-  top: 22%;
-  right: 36%;
+  top: calc(50% - var(--end-h) / 2 - 4.5rem);
+  left: calc(50% + var(--end-w) / 6);
 }
 
-/* --- Boutons posés sur la scène ---------------------------------------------- */
+/* --- Flèche vers la suite ------------------------------------------------------ */
 
-.hero__scroll,
-.hero__toggle {
+.hero__scroll {
   position: absolute;
   /* Toujours au-dessus des photos, qui peuvent frôler les bords de l'écran. */
   z-index: 2;
   bottom: clamp(1rem, 3vh, 2rem);
+  left: 50%;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  color: var(--on-night);
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: background-color 0.2s;
-}
-
-.hero__scroll {
-  left: 50%;
   width: 3.5rem;
   height: 3.5rem;
   margin-left: -1.75rem;
   border: 2px solid var(--on-night);
+  border-radius: 50%;
   background: rgb(31 22 80 / 0.9);
+  color: var(--on-night);
+  cursor: pointer;
   animation: hero-nudge 2.4s var(--ease-out) infinite;
+  transition: background-color 0.2s;
 }
 
 .hero__scroll:hover {
   background: var(--primary);
 }
 
-.hero__toggle {
-  right: var(--gutter);
-  width: 2.75rem;
-  height: 2.75rem;
-  padding: 0;
-  border: 1px solid rgb(255 255 255 / 0.4);
-  background: rgb(31 22 80 / 0.9);
-}
-
-.hero__toggle:hover {
-  background: var(--primary);
-}
-
-.hero__scroll:focus-visible,
-.hero__toggle:focus-visible {
+.hero__scroll:focus-visible {
   outline-color: var(--glow);
   box-shadow: 0 0 0 6px var(--ink);
 }
@@ -253,25 +229,27 @@
   }
 }
 
-/* --- Écrans en portrait : pastille presque pleine largeur, deux photos
-   au-dessus, deux en dessous. ------------------------------------------------- */
+/* --- Tablette en portrait : cadre presque pleine largeur au centre, deux
+   photos au-dessus, deux en dessous. (Sous 720 px de large, le hero n'est pas
+   affiché du tout.) ------------------------------------------------------------ */
 
 @media (orientation: portrait) {
   .hero__pin {
-    --end-w: 82vw;
-    --end-h: calc(var(--end-w) * 0.52);
-    /* Deux photos côte à côte au-dessus de la vidéo, deux en dessous. */
-    --shot: min(46vw, 24vh);
+    --end-w: 80vw;
+    --shot: min(40vw, 19vh);
 
     height: 200vh;
     height: 200svh;
   }
 
-  /* En plein écran, on cadre le lettrage et le bonhomme de neige ; le point de
-     visée revient vers le centre du tableau à mesure que le cadre s'élargit. */
-  .hero__media img,
-  .hero__media video {
-    object-position: calc(52% - var(--shrink) * 8%) 50%;
+  /* Plein écran, une photo en largeur rognée en hauteur couperait le texte du
+     tableau : elle est montrée entière, sur sa version floutée. */
+  .hero__media {
+    background: url('../assets/media/hero-photo-fond.webp') center / cover;
+  }
+
+  .hero__photo {
+    object-fit: contain;
   }
 
   .hero__shot--fusee {
@@ -279,20 +257,21 @@
     left: 3%;
   }
 
-  .hero__shot--nouvel-an {
-    top: 6.25rem;
+  .hero__shot--bonjour {
+    top: 7rem;
     right: 3%;
-    width: var(--shot);
-  }
-
-  .hero__shot--noel {
-    bottom: 5.75rem;
-    left: 3%;
+    width: calc(var(--shot) * 1.15);
   }
 
   .hero__shot--sirene {
-    right: 3%;
     bottom: 6.5rem;
+    left: 3%;
+  }
+
+  .hero__shot--fleurs {
+    right: 3%;
+    bottom: 7rem;
+    width: var(--shot);
   }
 
   /* Pas de place pour les tracés entre les photos sur un écran étroit. */
@@ -301,15 +280,16 @@
   }
 }
 
-/* Écran large mais très bas (téléphone tenu en paysage) : photos plus petites,
+/* Écran large mais très bas (téléphone tenu en paysage) : tout plus petit,
    pas de tracés décoratifs. */
 @media (orientation: landscape) and (max-height: 560px) {
   .hero__pin {
+    --end-w: min(36vw, 90vh);
     --shot: min(22vw, 33vh);
   }
 
-  .hero__shot--noel,
-  .hero__shot--sirene {
+  .hero__shot--sirene,
+  .hero__shot--fleurs {
     bottom: 3%;
   }
 
@@ -318,8 +298,9 @@
   }
 }
 
-/* Animations réduites : pas d'épinglage ni de mouvement. L'état final (vidéo en
-   pastille, photos autour) est affiché tel quel ; `--p` est figé à 1 par le hook. */
+/* Animations réduites : pas d'épinglage ni de mouvement. L'état final (photo
+   resserrée, photos des formats autour) est affiché tel quel ; `--p` est figé à
+   1 par le hook. */
 @media (prefers-reduced-motion: reduce) {
   .hero__pin {
     --p: 1;
@@ -333,10 +314,6 @@
 
   .hero__scroll {
     animation: none;
-  }
-
-  .hero__scroll,
-  .hero__toggle {
     transition: none;
   }
 }

@@ -134,6 +134,13 @@
   mix-blend-mode: multiply;
 }
 
+/* Le message « Good Morning » est à gauche de la photo, la fleur rouge à
+   droite. Quand la carte est moins large que l'image, le cadrage garde le
+   message entier et laisse la fleur sortir du cadre plutôt que la couper. */
+.stack__card--annoncer .stack__media img {
+  object-position: 12% 50%;
+}
+
 .stack__card--annoncer {
   background: var(--night);
   color: var(--on-night);
@@ -166,6 +173,29 @@
 }
 
 /* La carte recouverte recule légèrement, comme une pile de cartes. */
+/* Téléphone : une carte haute comme l'écran rognerait les photos en largeur
+   jusqu'à les rendre illisibles. La carte prend la hauteur de son contenu et
+   chaque photo garde des proportions proches de l'original ; l'empilement au
+   défilement est conservé. */
+@media (max-width: 720px) {
+  .stack__card {
+    grid-template-rows: auto auto;
+    height: auto;
+  }
+
+  .stack__media img {
+    aspect-ratio: 5 / 4;
+  }
+
+  .stack__card--creer .stack__media img {
+    aspect-ratio: 1;
+  }
+
+  .stack__card--annoncer .stack__media img {
+    aspect-ratio: 16 / 9;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .stack__card {
     --covered: clamp(0, var(--p) * (var(--count) - 1) - var(--i), 1);

@@ -9,7 +9,7 @@
   --ink-soft: #5b5285;
   --line: #e6ddf3;
 
-  /* Nuit indigo, réservée à la vidéo, à la démo et au pied de page */
+  /* Nuit indigo : zone de dessin, FAQ, pied de page */
   --night: #160f3a;
   --night-soft: #251b5c;
   --on-night: #fff8ec;
@@ -121,6 +121,12 @@ a {
 button {
   font: inherit;
   color: inherit;
+}
+
+/* Le contenu principal reçoit le focus à chaque changement de page (App.tsx) :
+   ce focus programmé n'a pas besoin de contour. */
+main:focus {
+  outline: none;
 }
 
 :focus-visible {

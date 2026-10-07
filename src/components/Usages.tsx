@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import ambiance from '../assets/media/ambiance.webp'
+import bonjourLarge from '../assets/media/bonjour-large.webp'
 import packshot from '../assets/media/packshot.webp'
-import stillNuit from '../assets/media/still-nuit.webp'
+import shotFleurs from '../assets/media/shot-fleurs.webp'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 import './Usages.css'
@@ -24,10 +24,10 @@ const USAGES = [
     tagClass: 'eyebrow eyebrow--orange',
     title: 'Une déco qui change avec vos envies.',
     text: 'Sur un bureau ou une étagère, le tableau affiche le motif du moment : une saison, une fête, une humeur.',
-    image: ambiance,
-    width: 680,
-    height: 620,
-    alt: 'Le tableau posé sur un meuble, incliné sur son support, avec un dessin de fête éclairé par la base.',
+    image: shotFleurs,
+    width: 1240,
+    height: 976,
+    alt: 'Le tableau posé sur un bureau, décoré d’une guirlande de fleurs multicolores, éclairé par sa base.',
   },
   {
     id: 'annoncer',
@@ -35,10 +35,10 @@ const USAGES = [
     tagClass: 'eyebrow eyebrow--green',
     title: 'Votre message, visible même dans le noir.',
     text: 'Menu du jour, mot d’accueil, suggestion du soir : au comptoir d’un bar ou d’une boutique, le message s’éclaire et se réécrit quand vous voulez.',
-    image: stillNuit,
-    width: 1600,
-    height: 900,
-    alt: 'Le tableau éclairé dans le noir : lettres multicolores, sapins verts et bonhomme de neige ressortent nettement.',
+    image: bonjourLarge,
+    width: 1000,
+    height: 436,
+    alt: 'Le tableau paysage allumé sur un bureau, avec « Good Morning » écrit en jaune et une fleur rouge.',
   },
 ]
 

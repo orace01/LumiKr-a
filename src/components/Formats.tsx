@@ -1,29 +1,31 @@
 import { useState } from 'react'
-import photo12 from '../assets/media/format-12x12.webp'
-import photo15 from '../assets/media/format-15x15.webp'
-import photo20 from '../assets/media/format-20x20.webp'
-import photo30 from '../assets/media/format-30x20.webp'
-import { formatPrice, product } from '../config/product'
-import { site } from '../config/site'
+import { product } from '../config/product'
+import { useCart } from '../shop/useCart'
+import { useShop } from '../shop/useShop'
+import { QuantityStepper } from './QuantityStepper'
 import { Reveal } from './Reveal'
 import { ScaleDiagram } from './ScaleDiagram'
 import { ToConfirm } from './ToConfirm'
+import { VARIANT_PHOTOS } from './variantPhotos'
 import './Formats.css'
-
-// Photo fournisseur de chaque format, par identifiant de variante.
-const PHOTOS: Record<string, string | undefined> = {
-  '12x12': photo12,
-  '15x15': photo15,
-  '20x20': photo20,
-  '30x20': photo30,
-}
 
 export function Formats() {
   const [selectedId, setSelectedId] = useState(product.defaultVariantId)
+  const [quantity, setQuantity] = useState(1)
   const selected = product.variants.find((variant) => variant.id === selectedId) ?? product.variants[0]
-  const checkoutUrl = product.checkout.url
-  // La commande n'est proposée que si le prix est fixé et la vente raccordée.
-  const canOrder = checkoutUrl !== null && selected.price !== null
+  const cart = useCart()
+  const { info, money, priceOf, saleOpen, status } = useShop()
+
+  // Les prix viennent du serveur, qui les applique aussi à la commande.
+  const price = priceOf(selected.id)
+  const canAdd = saleOpen && price !== null
+  const shipping = info?.shippingMethods.length === 1 ? info.shippingMethods[0] : null
+
+  const addToCart = () => {
+    cart.add(selected.id, quantity)
+    setQuantity(1)
+    cart.open()
+  }
 
   return (
     <section id="formats" className="section formats" aria-labelledby="formats-title">
@@ -57,10 +59,10 @@ export function Formats() {
                   onChange={() => setSelectedId(variant.id)}
                 />
                 <span className="formats__option-card">
-                  {PHOTOS[variant.id] && (
+                  {VARIANT_PHOTOS[variant.id] && (
                     <img
                       className="formats__option-photo"
-                      src={PHOTOS[variant.id]}
+                      src={VARIANT_PHOTOS[variant.id]}
                       width={400}
                       height={300}
                       loading="lazy"
@@ -70,35 +72,65 @@ export function Formats() {
                   )}
                   <span className="formats__option-text">
                     <span className="formats__option-label">{variant.label}</span>
-                    <span className="formats__option-shape">{variant.shape}</span>
+                    <span className="formats__option-shape">
+                      {variant.shape}
+                      {priceOf(variant.id) !== null && ` · ${money(priceOf(variant.id)!)}`}
+                    </span>
                   </span>
                 </span>
               </label>
             ))}
           </fieldset>
 
-          <div className="formats__buy" aria-live="polite">
-            <p className="formats__price">
-              {selected.price !== null ? (
-                formatPrice(selected.price, site.locale)
-              ) : (
-                <>
-                  <span className="formats__price-label">Prix du {selected.label}</span> <ToConfirm />
-                </>
-              )}
-            </p>
-            {canOrder ? (
-              <a className="btn btn--primary" href={checkoutUrl}>
-                Commander le {selected.label}
-              </a>
-            ) : (
-              <button type="button" className="btn btn--primary" disabled>
-                Commande bientôt disponible
-              </button>
-            )}
+          <div className="formats__buy">
+            <div className="formats__price-block" aria-live="polite">
+              <p className="formats__price">
+                {status === 'loading' ? (
+                  <span className="formats__price-label">Chargement du prix…</span>
+                ) : price !== null ? (
+                  money(price)
+                ) : (
+                  <>
+                    <span className="formats__price-label">Prix du {selected.label}</span> <ToConfirm />
+                  </>
+                )}
+              </p>
+              <p className="formats__shipping">
+                {shipping && shipping.priceCents !== null
+                  ? `Livraison ${money(shipping.priceCents)}${shipping.delay ? ` · ${shipping.delay}` : ''}`
+                  : 'Prix TTC · livraison calculée à la commande'}
+              </p>
+            </div>
+            <QuantityStepper value={quantity} onChange={setQuantity} itemLabel={selected.label} />
           </div>
-          {!canOrder && (
-            <p className="formats__notice">La vente en ligne n’est pas encore ouverte : aucune commande n’est enregistrée.</p>
+
+          <button type="button" className="btn btn--primary formats__add" disabled={!canAdd} onClick={addToCart}>
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+              <path
+                d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8zM9 8V6.5a3 3 0 0 1 6 0V8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Ajouter au panier
+          </button>
+
+          {status === 'error' && (
+            <p className="formats__notice" role="alert">
+              La boutique est momentanément indisponible. Réessayez dans quelques instants.
+            </p>
+          )}
+          {status === 'ready' && !saleOpen && (
+            <p className="formats__notice">
+              La vente en ligne ouvre bientôt.
+              {/* Pour le propriétaire du site seulement, pendant le développement. */}
+              {import.meta.env.DEV && info?.closedReason && <> ({info.closedReason})</>}
+            </p>
+          )}
+          {saleOpen && info?.paymentProviderName && (
+            <p className="formats__notice">Paiement sécurisé par {info.paymentProviderName}.</p>
           )}
         </Reveal>
       </div>

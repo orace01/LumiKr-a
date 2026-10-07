@@ -46,8 +46,9 @@ export function FormatCarousel() {
               height={shot.height}
               alt={shot.alt}
               decoding="async"
-              // La première photo est le plus grand visuel du premier écran.
-              loading={index === 0 ? 'eager' : 'lazy'}
+              // Les deux premières photos sont visibles dès l'arrivée (la seconde
+              // dépasse à droite) ; la première est le plus grand visuel de l'écran.
+              loading={index < 2 ? 'eager' : 'lazy'}
               fetchPriority={index === 0 ? 'high' : 'auto'}
             />
             <span className="carousel__label">{formatLabel(shot.variantId)}</span>

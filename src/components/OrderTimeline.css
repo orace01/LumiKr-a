@@ -1,0 +1,77 @@
+.timeline {
+  display: grid;
+}
+
+.timeline__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+/* Trait vertical entre deux étapes. */
+.timeline__step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 2.6rem;
+  bottom: 0.2rem;
+  left: calc(1.25rem - 1px);
+  width: 2px;
+  background: var(--line);
+}
+
+.timeline__step--done:not(:last-child)::after {
+  background: var(--ink);
+}
+
+.timeline__dot {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--ink-soft);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.timeline__step--done .timeline__dot {
+  border-color: var(--ink);
+  background: var(--green);
+  color: var(--ink);
+}
+
+.timeline__step--current .timeline__dot {
+  border-color: var(--ink);
+  background: var(--glow);
+  color: var(--ink);
+  box-shadow: 0 0 0 5px var(--glow-soft);
+}
+
+.timeline__body {
+  display: grid;
+  gap: 0.2rem;
+  padding-top: 0.35rem;
+}
+
+.timeline__title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 600;
+}
+
+.timeline__step--todo .timeline__title,
+.timeline__text {
+  color: var(--ink-soft);
+}
+
+.timeline__tracking {
+  margin-top: 0.4rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 1rem;
+  background: var(--violet-soft);
+  font-size: var(--step--1);
+}

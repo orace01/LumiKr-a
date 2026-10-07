@@ -1,16 +1,16 @@
 import { useRef } from 'react'
+import heroPhoto from '../assets/media/hero-photo.webp'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 import { Doodle } from './Doodle'
-import { HeroVideo } from './HeroVideo'
 import { formatLabel, SHOTS } from './shots'
 import './Hero.css'
 
 /**
- * La vidéo plein écran. Elle reste épinglée pendant le défilement, se referme
- * en pastille, puis les photos surgissent autour. Le titre et les boutons
- * suivent dans Intro.
+ * La photo plein écran, jusque sous le header. Elle reste épinglée pendant le
+ * défilement, se resserre au centre, puis les photos des formats
+ * surgissent autour. Le titre et les boutons suivent dans Intro.
  */
 function HeroStage() {
   const pinRef = useRef<HTMLDivElement>(null)
@@ -18,10 +18,19 @@ function HeroStage() {
   useScrollProgress(pinRef, reducedMotion)
 
   return (
-    <section className="hero" aria-label="Le tableau lumineux en vidéo et en photos">
+    <section className="hero" aria-label="Le tableau lumineux en photos">
       <div ref={pinRef} className="hero__pin">
         <div className="hero__stage">
-          <HeroVideo />
+          <div className="hero__media">
+            <img
+              className="hero__photo"
+              src={heroPhoto}
+              width={2048}
+              height={1144}
+              alt="Le tableau lumineux posé sur un bureau, avec un message écrit aux feutres de couleur, « Good Morning » en jaune et une fleur rouge."
+              fetchPriority="high"
+            />
+          </div>
 
           <ul className="hero__collage">
             {SHOTS.map((shot) => (
@@ -55,8 +64,8 @@ function HeroStage() {
 }
 
 /**
- * Sur téléphone il n'y a pas de vidéo : rien n'est rendu ici (ni la vidéo ni
- * son image d'attente ne sont téléchargées) et Intro devient le premier écran.
+ * Sur téléphone, Intro est le premier écran (photos des formats à faire
+ * défiler) : rien n'est rendu ici et la photo n'est pas téléchargée.
  */
 export function Hero() {
   const mobile = useIsMobile()

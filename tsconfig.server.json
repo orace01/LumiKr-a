@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.server.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023"],
+    "module": "esnext",
+    "types": ["node"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  // Le serveur ne partage avec le site que la configuration et la logique pure
+  // (types, prix, validation) ; les fichiers propres au navigateur en sont exclus.
+  "include": [
+    "server",
+    "src/config/product.ts",
+    "src/config/shop.ts",
+    "src/shop/types.ts",
+    "src/shop/money.ts",
+    "src/shop/pricing.ts",
+    "src/shop/validation.ts"
+  ]
+}

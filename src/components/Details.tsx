@@ -1,8 +1,17 @@
 import feutres from '../assets/media/feutres.webp'
+import supportDos from '../assets/media/support-dos.webp'
+import supportFace from '../assets/media/support-face.webp'
+import supportProfil from '../assets/media/support-profil.webp'
 import { product, type Fact } from '../config/product'
 import { Reveal } from './Reveal'
 import { ToConfirm } from './ToConfirm'
 import './Details.css'
+
+const SUPPORT_VIEWS = [
+  { src: supportFace, height: 146, label: 'De face' },
+  { src: supportDos, height: 150, label: 'De dos' },
+  { src: supportProfil, height: 152, label: 'De profil' },
+]
 
 function FactList({ facts }: { facts: Fact[] }) {
   return (
@@ -45,6 +54,17 @@ export function Details() {
               alt="Sept feutres alignés : blanc, violet, vert, bleu, orange, rose et jaune."
             />
             <FactList facts={product.inTheBox} />
+            <figure className="details__support">
+              <ul className="details__support-views">
+                {SUPPORT_VIEWS.map((view) => (
+                  <li key={view.label}>
+                    <img src={view.src} width={274} height={view.height} loading="lazy" decoding="async" alt="" />
+                    <span>{view.label}</span>
+                  </li>
+                ))}
+              </ul>
+              <figcaption>Le support, vu de face, de dos et de profil (photos du fournisseur).</figcaption>
+            </figure>
           </Reveal>
           <Reveal className="details__card" delay={120}>
             <h3 className="details__subtitle">Caractéristiques</h3>

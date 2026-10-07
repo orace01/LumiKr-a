@@ -202,7 +202,7 @@
 }
 
 /* --- Téléphone : le premier écran du site ------------------------------------
-   Pas de vidéo au-dessus (voir Hero.tsx). Le bloc titre n'est plus épinglé : il
+   Pas de hero au-dessus (voir Hero.tsx). Le bloc titre n'est plus épinglé : il
    passe sous le header fixe, accueille les photos à faire défiler, et les
    étapes le suivent normalement. Seuil partagé avec useIsMobile. */
 @media (max-width: 720px) {

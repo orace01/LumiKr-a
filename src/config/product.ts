@@ -18,8 +18,14 @@ export interface Variant {
   shape: 'Carré' | 'Paysage'
   widthCm: number
   heightCm: number
-  /** Prix TTC en euros. `null` tant qu'il n'est pas fixé : rien n'est affiché. */
+  /**
+   * Prix TTC dans la devise de la boutique (src/config/shop.ts). `null` tant
+   * qu'il n'est pas fixé : le site affiche « À confirmer » et, en mode réel, la
+   * vente reste fermée.
+   */
   price: number | null
+  /** Identifiant de la variante chez CJ (« vid »), à reprendre dans leur back-office. */
+  cjVariantId: string | null
 }
 
 export interface PenColor {
@@ -28,12 +34,12 @@ export interface PenColor {
 }
 
 // Formats vendus (choix du 2 octobre 2026 : les quatre). Dimensions relevées
-// sur les visuels fournisseur.
+// sur les visuels fournisseur. À CONFIRMER : prix et identifiants CJ.
 const variants: Variant[] = [
-  { id: '12x12', label: '12 × 12 cm', shape: 'Carré', widthCm: 12, heightCm: 12, price: null },
-  { id: '15x15', label: '15 × 15 cm', shape: 'Carré', widthCm: 15, heightCm: 15, price: null },
-  { id: '20x20', label: '20 × 20 cm', shape: 'Carré', widthCm: 20, heightCm: 20, price: null },
-  { id: '30x20', label: '30 × 20 cm', shape: 'Paysage', widthCm: 30, heightCm: 20, price: null },
+  { id: '12x12', label: '12 × 12 cm', shape: 'Carré', widthCm: 12, heightCm: 12, price: null, cjVariantId: null },
+  { id: '15x15', label: '15 × 15 cm', shape: 'Carré', widthCm: 15, heightCm: 15, price: null, cjVariantId: null },
+  { id: '20x20', label: '20 × 20 cm', shape: 'Carré', widthCm: 20, heightCm: 20, price: null, cjVariantId: null },
+  { id: '30x20', label: '30 × 20 cm', shape: 'Paysage', widthCm: 30, heightCm: 20, price: null, cjVariantId: null },
 ]
 
 // Couleurs de feutres visibles sur le visuel fournisseur ; elles servent aussi
@@ -81,14 +87,4 @@ export const product = {
   penColors,
   inTheBox,
   specs,
-
-  // Raccordement de la vente : géré séparément. Tant que `url` est `null`, le
-  // bloc achat affiche un état « bientôt disponible » et aucun faux panier.
-  checkout: {
-    url: null as string | null,
-  },
-}
-
-export function formatPrice(price: number, locale: string): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(price)
 }

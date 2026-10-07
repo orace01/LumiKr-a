@@ -1,0 +1,15 @@
+/* Pastille discrète en bas à gauche ; elle laisse passer les clics. */
+.demo-banner {
+  position: fixed;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 60;
+  padding: 0.3rem 0.8rem;
+  border: 2px dashed var(--ink);
+  border-radius: 999px;
+  background: var(--glow);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  pointer-events: none;
+}

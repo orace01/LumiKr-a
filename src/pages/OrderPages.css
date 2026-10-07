@@ -1,0 +1,182 @@
+/* Pages secondaires : confirmation, suivi, paiement simulé, pages légales. */
+
+.order-page {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  align-content: start;
+  min-height: 70vh;
+  padding-block: calc(var(--header-height) + clamp(1.5rem, 4vw, 3rem)) var(--section);
+}
+
+.order-page--center {
+  justify-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.order-page--center .lede {
+  max-width: 52ch;
+}
+
+.order-page__title {
+  font-size: var(--step-3);
+}
+
+.order-page__intro {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+}
+
+.order-page__hero {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.order-page__hero .lede {
+  max-width: 54ch;
+}
+
+.order-page__check {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: var(--sticker);
+  rotate: -6deg;
+}
+
+.order-page__number {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.order-page__grid {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .order-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .order-page__grid--tracking {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
+.order-page__card {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: 0 0.5rem 0 var(--ink);
+}
+
+.order-page__card:focus-visible {
+  outline-offset: 4px;
+}
+
+.order-page__subtitle {
+  font-size: var(--step-2);
+}
+
+.order-page__status {
+  font-weight: 700;
+}
+
+.order-page__address {
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1.25rem;
+  background: var(--violet-soft);
+}
+
+.order-page__address-title {
+  font-weight: 700;
+}
+
+.order-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+}
+
+.order-page__form .btn {
+  width: 100%;
+}
+
+.order-page__help {
+  background: var(--glow-soft);
+}
+
+.order-page__spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid var(--line);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: order-spin 0.9s linear infinite;
+}
+
+@keyframes order-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-page__spinner {
+    animation-duration: 2.5s;
+  }
+}
+
+/* --- Paiement simulé : un look neutre, distinct de la boutique ---------------- */
+
+.demo-pay__badge {
+  padding: 0.35rem 1rem;
+  border: 2px dashed var(--ink);
+  border-radius: 999px;
+  background: var(--glow-soft);
+  font-weight: 700;
+}
+
+.demo-pay__amount {
+  display: grid;
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.demo-pay__amount span {
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.demo-pay__actions {
+  display: grid;
+  gap: 0.75rem;
+  width: min(100%, 22rem);
+}
+
+/* --- Pages légales ------------------------------------------------------------ */
+
+.legal {
+  justify-items: start;
+  max-width: calc(48rem + 2 * var(--gutter));
+}

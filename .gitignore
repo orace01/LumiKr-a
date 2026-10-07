@@ -10,6 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dist-server
+
+# Commandes enregistrées par le serveur (données clients)
+data
+
+# Secrets (clés du paiement et de CJ) : jamais dans le dépôt
+.env
 *.local
 
 # Editor directories and files

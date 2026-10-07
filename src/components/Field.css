@@ -1,0 +1,71 @@
+.field {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.field__label {
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.field__optional {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.field__input {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0 1rem;
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+select.field__input {
+  padding-right: 2.5rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='%231f1650' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 0.9rem center;
+  background-repeat: no-repeat;
+  background-size: 1.1rem;
+}
+
+.field__input:focus-visible {
+  outline-offset: 2px;
+}
+
+.field__hint {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+.field--error .field__input {
+  border-color: #b3123c;
+  box-shadow: 0 0 0 1px #b3123c;
+}
+
+.field__error {
+  display: flex;
+  gap: 0.35rem;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: #b3123c;
+}
+
+.field__error::before {
+  content: '!';
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  background: #b3123c;
+  color: #fff;
+  font-size: 0.75rem;
+}
