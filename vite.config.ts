@@ -46,12 +46,14 @@ export default defineConfig(({ isSsrBuild }) => ({
   // Le serveur (build --ssr) n'a pas besoin d'une copie de public/ : il sert dist/.
   build: isSsrBuild
     ? {
-        // Serveur de production et outil CJ, compilés dans dist-server/.
+        // Serveur de production, fonction Vercel et outil CJ, compilés dans dist-server/.
         outDir: 'dist-server',
         copyPublicDir: false,
-        rollupOptions: { input: { main: 'server/main.ts', cli: 'server/cli.ts' } },
+        rollupOptions: { input: { main: 'server/main.ts', vercel: 'server/vercel.ts', cli: 'server/cli.ts' } },
       }
     : {},
+  // Dépendances (hono…) incluses dans dist-server/ : la fonction Vercel n'a pas de node_modules.
+  ssr: isSsrBuild ? { noExternal: true } : {},
   test: {
     include: ['server/**/*.test.ts', 'src/**/*.test.ts'],
   },

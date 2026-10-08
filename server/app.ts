@@ -1,7 +1,9 @@
 import { getConnInfo } from '@hono/node-server/conninfo'
+import { timingSafeEqual } from 'node:crypto'
 import { Hono, type Context } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { secureHeaders } from 'hono/secure-headers'
+import { site } from '../src/config/site'
 import { missingLegalInfo } from '../src/content/legal/fields'
 import type { ShopMode } from '../src/shop/types'
 import { readConfig, type ServerConfig } from './config'
@@ -10,7 +12,8 @@ import { DemoFulfillmentProvider } from './fulfillment/demo'
 import type { FulfillmentProvider } from './fulfillment/types'
 import { consoleNotifier, type Notifier } from './notify'
 import { CheckoutError, createOrderService } from './orders/service'
-import { JsonFileOrderStore, type OrderStore } from './orders/store'
+import { RedisOrderStore, RedisRest, readRedisSettings, redisTokenStore } from './orders/redis'
+import { JsonFileOrderStore, MemoryOrderStore, type OrderStore } from './orders/store'
 import { AggregatorPaymentProvider } from './payment/aggregator'
 import { DemoPaymentProvider } from './payment/demo'
 import type { PaymentProvider } from './payment/types'
@@ -24,6 +27,8 @@ export interface AppDeps {
   notifier: Notifier
   /** Si renseigné, suit les commandes en cours auprès du fournisseur à cet intervalle. */
   syncIntervalMs?: number
+  /** Faux si les commandes ne peuvent pas être gardées (Vercel sans base) : la vente reste fermée. */
+  storageReady?: boolean
 }
 
 /** L'API de la boutique, sous /api. Les dépendances sont injectées pour les tests. */
@@ -141,6 +146,17 @@ export function createApp(deps: AppDeps) {
     return order ? c.json(order) : c.json({ message: 'Commande introuvable.' }, 404)
   })
 
+  // Tâche planifiée de Vercel (vercel-output.mjs) : suivi des colis en cours,
+  // pour prévenir le client de l'expédition sans attendre sa visite.
+  app.get('/cron/sync', async (c) => {
+    const token = c.req.header('authorization')?.replace(/^Bearer\s+/i, '') ?? ''
+    const secret = config.cronSecret ?? ''
+    const allowed = secret !== '' && token.length === secret.length && timingSafeEqual(Buffer.from(token), Buffer.from(secret))
+    if (!allowed) return c.json({ message: 'Introuvable.' }, 404)
+    await orders.syncAll()
+    return c.json({ synced: true })
+  })
+
   app.notFound((c) => c.json({ message: 'Introuvable.' }, 404))
   app.onError((error, c) => {
     console.error('[api]', error)
@@ -154,16 +170,25 @@ export function createApp(deps: AppDeps) {
  * Dépendances réelles, selon le mode : simulées en démo, raccordées en réel.
  * En démo, CJ n'est sollicité qu'en mode test CJ (CJ_SANDBOX=1, avec une clé) :
  * un paiement simulé ne doit jamais déclencher une vraie commande.
+ *
+ * Commandes et jeton CJ : dans Redis s'il est configuré (obligatoire sur
+ * Vercel, où les fichiers ne sont pas gardés), sinon dans le dossier des données.
  */
 export function createDefaultDeps(config: ServerConfig = readConfig(), env: NodeJS.ProcessEnv = process.env): AppDeps {
   const demo = config.mode === 'demo'
   const cj = readCjSettings(env)
   const useCj = !demo || (cj.sandbox && cj.apiKey !== '')
+  const redisSettings = readRedisSettings(env)
+  const redis = redisSettings ? new RedisRest(redisSettings) : null
+  const serverless = Boolean(env.VERCEL)
   return {
     config,
-    store: new JsonFileOrderStore(config.dataDir),
+    store: redis ? new RedisOrderStore(redis) : serverless ? new MemoryOrderStore() : new JsonFileOrderStore(config.dataDir),
+    storageReady: redis !== null || !serverless,
     payment: demo ? new DemoPaymentProvider() : new AggregatorPaymentProvider(),
-    fulfillment: useCj ? CjFulfillmentProvider.fromEnv(config.dataDir, env) : new DemoFulfillmentProvider(),
+    fulfillment: useCj
+      ? CjFulfillmentProvider.fromEnv(config.dataDir, env, redis ? redisTokenStore(redis) : undefined)
+      : new DemoFulfillmentProvider(),
     notifier: consoleNotifier,
   }
 }
@@ -177,10 +202,17 @@ let defaultApp: ReturnType<typeof createApp> | null = null
 export function getDefaultApp(fallbackMode: ShopMode = 'demo') {
   if (!defaultApp) {
     const deps = createDefaultDeps(readConfig(process.env, fallbackMode))
+    const storage = deps.store instanceof RedisOrderStore ? 'Redis' : deps.storageReady ? `${deps.config.dataDir}/` : 'mémoire (non gardées)'
     console.info(
-      `[boutique] mode ${deps.config.mode} · paiement ${deps.payment.id} · fournisseur ${deps.fulfillment.id} · commandes dans ${deps.config.dataDir}/`,
+      `[boutique] mode ${deps.config.mode} · paiement ${deps.payment.id} · fournisseur ${deps.fulfillment.id} · commandes dans ${storage}`,
     )
+    if (!deps.storageReady) {
+      console.warn('[boutique] Pas de base Redis (Vercel → Storage → Upstash for Redis) : la vente reste fermée.')
+    }
     const legal = missingLegalInfo()
+    if (site.legalPages.length === 0) {
+      console.warn('[boutique] Pages légales hors ligne (legalPagesOnline, src/config/site.ts) : la vente réelle reste fermée.')
+    }
     if (legal.length > 0) console.warn(`[boutique] Pages légales à compléter (src/config/site.ts, shop.ts) : ${legal.join(', ')}`)
     if (deps.fulfillment instanceof CjFulfillmentProvider && !deps.fulfillment.isConfigured()) {
       console.warn(`[boutique] CJ pas encore prêt, il manque : ${deps.fulfillment.missing().join(', ')}`)

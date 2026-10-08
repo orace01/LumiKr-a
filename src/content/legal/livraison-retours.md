@@ -1,4 +1,4 @@
-Dernière mise à jour : 7 octobre 2026.
+Dernière mise à jour : 8 octobre 2026.
 
 ## Livraison
 
@@ -27,9 +27,12 @@ Vous avez **14 jours à compter de la réception** de votre commande pour vous r
 
 ## Formulaire de rétractation
 
-À compléter et à renvoyer uniquement si vous souhaitez vous rétracter de votre commande, par e-mail à {email} ou par courrier à l’adresse ci-dessous.
+À compléter et à renvoyer par e-mail à {email}, uniquement si vous souhaitez vous rétracter de votre commande.
 
-> À l’attention de {vendeur}, {adresse}, {email} :
+> À l’attention de {marque}
+> {vendeur}
+> {adresse}
+> {email}
 >
 > Je vous notifie par la présente ma rétractation du contrat portant sur la vente du bien ci-dessous :
 >

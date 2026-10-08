@@ -3,6 +3,7 @@ import { Field, SelectField } from '../components/Field'
 import { OrderSummary } from '../components/OrderSummary'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { Link } from '../components/Link'
+import { site } from '../config/site'
 import { useLocation } from '../router'
 import { api, ApiError } from '../shop/api'
 import { useCart } from '../shop/useCart'
@@ -358,9 +359,13 @@ export function CheckoutPage() {
               />
               <label htmlFor="champ-acceptTerms">
                 J’ai lu et j’accepte les{' '}
-                <a href="/cgv" target="_blank" rel="noopener">
-                  conditions générales de vente
-                </a>
+                {site.legalPages.some((page) => page.path === '/cgv') ? (
+                  <a href="/cgv" target="_blank" rel="noopener">
+                    conditions générales de vente
+                  </a>
+                ) : (
+                  'conditions générales de vente'
+                )}
                 .
               </label>
               {errors.acceptTerms && (

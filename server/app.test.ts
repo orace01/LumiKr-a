@@ -103,6 +103,14 @@ describe('API en mode démo', () => {
     const ok = await app.request('/api/admin/orders', { headers: { Authorization: 'Bearer secret' } })
     expect(ok.status).toBe(200)
   })
+
+  it('la tâche planifiée de suivi demande le secret de Vercel', async () => {
+    expect((await demoApp().request('/api/cron/sync')).status).toBe(404)
+    const app = demoApp({ cronSecret: 'secret-cron' })
+    expect((await app.request('/api/cron/sync', { headers: { Authorization: 'Bearer autre' } })).status).toBe(404)
+    const ok = await app.request('/api/cron/sync', { headers: { Authorization: 'Bearer secret-cron' } })
+    expect(await ok.json()).toEqual({ synced: true })
+  })
 })
 
 describe('choix du fournisseur', () => {

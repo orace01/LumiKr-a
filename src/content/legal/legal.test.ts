@@ -64,4 +64,20 @@ describe('pages légales', () => {
       { type: 'paragraph', lines: [[{ type: 'text', text: 'Jeton inconnu : ' }, { type: 'text', text: '{inconnu}' }, { type: 'text', text: '.' }]] },
     ])
   })
+
+  it('retire les lignes d’une information facultative manquante, puis les titres vides', () => {
+    const withOptional: Record<string, LegalField> = {
+      ...fields,
+      tva: { label: 'TVA', value: null, required: false },
+      mediateur: { label: 'médiateur', value: null, required: false },
+    }
+    const blocks = parseLegal(
+      ['## Vendeur', 'Marque Lumi\nTVA : {tva}', '- TVA : {tva}\n- e-mail : {email}', '## Médiation', 'Médiateur : {mediateur}.', '## Droit applicable', 'Droit français.'].join('\n\n'),
+      withOptional,
+    )
+    expect(blocks.map((block) => block.type)).toEqual(['heading', 'paragraph', 'list', 'heading', 'paragraph'])
+    expect(blocks[1]).toEqual({ type: 'paragraph', lines: [[{ type: 'text', text: 'Marque Lumi' }]] })
+    expect(blocks[2]).toMatchObject({ type: 'list', items: [[{ text: 'e-mail : ' }, { type: 'link' }]] })
+    expect(blocks[3]).toMatchObject({ type: 'heading', children: [{ text: 'Droit applicable' }] })
+  })
 })

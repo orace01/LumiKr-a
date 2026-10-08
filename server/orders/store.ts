@@ -3,16 +3,19 @@ import path from 'node:path'
 import type { Order } from './types'
 
 /**
- * Où sont enregistrées les commandes. Le fichier JSON suffit pour démarrer sur
- * un seul serveur ; pour plusieurs instances ou un hébergement « serverless »,
- * il faudra une base de données qui respecte cette même interface.
+ * Où sont enregistrées les commandes. Le fichier JSON suffit sur un seul
+ * serveur ; sur Vercel ou avec plusieurs instances, c'est Redis (redis.ts).
  */
 export interface OrderStore {
   get(id: string): Promise<Order | null>
   findByPaymentReference(reference: string): Promise<Order | null>
   list(): Promise<Order[]>
   create(order: Order): Promise<void>
-  /** Applique `change` à la commande et enregistre le résultat. */
+  /**
+   * Applique `change` à la commande et enregistre le résultat, d'un seul tenant.
+   * `change` peut être rappelée (modification simultanée par une autre
+   * instance) : elle repart toujours de la commande qu'on lui donne.
+   */
   update(id: string, change: (order: Order) => Order): Promise<Order>
 }
 

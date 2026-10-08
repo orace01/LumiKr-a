@@ -29,6 +29,8 @@ export interface OrderServiceDeps {
   notifier: Notifier
   /** Intervalle minimal entre deux demandes de suivi au fournisseur. */
   trackingSyncMs?: number
+  /** Faux si les commandes ne peuvent pas être gardées (Vercel sans base) : la vente reste fermée. */
+  storageReady?: boolean
 }
 
 const CUSTOMER_STATUS: Record<OrderStatus, CustomerStatus> = {
@@ -104,7 +106,11 @@ export function createOrderService(deps: OrderServiceDeps) {
   const trackingSyncMs = deps.trackingSyncMs ?? (deps.mode === 'demo' ? 10_000 : 30 * 60_000)
 
   const catalog = () =>
-    buildCatalog(deps.mode, { payment: payment.isConfigured(), fulfillment: fulfillment.isConfigured() })
+    buildCatalog(deps.mode, {
+      payment: payment.isConfigured(),
+      fulfillment: fulfillment.isConfigured(),
+      storage: deps.storageReady ?? true,
+    })
 
   async function uniqueId() {
     for (let attempt = 0; attempt < 10; attempt++) {
@@ -235,6 +241,8 @@ export function createOrderService(deps: OrderServiceDeps) {
     // simultanées ne peuvent pas déclencher deux envois au fournisseur.
     let paidNow = false
     const updated = await store.update(found.id, (current) => {
+      // `update` peut rejouer cette fonction (modification simultanée) : l'indicateur repart de zéro.
+      paidNow = false
       if (!AWAITING_PAYMENT.includes(current.status)) return current
       if (event.outcome === 'paid') {
         paidNow = true
@@ -260,6 +268,7 @@ export function createOrderService(deps: OrderServiceDeps) {
       const tracking = await fulfillment.getTracking(order)
       let shippedNow = false
       const updated = await store.update(order.id, (current) => {
+        shippedNow = false
         let next: Order = { ...current, fulfillment: { ...current.fulfillment, lastSyncAt: new Date().toISOString() } }
         if (!tracking) return next
         next = {

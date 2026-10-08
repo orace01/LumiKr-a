@@ -2,7 +2,7 @@ import path from 'node:path'
 import { product } from '../../src/config/product'
 import { shop } from '../../src/config/shop'
 import type { Order } from '../orders/types'
-import { CJ_ERRORS, CjApiError, CjClient } from './cj-client'
+import { CJ_ERRORS, CjApiError, CjClient, type CjTokenStore } from './cj-client'
 import type { FulfillmentProvider, TrackingInfo } from './types'
 
 /**
@@ -183,14 +183,17 @@ export class CjFulfillmentProvider implements FulfillmentProvider {
     this.mapping = mapping
   }
 
-  /** Réglages lus dans l'environnement ; le jeton CJ est gardé dans le dossier des données. */
-  static fromEnv(dataDir: string, env: NodeJS.ProcessEnv = process.env) {
+  /**
+   * Réglages lus dans l'environnement. Le jeton CJ est gardé dans `tokenStore`
+   * s'il est fourni (base de données), sinon dans le dossier des données.
+   */
+  static fromEnv(dataDir: string, env: NodeJS.ProcessEnv = process.env, tokenStore?: CjTokenStore) {
     const settings = readCjSettings(env)
     const interval = Number(env.CJ_MIN_INTERVAL_MS)
     const client = settings.apiKey
       ? new CjClient({
           apiKey: settings.apiKey,
-          tokenFile: path.join(dataDir, 'cj-token.json'),
+          ...(tokenStore ? { tokenStore } : { tokenFile: path.join(dataDir, 'cj-token.json') }),
           ...(Number.isFinite(interval) && interval > 0 ? { minIntervalMs: interval } : {}),
         })
       : null

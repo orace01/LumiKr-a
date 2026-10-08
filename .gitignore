@@ -29,3 +29,6 @@ data
 *.njsproj
 *.sln
 *.sw?
+
+# Déploiement Vercel assemblé (npm run build:vercel)
+.vercel

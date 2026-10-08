@@ -27,21 +27,23 @@ export function Footer() {
           </ul>
         </nav>
 
-        <div>
-          <h2 className="footer__title">Informations</h2>
-          <ul className="footer__links">
-            {site.legalPages.map((page) => (
-              <li key={page.path}>
-                <Link to={page.path}>{page.title}</Link>
-              </li>
-            ))}
-            {site.contactEmail && (
-              <li>
-                <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
-              </li>
-            )}
-          </ul>
-        </div>
+        {(site.legalPages.length > 0 || site.contactEmail) && (
+          <div>
+            <h2 className="footer__title">Informations</h2>
+            <ul className="footer__links">
+              {site.legalPages.map((page) => (
+                <li key={page.path}>
+                  <Link to={page.path}>{page.title}</Link>
+                </li>
+              ))}
+              {site.contactEmail && (
+                <li>
+                  <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="container footer__bottom">
         <p>

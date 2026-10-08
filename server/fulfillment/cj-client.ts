@@ -44,7 +44,7 @@ interface CjEnvelope<T> {
   requestId?: string
 }
 
-interface CjToken {
+export interface CjToken {
   accessToken: string
   accessTokenExpiryDate: string
   refreshToken: string
@@ -52,10 +52,37 @@ interface CjToken {
   openId?: number | string
 }
 
+/** Où garder le jeton CJ entre deux démarrages : fichier, base de données… */
+export interface CjTokenStore {
+  load(): Promise<CjToken | null>
+  save(token: CjToken): Promise<void>
+}
+
+/** Jeton dans un fichier lisible par le seul propriétaire. */
+export function fileTokenStore(file: string): CjTokenStore {
+  return {
+    async load() {
+      try {
+        const saved = JSON.parse(await readFile(file, 'utf8')) as CjToken
+        return saved?.accessToken ? saved : null
+      } catch {
+        return null
+      }
+    },
+    async save(token) {
+      await mkdir(path.dirname(file), { recursive: true })
+      await writeFile(file, JSON.stringify(token, null, 2), { encoding: 'utf8', mode: 0o600 })
+      await chmod(file, 0o600)
+    },
+  }
+}
+
 export interface CjClientOptions {
   apiKey: string
   /** Fichier où garder le jeton entre deux redémarrages ; `null` : en mémoire seulement. */
-  tokenFile: string | null
+  tokenFile?: string | null
+  /** Autre emplacement du jeton (base de données) ; l'emporte sur `tokenFile`. */
+  tokenStore?: CjTokenStore
   /**
    * Intervalle minimal entre deux appels. CJ limite un compte gratuit à un
    * appel par seconde (davantage selon le niveau du compte).
@@ -80,14 +107,15 @@ function stillValid(expiry: string | undefined) {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export class CjClient {
-  private readonly options: Required<Omit<CjClientOptions, 'tokenFile'>> & { tokenFile: string | null }
+  private readonly options: Required<Omit<CjClientOptions, 'tokenFile' | 'tokenStore'>>
+  private readonly tokenStore: CjTokenStore | null
   private token: CjToken | null = null
   private tokenLoaded = false
   private pendingToken: Promise<CjToken> | null = null
   private queue: Promise<unknown> = Promise.resolve()
   private lastCallAt = 0
 
-  constructor(options: CjClientOptions) {
+  constructor({ tokenFile = null, tokenStore, ...options }: CjClientOptions) {
     this.options = {
       minIntervalMs: 1100,
       fetch: globalThis.fetch.bind(globalThis),
@@ -95,6 +123,7 @@ export class CjClient {
       retryDelayMs: 1500,
       ...options,
     }
+    this.tokenStore = tokenStore ?? (tokenFile ? fileTokenStore(tokenFile) : null)
   }
 
   /** Identifiant du compte CJ, connu une fois le jeton obtenu. */
@@ -114,10 +143,15 @@ export class CjClient {
         return await this.send<T>(method, endpoint, { ...options, token: token.accessToken })
       } catch (error) {
         if (!(error instanceof CjApiError)) throw error
-        // Jeton refusé (révoqué, expiré plus tôt que prévu) : un seul nouvel essai.
+        // Jeton refusé (révoqué, expiré plus tôt que prévu) : un seul nouvel essai,
+        // avec le jeton enregistré s'il a changé (renouvelé par une autre instance
+        // du serveur), sinon avec un neuf.
         if (attempt === 0 && (error.code === CJ_ERRORS.invalidToken || error.code === CJ_ERRORS.emptyToken)) {
+          const rejected = token.accessToken
           this.token = null
-          token = await this.ensureToken({ forceNew: true })
+          this.tokenLoaded = false
+          token = await this.ensureToken()
+          if (token.accessToken === rejected) token = await this.ensureToken({ forceNew: true })
           continue
         }
         if (error.code === CJ_ERRORS.tooManyRequests && attempt < 2) {
@@ -129,7 +163,7 @@ export class CjClient {
     }
   }
 
-  /** Obtient un jeton valide : celui en mémoire, celui du fichier, un renouvelé ou un neuf. */
+  /** Obtient un jeton valide : celui en mémoire, celui enregistré, un renouvelé ou un neuf. */
   async ensureToken({ forceNew = false } = {}): Promise<CjToken> {
     if (!forceNew) {
       await this.loadToken()
@@ -159,24 +193,16 @@ export class CjClient {
   private async loadToken() {
     if (this.tokenLoaded) return
     this.tokenLoaded = true
-    if (!this.options.tokenFile) return
-    try {
-      const saved = JSON.parse(await readFile(this.options.tokenFile, 'utf8')) as CjToken
-      if (saved?.accessToken) this.token = saved
-    } catch {
-      // Pas encore de jeton enregistré.
-    }
+    const saved = await this.tokenStore?.load().catch(() => null)
+    if (saved) this.token = saved
   }
 
   private async saveToken() {
-    const file = this.options.tokenFile
-    if (!file || !this.token) return
+    if (!this.tokenStore || !this.token) return
     try {
-      await mkdir(path.dirname(file), { recursive: true })
-      await writeFile(file, JSON.stringify(this.token, null, 2), { encoding: 'utf8', mode: 0o600 })
-      await chmod(file, 0o600)
+      await this.tokenStore.save(this.token)
     } catch (error) {
-      console.warn('[cj] jeton non enregistré sur le disque', error)
+      console.warn('[cj] jeton non enregistré', error)
     }
   }
 

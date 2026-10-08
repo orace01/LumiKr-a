@@ -74,6 +74,22 @@ describe('CjClient', () => {
     expect(issued).toBe(2)
   })
 
+  it('reprend le jeton enregistré par une autre instance avant d’en redemander un', async () => {
+    let saved = token(1)
+    const tokenStore = { load: async () => saved, save: async (next: typeof saved) => void (saved = next) }
+    const cj = fakeCj((endpoint, _body, accessToken) => {
+      if (endpoint.startsWith('/authentication')) return ok(token(3))
+      return accessToken === 'access-1' ? fail(CJ_ERRORS.invalidToken) : ok('fait')
+    })
+    const client = new CjClient({ apiKey: 'k', tokenStore, minIntervalMs: 0, fetch: cj.fetch })
+    await client.ensureToken()
+    // Entre-temps, une autre instance a renouvelé le jeton.
+    saved = token(2)
+    expect(await client.call('GET', '/x')).toBe('fait')
+    expect(cj.calls.map((call) => call.endpoint)).toEqual(['/x', '/x'])
+    expect(cj.calls[1].token).toBe('access-2')
+  })
+
   it('renouvelle un jeton expiré avec le refreshToken', async () => {
     const dir = await mkdtemp(path.join(tmpdir(), 'cj-'))
     dirs.push(dir)

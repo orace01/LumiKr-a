@@ -1,30 +1,36 @@
-Dernière mise à jour : 7 octobre 2026.
+Dernière mise à jour : 8 octobre 2026.
 
-## 1. Objet
+## Objet
 
 Les présentes conditions générales de vente (CGV) s’appliquent à toute commande passée sur le site {site} par un consommateur, c’est-à-dire une personne physique agissant à des fins qui n’entrent pas dans le cadre de son activité professionnelle. Elles sont acceptées en cochant la case prévue avant le paiement. Les CGV applicables sont celles en vigueur à la date de la commande.
 
 Pour commander, vous devez être majeur et capable de contracter.
 
-## 2. Vendeur
+## Vendeur
 
-Les produits sont vendus par **{vendeur}**, {statut}, {adresse}, {immatriculation}.
+Les produits sont vendus sous la marque {marque}.
+Vendeur : {vendeur}
+{statut}
+Adresse : {adresse}
+Immatriculation : {immatriculation}
+TVA : {tva}
 
-Service client : {email}, {telephone}.
+Service client : {email}
+Téléphone : {telephone}
 
-## 3. Produit
+## Produit
 
 Le site propose un tableau lumineux à dessiner en plusieurs formats. Ses caractéristiques essentielles (dimensions, contenu de la boîte, alimentation) sont présentées sur la page d’accueil, avant la commande. Les dessins et décors visibles sur les photos sont des exemples de réalisation.
 
 Les commandes sont acceptées dans la limite des stocks disponibles. Si un produit commandé n’est plus disponible, nous vous en informons sans délai et vous remboursons intégralement, au plus tard 14 jours après vous en avoir informé.
 
-## 4. Prix
+## Prix
 
 Les prix sont indiqués en euros, toutes taxes comprises. La livraison est offerte. Le prix facturé est celui affiché au moment de la validation de la commande.
 
 Les éventuels droits de douane et taxes d’importation sont à notre charge : vous n’avez rien à payer à la réception du colis.
 
-## 5. Commande
+## Commande
 
 Pour commander :
 
@@ -39,13 +45,13 @@ Nous pouvons refuser une commande anormale, passée de mauvaise foi, ou émanant
 
 Pour toute commande d’au moins 120 €, nous conservons le contrat pendant 10 ans et vous y donnons accès sur simple demande (articles L. 213-1 et D. 213-1 du Code de la consommation).
 
-## 6. Paiement
+## Paiement
 
 Le paiement s’effectue en ligne, au moment de la commande, auprès de {paiement}. Vos coordonnées bancaires sont saisies uniquement chez ce prestataire : elles ne transitent jamais par notre site et nous n’y avons pas accès.
 
 La commande n’est préparée qu’une fois le paiement confirmé par le prestataire. En cas de refus du paiement, la commande n’est pas conclue.
 
-## 7. Livraison
+## Livraison
 
 Nous livrons uniquement en France métropolitaine, à l’adresse indiquée lors de la commande. Les commandes sont expédiées depuis l’entrepôt de notre partenaire logistique, en Chine.
 
@@ -57,11 +63,11 @@ Si la livraison n’intervient pas dans le délai prévu, vous pouvez nous deman
 
 Le risque de perte ou d’endommagement du produit vous est transféré au moment où vous, ou un tiers désigné par vous, en prenez physiquement possession (article L. 216-4 du Code de la consommation). Un colis abîmé ou un produit endommagé à l’arrivée nous est signalé à {email}, si possible avec une photo : nous le remplaçons ou vous remboursons, sans frais pour vous.
 
-## 8. Droit de rétractation
+## Droit de rétractation
 
 Vous disposez de **14 jours** à compter de la réception du produit pour vous rétracter, sans avoir à motiver votre décision (article L. 221-18 du Code de la consommation). Si une commande est livrée en plusieurs colis, le délai court à partir de la réception du dernier.
 
-Pour exercer ce droit, informez-nous de votre décision avant l’expiration du délai, par e-mail à {email} ou par courrier à l’adresse du vendeur, au moyen du [formulaire de rétractation](/livraison-retours) ou de toute autre déclaration dénuée d’ambiguïté. Nous en accusons réception par e-mail.
+Pour exercer ce droit, informez-nous de votre décision avant l’expiration du délai, par e-mail à {email}, au moyen du [formulaire de rétractation](/livraison-retours) ou de toute autre déclaration dénuée d’ambiguïté. Nous en accusons réception par e-mail.
 
 Vous renvoyez ensuite le produit, sans retard excessif et au plus tard 14 jours après nous avoir communiqué votre décision, à l’adresse de retour que nous vous indiquons par e-mail. **Les frais de retour sont à votre charge.**
 
@@ -69,7 +75,7 @@ Nous vous remboursons la totalité des sommes versées au plus tard 14 jours apr
 
 Votre responsabilité ne peut être engagée qu’en cas de dépréciation du produit résultant de manipulations autres que celles nécessaires pour établir sa nature, ses caractéristiques et son bon fonctionnement (article L. 221-23 du Code de la consommation).
 
-## 9. Garanties légales
+## Garanties légales
 
 Le produit bénéficie de la garantie légale de conformité et de la garantie légale des vices cachés, dans les conditions rappelées ci-dessous. Pour les mettre en œuvre, écrivez-nous à {email} en précisant votre numéro de commande et le défaut constaté, si possible avec une photo ou une vidéo. Les frais de retour d’un produit défectueux sont à notre charge. Nous ne proposons pas de garantie commerciale en plus des garanties légales.
 
@@ -104,20 +110,19 @@ Le produit bénéficie de la garantie légale de conformité et de la garantie l
 >
 > Le consommateur bénéficie également de la garantie légale des vices cachés en application des articles 1641 à 1649 du code civil, pour une durée de deux ans à compter de la découverte du défaut. Cette garantie donne droit à une réduction de prix si le bien est conservé ou à un remboursement intégral contre restitution du bien.
 
-## 10. Données personnelles
+## Données personnelles
 
 Les données recueillies lors de la commande servent à son traitement, à sa livraison et au service client. Leur utilisation et vos droits sont détaillés dans notre [politique de confidentialité](/confidentialite).
 
-## 11. Service client et réclamations
+## Service client et réclamations
 
-Pour toute question ou réclamation : {email} ou {telephone}. Nous vous répondons dans les meilleurs délais.
+Pour toute question ou réclamation, écrivez-nous à {email}. Nous vous répondons dans les meilleurs délais.
+Téléphone : {telephone}
 
-## 12. Médiation
+## Médiation
 
-Conformément aux articles L. 612-1 et suivants du Code de la consommation, vous pouvez recourir gratuitement au médiateur de la consommation dont nous relevons : {mediateur}.
+Conformément aux articles L. 612-1 et suivants du Code de la consommation, vous pouvez recourir gratuitement au médiateur de la consommation dont nous relevons : {mediateur}. Il ne peut être saisi qu’après une réclamation écrite adressée au préalable à notre service client, et au plus tard un an après cette réclamation.
 
-Le médiateur ne peut être saisi qu’après une réclamation écrite adressée au préalable à notre service client, et au plus tard un an après cette réclamation.
-
-## 13. Droit applicable et litiges
+## Droit applicable et litiges
 
 Les présentes CGV sont soumises au droit français. En cas de litige, une solution amiable sera recherchée en priorité. À défaut, vous pouvez saisir, à votre choix, la juridiction du lieu où vous demeuriez au moment de la conclusion du contrat ou de la survenance du fait dommageable, ou toute autre juridiction compétente (article R. 631-3 du Code de la consommation).

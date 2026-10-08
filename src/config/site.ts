@@ -8,6 +8,11 @@ export interface LegalPage {
   title: string
 }
 
+// Pages légales réduites au minimum (choix du 8 octobre 2026) : les lignes
+// d'entreprise vides sont retirées (src/content/legal/fields.ts). `false` les
+// met hors ligne ; en mode réel, la vente ne s'ouvre pas sans elles.
+const legalPagesOnline = true
+
 const legalPages: LegalPage[] = [
   { path: '/mentions-legales', title: 'Mentions légales' },
   { path: '/cgv', title: 'Conditions générales de vente' },
@@ -17,8 +22,8 @@ const legalPages: LegalPage[] = [
 
 /**
  * Identité légale du vendeur, reprise dans les pages légales. `null` = pas
- * encore renseigné : la page affiche « à compléter » et, en mode réel, la
- * vente reste fermée (obligatoire pour vendre en ligne en France).
+ * renseigné : la ligne correspondante n'est pas affichée. À remplir dès que
+ * l'activité est déclarée (micro-entreprise ou société).
  */
 export interface Seller {
   /** Raison sociale, ou prénom et nom suivis de « EI » pour un entrepreneur individuel. */
@@ -40,7 +45,7 @@ export interface Seller {
   mediator: string | null
 }
 
-// À COMPLÉTER : identité du vendeur.
+// Facultatif pour l'instant : pas d'entreprise enregistrée.
 const seller: Seller = {
   name: null,
   legalForm: null,
@@ -72,6 +77,7 @@ export const site = {
   /** À CONFIRMER : adresse de contact du service client. */
   contactEmail: null as string | null,
 
-  legalPages,
+  /** Pages légales en ligne : aucune tant que `legalPagesOnline` vaut `false`. */
+  legalPages: legalPagesOnline ? legalPages : [],
   seller,
 }

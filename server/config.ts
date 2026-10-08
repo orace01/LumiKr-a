@@ -18,14 +18,25 @@ export interface ServerConfig {
   dataDir: string
   /** Jeton d'accès à GET /api/admin/orders ; route désactivée s'il est absent. */
   adminToken: string | null
+  /**
+   * Secret des tâches planifiées de Vercel (variable CRON_SECRET, que Vercel
+   * envoie lui-même) ; GET /api/cron/sync est désactivée sans lui.
+   */
+  cronSecret?: string | null
 }
 
 export function readConfig(env: NodeJS.ProcessEnv = process.env, fallbackMode: ShopMode = 'demo'): ServerConfig {
   const mode = env.SHOP_MODE === 'demo' || env.SHOP_MODE === 'live' ? env.SHOP_MODE : fallbackMode
   return {
     mode,
-    publicUrl: env.PUBLIC_URL ? env.PUBLIC_URL.replace(/\/+$/, '') : null,
+    // Sur Vercel, à défaut de PUBLIC_URL : le domaine de production du projet.
+    publicUrl: env.PUBLIC_URL
+      ? env.PUBLIC_URL.replace(/\/+$/, '')
+      : env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : null,
     dataDir: env.DATA_DIR ?? 'data',
     adminToken: env.ADMIN_TOKEN || null,
+    cronSecret: env.CRON_SECRET || null,
   }
 }

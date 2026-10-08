@@ -110,9 +110,9 @@ Fonctionnement :
 
 ## Commandes et administration
 
-Les commandes sont enregistrées dans `data/orders.json` (dossier ignoré par Git), ce qui
-suffit sur un seul serveur. Pour plusieurs instances ou un hébergement « serverless », il
-faudra une base de données qui respecte l'interface `OrderStore` (`server/orders/store.ts`).
+Les commandes sont enregistrées dans Redis si ses identifiants sont définis (obligatoire
+sur Vercel, voir ci-dessous), sinon dans `data/orders.json` (dossier ignoré par Git), ce qui
+suffit sur un seul serveur classique (`npm start`).
 
 Avec `ADMIN_TOKEN` défini :
 
@@ -123,6 +123,29 @@ curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://…/api/admin/order
 
 Une commande payée que CJ a refusée passe en `fulfillment_error` (le client, lui, voit
 « confirmée ») : elle se relance avec la seconde commande.
+
+## Mise en ligne sur Vercel
+
+`vercel.json` fait construire le projet avec `npm run build:vercel` : le site en fichiers
+statiques et toute l'API `/api/*` en une fonction (`server/vercel.ts`, assemblée par
+`scripts/vercel-output.mjs`). Les adresses directes (`/suivi`, `/cgv`…) renvoient le site.
+
+Une fois pour toutes, dans le projet Vercel :
+
+1. **Storage → Upstash for Redis** (gratuit pour démarrer), relié au projet : Vercel ajoute
+   lui-même `KV_REST_API_URL` et `KV_REST_API_TOKEN`. Sans base, la vente reste fermée :
+   une commande serait perdue d'une requête à l'autre.
+2. **Settings → Environment Variables** (environnement Production) :
+   `CJ_API_KEY`, `CJ_IOSS_TYPE=3`, `CJ_PAY_TYPE=2`, `CJ_FROM_COUNTRY=CN`, puis deux
+   longues chaînes aléatoires
+   (`node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`) pour `CRON_SECRET` et `ADMIN_TOKEN`.
+   `PUBLIC_URL` est facultatif (domaine de production par défaut) ; `SHOP_MODE` reste vide
+   (mode réel). Les variables du paiement viendront avec l'agrégateur.
+3. Redéployer, puis vérifier que `https://…/api/shop` répond en JSON. Les journaux de la
+   fonction (Logs) listent au démarrage ce qui manque encore.
+
+Le suivi des colis est relu chez CJ une fois par jour (tâche planifiée `/api/cron/sync`,
+maximum de l'offre gratuite de Vercel) et à chaque consultation d'une commande par le client.
 
 ## Où modifier quoi
 
@@ -151,7 +174,8 @@ Même règle pour les prix et frais de livraison : `null` tant qu'ils ne sont pa
 Les textes sont en Markdown simplifié dans `src/content/legal/` (titres `##`, listes `-`,
 encadrés `>`, `**gras**`, `[liens](/cgv)`). Les jetons `{vendeur}`, `{adresse}`, `{email}`,
 `{delai}`… sont remplacés par les valeurs de la configuration (`src/content/legal/fields.ts`) :
-l'identité du vendeur ne se saisit qu'une fois.
+l'identité du vendeur ne se saisit qu'une fois. Une ligne dont un jeton facultatif est vide
+est retirée ; un jeton indispensable vide (e-mail, délai) s'affiche « à compléter ».
 
 ## Médias
 
@@ -203,17 +227,18 @@ Avec « animations réduites », rien n'est épinglé ni animé : chaque section
   rapport EN 71) avant de les afficher.
 - Vérifier que la photo du début de page montre bien la référence vendue : sa base est en
   bois, celle des photos fournisseur est blanche.
-- Compléter l'identité du vendeur (`seller` et `contactEmail` dans `src/config/site.ts`) :
-  nom, statut, adresse, SIREN, TVA, téléphone, directeur de la publication, hébergeur et
-  médiateur de la consommation (adhésion obligatoire). Les pages légales sont rédigées dans
-  `src/content/legal/` ; tant qu'une information manque, elles affichent « à compléter » et,
-  en mode réel, la vente reste fermée. Les faire relire par un professionnel du droit.
+- Renseigner l'e-mail du service client (`contactEmail`, `src/config/site.ts`) : seule
+  information indispensable des pages légales, réduites au minimum le 8 octobre 2026 (pas
+  d'entreprise enregistrée). Les lignes d'entreprise (`seller` : nom, statut, adresse,
+  SIREN, TVA, téléphone, hébergeur, médiateur) n'apparaissent qu'une fois renseignées : à
+  remplir dès que l'activité est déclarée. Les textes sont dans `src/content/legal/` ; les
+  faire relire par un professionnel du droit.
 - Raccorder le paiement et configurer CJ (voir « Ce qui reste à raccorder »).
 - Brancher l'envoi des e-mails au client (`server/notify.ts`) : pour l'instant ils sont
   seulement écrits dans le journal. Obligatoire avant d'ouvrir la vente : les CGV annoncent
   une confirmation de commande par e-mail (exigée par l'article L. 221-13 du Code de la
   consommation) et l'envoi du numéro de suivi.
-- Héberger sur un serveur Node.js qui garde ses fichiers (`data/`), avec HTTPS et
-  `PUBLIC_URL` renseigné.
+- Sur Vercel : créer la base Upstash for Redis et renseigner les variables (voir « Mise en
+  ligne sur Vercel »).
 - Passer `og:image` en URL absolue et ajouter les données structurées produit une fois le
   domaine et les prix connus.

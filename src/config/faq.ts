@@ -1,5 +1,6 @@
 import { product } from './product'
 import { shop } from './shop'
+import { site } from './site'
 
 export interface FaqEntry {
   question: string
@@ -13,6 +14,7 @@ const formatList = new Intl.ListFormat('fr', { type: 'conjunction' }).format(
   product.variants.map((variant) => variant.label),
 )
 const delay = shop.shippingMethods[0]?.delay ?? null
+const returnsPageOnline = site.legalPages.some((page) => page.path === '/livraison-retours')
 
 // Les réponses ne reprennent que ce qui est établi (fiche CJ du produit,
 // réglages de la boutique, pages légales). Pas de question sur l'âge ni la
@@ -37,6 +39,6 @@ export const faq: FaqEntry[] = [
   },
   {
     question: 'Quels sont les délais de livraison et les conditions de retour ?',
-    answer: `Livraison offerte en France métropolitaine${delay ? `, en ${delay}` : ''}. Vous avez 14 jours après réception pour changer d’avis, et le tableau bénéficie des garanties légales. Tous les détails sont sur la page « Livraison et retours ».`,
+    answer: `Livraison offerte en France métropolitaine${delay ? `, en ${delay}` : ''}. Vous avez 14 jours après réception pour changer d’avis, et le tableau bénéficie des garanties légales.${returnsPageOnline ? ' Tous les détails sont sur la page « Livraison et retours ».' : ''}`,
   },
 ]

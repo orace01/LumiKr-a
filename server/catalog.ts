@@ -1,5 +1,6 @@
 import { product } from '../src/config/product'
 import { shop } from '../src/config/shop'
+import { site } from '../src/config/site'
 import { toCents } from '../src/shop/money'
 import { missingLegalInfo } from '../src/content/legal/fields'
 import type { ShopInfo, ShopMode } from '../src/shop/types'
@@ -11,7 +12,7 @@ const DEMO_PRICES_CENTS: Record<string, number> = { '12x12': 1000, '15x15': 1500
 const DEMO_SHIPPING_CENTS = 500
 
 /** Catalogue tel que le serveur l'applique : c'est lui qui fait foi pour les montants. */
-export function buildCatalog(mode: ShopMode, ready: { payment: boolean; fulfillment: boolean }): ShopInfo {
+export function buildCatalog(mode: ShopMode, ready: { payment: boolean; fulfillment: boolean; storage?: boolean }): ShopInfo {
   const demo = mode === 'demo'
   const variants = product.variants.map((variant) => ({
     id: variant.id,
@@ -30,9 +31,12 @@ export function buildCatalog(mode: ShopMode, ready: { payment: boolean; fulfillm
     closedReason = 'Les prix ne sont pas encore fixés.'
   } else if (shippingMethods.some((method) => method.priceCents === null)) {
     closedReason = 'Les frais de livraison ne sont pas encore fixés.'
-  } else if (!demo && missingLegalInfo().length > 0) {
-    // Vendre en ligne sans identité du vendeur, délai ni médiateur est interdit.
-    closedReason = 'Les informations légales du vendeur ne sont pas complètes.'
+  } else if (!demo && (site.legalPages.length === 0 || missingLegalInfo().length > 0)) {
+    // Vendre en ligne sans CGV ni identité du vendeur est interdit.
+    closedReason = 'Les pages légales ne sont pas en ligne ou pas complètes.'
+  } else if (ready.storage === false) {
+    // Sur Vercel sans base de données, une commande serait perdue à la requête suivante.
+    closedReason = 'L’enregistrement des commandes n’est pas encore raccordé.'
   } else if (!ready.payment) {
     closedReason = 'Le paiement en ligne n’est pas encore raccordé.'
   } else if (!ready.fulfillment) {
