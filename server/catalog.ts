@@ -1,6 +1,7 @@
 import { product } from '../src/config/product'
 import { shop } from '../src/config/shop'
 import { toCents } from '../src/shop/money'
+import { missingLegalInfo } from '../src/content/legal/fields'
 import type { ShopInfo, ShopMode } from '../src/shop/types'
 
 // Prix de démonstration, utilisés UNIQUEMENT en mode `demo` et seulement pour
@@ -29,6 +30,9 @@ export function buildCatalog(mode: ShopMode, ready: { payment: boolean; fulfillm
     closedReason = 'Les prix ne sont pas encore fixés.'
   } else if (shippingMethods.some((method) => method.priceCents === null)) {
     closedReason = 'Les frais de livraison ne sont pas encore fixés.'
+  } else if (!demo && missingLegalInfo().length > 0) {
+    // Vendre en ligne sans identité du vendeur, délai ni médiateur est interdit.
+    closedReason = 'Les informations légales du vendeur ne sont pas complètes.'
   } else if (!ready.payment) {
     closedReason = 'Le paiement en ligne n’est pas encore raccordé.'
   } else if (!ready.fulfillment) {

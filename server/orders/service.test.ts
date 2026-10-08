@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { buildCatalog } from '../catalog'
 import type { FulfillmentProvider } from '../fulfillment/types'
 import type { Notifier } from '../notify'
 import { DemoPaymentProvider } from '../payment/demo'
@@ -20,6 +21,11 @@ const customer = {
   acceptTerms: true,
 }
 const ORIGIN = 'https://boutique.test'
+
+// Prix du catalogue : ceux de la configuration, ou de démonstration s'ils ne sont pas fixés.
+const catalog = buildCatalog('demo', { payment: true, fulfillment: true })
+const priceOf = (variantId: string) => catalog.variants.find((variant) => variant.id === variantId)!.priceCents!
+const shippingCents = catalog.shippingMethods[0].priceCents!
 
 function setup(options: { fulfillmentFails?: boolean } = {}) {
   const store = new MemoryOrderStore()
@@ -59,8 +65,7 @@ describe('commande', () => {
     expect(orderId).toMatch(/^LK-[2-9A-HJ-NP-Z]{6}$/)
     expect(order.status).toBe('pending_payment')
     expect(order.payment.reference).toBe(reference)
-    // Prix de démonstration du 20 × 20 (20,00) × 2 + livraison de démo (5,00).
-    expect(order.totalCents).toBe(4500)
+    expect(order.totalCents).toBe(2 * priceOf('20x20') + shippingCents)
   })
 
   it('recalcule les montants sans tenir compte de ce que le navigateur envoie', async () => {
@@ -68,7 +73,7 @@ describe('commande', () => {
       { customer, lines: [{ variantId: '20x20', quantity: 1, unitPriceCents: 1 }], totalCents: 1 },
       ORIGIN,
     )
-    expect((await env.store.get(orderId))!.totalCents).toBe(2500)
+    expect((await env.store.get(orderId))!.totalCents).toBe(priceOf('20x20') + shippingCents)
   })
 
   it('refuse un formulaire incomplet avec le détail des champs', async () => {
@@ -126,6 +131,17 @@ describe('commande', () => {
     expect(await env.service.getForCustomer(orderId, order.accessKey)).toMatchObject({ id: orderId, status: 'awaiting_payment' })
     expect(await env.service.lookup(orderId, 'autre@exemple.fr')).toBeNull()
     expect(await env.service.lookup(orderId.toLowerCase(), ' Camille@Exemple.fr ')).toMatchObject({ id: orderId })
+  })
+
+  it('signale une commande annulée chez le fournisseur à l’administrateur, pas au client', async () => {
+    const { orderId, reference } = await placeOrder(env)
+    await env.service.handlePaymentEvent({ reference, outcome: 'paid' })
+    vi.mocked(env.fulfillment.getTracking).mockResolvedValueOnce({ status: 'cancelled', carrier: null, trackingNumber: null, trackingUrl: null })
+    await env.service.syncAll()
+    const order = (await env.store.get(orderId))!
+    expect(order.status).toBe('fulfillment_error')
+    expect(order.fulfillment.error).toMatch(/annulée/)
+    expect((await env.service.lookup(orderId, customer.email))?.status).toBe('confirmed')
   })
 
   it('met à jour le suivi auprès du fournisseur et prévient le client de l’expédition', async () => {

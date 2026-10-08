@@ -1,7 +1,8 @@
 import type { Order } from '../orders/types'
 
 export interface TrackingInfo {
-  status: 'processing' | 'shipped' | 'delivered'
+  /** `cancelled` : commande annulée chez le fournisseur, à traiter à la main. */
+  status: 'processing' | 'shipped' | 'delivered' | 'cancelled'
   carrier: string | null
   trackingNumber: string | null
   trackingUrl: string | null

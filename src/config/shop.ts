@@ -26,9 +26,12 @@ export interface Country {
 // À CONFIRMER : pays où tu livres. CJ calcule ses frais par pays.
 const countries: Country[] = [{ code: 'FR', name: 'France' }]
 
-// À CONFIRMER : prix, délai et mode d'envoi CJ correspondant.
+// Livraison offerte : son coût est compris dans le prix des formats.
+// Délai choisi le 8 octobre 2026. En jours ouvrés : CJ annonce 6 à 9 jours de
+// transport pour Fast Line, plus la préparation de la commande en entrepôt.
+// À ajuster d'après les premières commandes.
 const shippingMethods: ShippingMethod[] = [
-  { id: 'standard', label: 'Livraison standard à domicile', price: null, delay: null, cjLogisticName: null },
+  { id: 'standard', label: 'Livraison standard à domicile', price: 0, delay: '10 jours ouvrés', cjLogisticName: 'CJPacket Fast Line' },
 ]
 
 export const shop = {

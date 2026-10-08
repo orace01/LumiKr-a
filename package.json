@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && vite build --ssr server/main.ts --outDir dist-server",
+    "build": "tsc -b && vite build && vite build --ssr",
     "start": "node dist-server/main.js",
     "test": "vitest run",
     "lint": "oxlint",
-    "media": "bash scripts/build-media.sh"
+    "media": "bash scripts/build-media.sh",
+    "cj": "vite build --ssr --logLevel warn && node dist-server/cli.js"
   },
   "dependencies": {
     "@fontsource-variable/figtree": "^5.3.0",

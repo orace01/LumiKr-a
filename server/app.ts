@@ -2,9 +2,10 @@ import { getConnInfo } from '@hono/node-server/conninfo'
 import { Hono, type Context } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { secureHeaders } from 'hono/secure-headers'
+import { missingLegalInfo } from '../src/content/legal/fields'
 import type { ShopMode } from '../src/shop/types'
 import { readConfig, type ServerConfig } from './config'
-import { CjFulfillmentProvider } from './fulfillment/cj'
+import { CjFulfillmentProvider, readCjSettings } from './fulfillment/cj'
 import { DemoFulfillmentProvider } from './fulfillment/demo'
 import type { FulfillmentProvider } from './fulfillment/types'
 import { consoleNotifier, type Notifier } from './notify'
@@ -21,12 +22,20 @@ export interface AppDeps {
   payment: PaymentProvider
   fulfillment: FulfillmentProvider
   notifier: Notifier
+  /** Si renseigné, suit les commandes en cours auprès du fournisseur à cet intervalle. */
+  syncIntervalMs?: number
 }
 
 /** L'API de la boutique, sous /api. Les dépendances sont injectées pour les tests. */
 export function createApp(deps: AppDeps) {
   const { config, payment } = deps
   const orders = createOrderService({ mode: config.mode, ...deps })
+  if (deps.syncIntervalMs) {
+    const timer = setInterval(() => {
+      orders.syncAll().catch((error) => console.error('[fournisseur] suivi périodique impossible', error))
+    }, deps.syncIntervalMs)
+    timer.unref()
+  }
   const limitCheckout = createRateLimiter({ max: 10, windowMs: 60_000 })
   const limitLookup = createRateLimiter({ max: 30, windowMs: 60_000 })
 
@@ -141,14 +150,20 @@ export function createApp(deps: AppDeps) {
   return app
 }
 
-/** Dépendances réelles, selon le mode : simulées en démo, raccordées en réel. */
-export function createDefaultDeps(config: ServerConfig = readConfig()): AppDeps {
+/**
+ * Dépendances réelles, selon le mode : simulées en démo, raccordées en réel.
+ * En démo, CJ n'est sollicité qu'en mode test CJ (CJ_SANDBOX=1, avec une clé) :
+ * un paiement simulé ne doit jamais déclencher une vraie commande.
+ */
+export function createDefaultDeps(config: ServerConfig = readConfig(), env: NodeJS.ProcessEnv = process.env): AppDeps {
   const demo = config.mode === 'demo'
+  const cj = readCjSettings(env)
+  const useCj = !demo || (cj.sandbox && cj.apiKey !== '')
   return {
     config,
     store: new JsonFileOrderStore(config.dataDir),
     payment: demo ? new DemoPaymentProvider() : new AggregatorPaymentProvider(),
-    fulfillment: demo ? new DemoFulfillmentProvider() : new CjFulfillmentProvider(),
+    fulfillment: useCj ? CjFulfillmentProvider.fromEnv(config.dataDir, env) : new DemoFulfillmentProvider(),
     notifier: consoleNotifier,
   }
 }
@@ -165,7 +180,14 @@ export function getDefaultApp(fallbackMode: ShopMode = 'demo') {
     console.info(
       `[boutique] mode ${deps.config.mode} · paiement ${deps.payment.id} · fournisseur ${deps.fulfillment.id} · commandes dans ${deps.config.dataDir}/`,
     )
-    defaultApp = createApp(deps)
+    const legal = missingLegalInfo()
+    if (legal.length > 0) console.warn(`[boutique] Pages légales à compléter (src/config/site.ts, shop.ts) : ${legal.join(', ')}`)
+    if (deps.fulfillment instanceof CjFulfillmentProvider && !deps.fulfillment.isConfigured()) {
+      console.warn(`[boutique] CJ pas encore prêt, il manque : ${deps.fulfillment.missing().join(', ')}`)
+    }
+    // Avec `npm start`, le suivi des colis est aussi mis à jour tous les quarts
+    // d'heure, pour prévenir le client de l'expédition sans attendre sa visite.
+    defaultApp = createApp({ ...deps, syncIntervalMs: fallbackMode === 'live' ? 15 * 60_000 : undefined })
   }
   return defaultApp
 }

@@ -18,7 +18,7 @@ const STEPS = [
   {
     color: 'var(--glow)',
     title: 'Dessinez',
-    text: 'Un prénom, un animal, un mot doux : les feutres de couleur glissent sur la plaque transparente.',
+    text: 'Un prénom, un animal, un mot doux : le feutre glisse sur la plaque transparente.',
     image: packshot,
     width: 1000,
     height: 1000,
@@ -75,7 +75,7 @@ export function Intro() {
             Leur imagination n’a jamais été aussi <span className="highlight">lumineuse</span>.
           </h1>
           <p className="lede rise__lede">
-            Une plaque d’acrylique, des feutres et une base LED : ils dessinent, la lumière révèle, on efface et on
+            Une plaque d’acrylique sur une base LED : ils dessinent au feutre, la lumière révèle, on efface et on
             recommence.
           </p>
           {mobile && <FormatCarousel />}

@@ -97,7 +97,7 @@ export function CartDrawer() {
               </div>
               <p className="cart__note">
                 {shipping && shipping.priceCents !== null
-                  ? `Livraison : ${money(shipping.priceCents)}${shipping.delay ? ` · ${shipping.delay}` : ''}. `
+                  ? `Livraison ${shipping.priceCents === 0 ? 'offerte' : `: ${money(shipping.priceCents)}`}${shipping.delay ? ` · ${shipping.delay}` : ''}. `
                   : 'Frais de livraison calculés à l’étape suivante. '}
                 Prix TTC.
               </p>

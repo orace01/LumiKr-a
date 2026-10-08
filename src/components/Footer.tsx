@@ -1,6 +1,5 @@
 import { site } from '../config/site'
 import { Link } from './Link'
-import { ToConfirm } from './ToConfirm'
 import './Footer.css'
 
 const YEAR = new Date().getFullYear()
@@ -34,23 +33,13 @@ export function Footer() {
             {site.legalPages.map((page) => (
               <li key={page.path}>
                 <Link to={page.path}>{page.title}</Link>
-                {!page.body && (
-                  <>
-                    {' '}
-                    <ToConfirm />
-                  </>
-                )}
               </li>
             ))}
-            <li>
-              {site.contactEmail ? (
+            {site.contactEmail && (
+              <li>
                 <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
-              ) : (
-                <>
-                  Contact <ToConfirm />
-                </>
-              )}
-            </li>
+              </li>
+            )}
           </ul>
         </div>
       </div>

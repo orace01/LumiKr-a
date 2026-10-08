@@ -6,6 +6,14 @@ import { getDefaultApp } from './app'
 // Serveur de production : l'API sous /api et le site construit (dist/) pour
 // tout le reste. Lancé par `npm start` après `npm run build`.
 
+// Secrets et réglages : variables d'environnement de l'hébergeur, ou fichier
+// .env à la racine (voir .env.example).
+try {
+  process.loadEnvFile('.env')
+} catch {
+  // Pas de fichier .env.
+}
+
 const site = new Hono()
 site.route('/', getDefaultApp('live'))
 // Une adresse d'API inconnue répond 404 en JSON, pas avec la page du site.

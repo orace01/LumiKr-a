@@ -1,4 +1,3 @@
-import feutres from '../assets/media/feutres.webp'
 import supportDos from '../assets/media/support-dos.webp'
 import supportFace from '../assets/media/support-face.webp'
 import supportProfil from '../assets/media/support-profil.webp'
@@ -44,15 +43,6 @@ export function Details() {
         <div className="details__columns">
           <Reveal className="details__card">
             <h3 className="details__subtitle">Dans la boîte</h3>
-            <img
-              className="details__photo"
-              src={feutres}
-              width={262}
-              height={212}
-              loading="lazy"
-              decoding="async"
-              alt="Sept feutres alignés : blanc, violet, vert, bleu, orange, rose et jaune."
-            />
             <FactList facts={product.inTheBox} />
             <figure className="details__support">
               <ul className="details__support-views">
@@ -72,9 +62,11 @@ export function Details() {
           </Reveal>
         </div>
 
-        <p className="details__note">
-          Les informations marquées <ToConfirm /> sont en cours de vérification auprès du fabricant.
-        </p>
+        {[...product.inTheBox, ...product.specs].some((fact) => !fact.verified) && (
+          <p className="details__note">
+            Les informations marquées <ToConfirm /> sont en cours de vérification auprès du fabricant.
+          </p>
+        )}
       </div>
     </section>
   )

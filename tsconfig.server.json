@@ -26,6 +26,8 @@
     "server",
     "src/config/product.ts",
     "src/config/shop.ts",
+    "src/config/site.ts",
+    "src/content/legal/fields.ts",
     "src/shop/types.ts",
     "src/shop/money.ts",
     "src/shop/pricing.ts",

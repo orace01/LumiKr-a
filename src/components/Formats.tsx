@@ -97,7 +97,7 @@ export function Formats() {
               </p>
               <p className="formats__shipping">
                 {shipping && shipping.priceCents !== null
-                  ? `Livraison ${money(shipping.priceCents)}${shipping.delay ? ` · ${shipping.delay}` : ''}`
+                  ? `Livraison ${shipping.priceCents === 0 ? 'offerte' : money(shipping.priceCents)}${shipping.delay ? ` · ${shipping.delay}` : ''}`
                   : 'Prix TTC · livraison calculée à la commande'}
               </p>
             </div>

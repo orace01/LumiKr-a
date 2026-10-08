@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { createApp, type AppDeps } from './app'
+import { product } from '../src/config/product'
+import { toCents } from '../src/shop/money'
+import { createApp, createDefaultDeps, type AppDeps } from './app'
+import { buildCatalog } from './catalog'
 import { CjFulfillmentProvider } from './fulfillment/cj'
 import { DemoFulfillmentProvider } from './fulfillment/demo'
 import { consoleNotifier } from './notify'
@@ -8,6 +11,10 @@ import { AggregatorPaymentProvider } from './payment/aggregator'
 import { DemoPaymentProvider } from './payment/demo'
 
 const silentNotifier = { orderPaid: async () => {}, orderShipped: async () => {} } satisfies typeof consoleNotifier
+
+// Montant attendu d'un 12 × 12 livré, d'après le catalogue de démonstration.
+const demoCatalog = buildCatalog('demo', { payment: true, fulfillment: true })
+const smallOrderCents = demoCatalog.variants.find((variant) => variant.id === '12x12')!.priceCents! + demoCatalog.shippingMethods[0].priceCents!
 
 function demoApp(overrides: Partial<AppDeps['config']> = {}) {
   return createApp({
@@ -61,7 +68,7 @@ describe('API en mode démo', () => {
 
     const reference = new URL(redirectUrl).searchParams.get('ref')
     const demo = await read(await app.request(`/api/demo/payments/${reference}`))
-    expect(demo).toEqual({ orderId, amountCents: 1500, currency: 'EUR' })
+    expect(demo).toEqual({ orderId, amountCents: smallOrderCents, currency: 'EUR' })
 
     const paid = await app.request(`/api/demo/payments/${reference}`, json({ outcome: 'paid' }))
     const { redirectUrl: back } = await read(paid)
@@ -69,7 +76,7 @@ describe('API en mode démo', () => {
     expect(returnUrl.pathname).toBe('/commande/confirmation')
 
     const confirmation = await app.request(`/api/orders/${orderId}?cle=${returnUrl.searchParams.get('cle')}`)
-    expect(await read(confirmation)).toMatchObject({ id: orderId, status: 'preparing', totalCents: 1500 })
+    expect(await read(confirmation)).toMatchObject({ id: orderId, status: 'preparing', totalCents: smallOrderCents })
 
     const lookup = await app.request('/api/orders/lookup', json({ orderId, email: customer.email }))
     expect(lookup.status).toBe(200)
@@ -98,12 +105,26 @@ describe('API en mode démo', () => {
   })
 })
 
+describe('choix du fournisseur', () => {
+  const demo = { mode: 'demo' as const, publicUrl: null, dataDir: '', adminToken: null }
+
+  it('en démo, n’appelle CJ qu’en mode test CJ', () => {
+    expect(createDefaultDeps(demo, {}).fulfillment.id).toBe('demo')
+    expect(createDefaultDeps(demo, { CJ_API_KEY: 'k' }).fulfillment.id).toBe('demo')
+    expect(createDefaultDeps(demo, { CJ_API_KEY: 'k', CJ_SANDBOX: '1' }).fulfillment.id).toBe('cj')
+  })
+
+  it('en réel, appelle toujours CJ', () => {
+    expect(createDefaultDeps({ ...demo, mode: 'live' }, {}).fulfillment.id).toBe('cj')
+  })
+})
+
 describe('API en mode réel, avant raccordement', () => {
   const app = createApp({
     config: { mode: 'live', publicUrl: null, dataDir: '', adminToken: null },
     store: new MemoryOrderStore(),
     payment: new AggregatorPaymentProvider(),
-    fulfillment: new CjFulfillmentProvider(),
+    fulfillment: CjFulfillmentProvider.fromEnv('', {}),
     notifier: silentNotifier,
   })
 
@@ -111,8 +132,10 @@ describe('API en mode réel, avant raccordement', () => {
     const shop = await read(await app.request('/api/shop'))
     expect(shop.saleOpen).toBe(false)
     expect(shop.closedReason).toBeTruthy()
-    // Jamais de prix fictif en mode réel.
-    expect(shop.variants.every((variant: { priceCents: number | null }) => variant.priceCents === null)).toBe(true)
+    // Jamais de prix fictif en mode réel : seulement ceux de la configuration.
+    expect(shop.variants.map((variant: { priceCents: number | null }) => variant.priceCents)).toEqual(
+      product.variants.map((variant) => (variant.price === null ? null : toCents(variant.price))),
+    )
 
     const checkout = await app.request('/api/checkout', json({ customer, lines: [{ variantId: '12x12', quantity: 1 }] }))
     expect(checkout.status).toBe(503)

@@ -271,6 +271,15 @@ export function createOrderService(deps: OrderServiceDeps) {
             trackingUrl: tracking.trackingUrl ?? next.fulfillment.trackingUrl,
           },
         }
+        if (tracking.status === 'cancelled') {
+          // Annulée chez le fournisseur : le client a payé, c'est à l'administrateur
+          // de décider (nouvelle commande chez CJ ou remboursement).
+          const error = 'Commande annulée chez le fournisseur : passer une nouvelle commande dans CJ ou rembourser le client.'
+          return {
+            ...withStatus(next, 'fulfillment_error', 'Annulée chez le fournisseur'),
+            fulfillment: { ...next.fulfillment, error },
+          }
+        }
         if (tracking.status !== 'processing' && next.status === 'sent_to_supplier') {
           next = withStatus(next, 'shipped')
           shippedNow = true
@@ -283,6 +292,17 @@ export function createOrderService(deps: OrderServiceDeps) {
     } catch (error) {
       console.warn(`[fournisseur] suivi indisponible pour ${order.id}`, error)
       return order
+    }
+  }
+
+  /**
+   * Suivi de toutes les commandes en cours d'acheminement, à appeler à
+   * intervalles réguliers : le client est prévenu de l'expédition même s'il ne
+   * consulte pas sa commande. Une commande à la fois (limites d'appels CJ).
+   */
+  async function syncAll() {
+    for (const order of await store.list()) {
+      if (order.status === 'sent_to_supplier' || order.status === 'shipped') await syncTracking(order)
     }
   }
 
@@ -314,5 +334,14 @@ export function createOrderService(deps: OrderServiceDeps) {
     return fulfill(order)
   }
 
-  return { catalog, checkout, handlePaymentEvent, getForCustomer, lookup, retryFulfillment, listOrders: () => store.list() }
+  return {
+    catalog,
+    checkout,
+    handlePaymentEvent,
+    getForCustomer,
+    lookup,
+    retryFulfillment,
+    syncAll,
+    listOrders: () => store.list(),
+  }
 }

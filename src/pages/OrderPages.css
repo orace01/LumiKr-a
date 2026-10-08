@@ -180,3 +180,57 @@
   justify-items: start;
   max-width: calc(48rem + 2 * var(--gutter));
 }
+
+.legal__body {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  line-height: 1.6;
+}
+
+.legal__body > :first-child {
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+}
+
+.legal__heading {
+  margin-top: 1.25rem;
+  font-size: var(--step-2);
+}
+
+h3.legal__heading {
+  font-size: var(--step-1);
+}
+
+.legal__list {
+  display: grid;
+  gap: 0.4rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.legal__box {
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 2px solid var(--ink);
+  border-radius: calc(var(--radius) * 0.6);
+  background: var(--paper);
+  font-size: var(--step--1);
+}
+
+.legal__body a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+  overflow-wrap: anywhere;
+}
+
+.legal__missing {
+  padding: 0.05rem 0.45rem;
+  border: 1px dashed #b98a1f;
+  border-radius: 0.4rem;
+  background: #fff6d9;
+  color: #6b4d06;
+  font-size: 0.9em;
+  font-weight: 600;
+}

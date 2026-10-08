@@ -170,7 +170,7 @@ export function Playground() {
 
       <div className="playground__controls">
         <fieldset className="playground__pens">
-          <legend>Couleur du feutre</legend>
+          <legend>Couleur</legend>
           <div className="playground__swatches">
             {product.penColors.map((pen) => (
               <label key={pen.hex} className="playground__swatch" style={{ color: pen.hex }}>

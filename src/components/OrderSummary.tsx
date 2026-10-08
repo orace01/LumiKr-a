@@ -43,7 +43,7 @@ export function OrderSummary({ lines, subtotalCents, shippingCents, totalCents, 
         </div>
         <div>
           <dt>Livraison{shippingLabel ? ` (${shippingLabel})` : ''}</dt>
-          <dd>{shippingCents === null ? 'À l’étape suivante' : money(shippingCents)}</dd>
+          <dd>{shippingCents === null ? 'À l’étape suivante' : shippingCents === 0 ? 'Offerte' : money(shippingCents)}</dd>
         </div>
         <div className="summary__total">
           <dt>Total TTC</dt>

@@ -10,12 +10,6 @@
   box-shadow: 0 0.5rem 0 var(--ink);
 }
 
-/* Le visuel des feutres a un fond blanc, comme la carte : pas de cadre. */
-.details__photo {
-  width: min(100%, 13rem);
-  margin: 0.5rem auto 0.75rem;
-}
-
 .details__heading {
   display: grid;
   gap: 1.25rem;

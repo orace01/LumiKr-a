@@ -21,6 +21,12 @@ function shopApi(): Plugin {
   return {
     name: 'shop-api',
     configureServer(server) {
+      // Mêmes variables que le serveur de production (clés CJ, SHOP_MODE…).
+      try {
+        process.loadEnvFile('.env')
+      } catch {
+        // Pas de fichier .env : mode démo.
+      }
       server.middlewares.use(async (req, res, next) => {
         if (!req.url?.startsWith('/api/')) return next()
         try {
@@ -38,7 +44,14 @@ function shopApi(): Plugin {
 export default defineConfig(({ isSsrBuild }) => ({
   plugins: [react(), siteMeta(), shopApi()],
   // Le serveur (build --ssr) n'a pas besoin d'une copie de public/ : il sert dist/.
-  build: { copyPublicDir: !isSsrBuild },
+  build: isSsrBuild
+    ? {
+        // Serveur de production et outil CJ, compilés dans dist-server/.
+        outDir: 'dist-server',
+        copyPublicDir: false,
+        rollupOptions: { input: { main: 'server/main.ts', cli: 'server/cli.ts' } },
+      }
+    : {},
   test: {
     include: ['server/**/*.test.ts', 'src/**/*.test.ts'],
   },

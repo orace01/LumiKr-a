@@ -2,7 +2,8 @@
 
 Boutique en ligne du tableau lumineux à dessiner (plaque acrylique effaçable, base LED, USB) :
 page d'accueil, panier, commande, paiement, confirmation et suivi. Tout fonctionne en mode
-démo ; il ne reste à raccorder que l'agrégateur de paiement et CJdropshipping (voir plus bas).
+démo. CJdropshipping est intégré et n'attend que sa configuration ; il ne reste à écrire que
+le raccordement de l'agrégateur de paiement (voir plus bas).
 
 ## Démarrer
 
@@ -41,20 +42,60 @@ aucun effet.
 
 ## Ce qui reste à raccorder
 
-Deux fichiers seulement, chacun documenté en tête :
-
-| Raccordement | Fichier | Ce qu'il faut écrire |
+| Raccordement | Fichier | État |
 | --- | --- | --- |
-| Agrégateur de paiement | `server/payment/aggregator.ts` | créer la transaction, vérifier la signature des notifications, (facultatif) interroger une transaction |
-| CJdropshipping | `server/fulfillment/cj.ts` | appeler la création de commande et la lecture du suivi ; la traduction commande → format CJ est déjà écrite (`toCjOrder`) |
+| Agrégateur de paiement | `server/payment/aggregator.ts` | à écrire : créer la transaction, vérifier la signature des notifications, (facultatif) interroger une transaction |
+| CJdropshipping | `server/fulfillment/cj.ts`, `cj-client.ts` | écrit et testé ; reste à le configurer (ci-dessous) |
 
-Puis, dans la configuration : les prix (`src/config/product.ts`), les identifiants de
-variante CJ (`cjVariantId`), le mode de livraison et son nom CJ (`src/config/shop.ts`).
-Les clés vont dans les variables d'environnement (`.env.example`), jamais dans le code.
+Les prix sont fixés (`src/config/product.ts`, livraison offerte). Les clés vont dans les
+variables d'environnement (`.env.example`), jamais dans le code.
 
 **La vente s'ouvre d'elle-même** quand tous les prix sont fixés et que les deux
 raccordements répondent `isConfigured() === true`. Avant cela, le site affiche « La vente en
-ligne ouvre bientôt » et le serveur refuse toute commande.
+ligne ouvre bientôt » et le serveur refuse toute commande. Au démarrage, `npm start` écrit
+dans le journal ce qui manque encore à CJ.
+
+### Configurer CJ
+
+`npm run cj` est un outil en lecture seule : il ne crée aucune commande et ne modifie
+rien sur le compte CJ.
+
+1. Dans le tableau de bord CJ, rubrique API, générer une clé. La copier dans un fichier
+   `.env` (à créer à partir de `.env.example`, ignoré par Git) : `CJ_API_KEY=…`.
+2. `npm run cj -- verifier` : teste la clé et liste ce qui reste à renseigner.
+3. `npm run cj -- produit` : variantes du produit `CJYD2333071`, avec leur `vid` et le stock
+   par entrepôt. Reporter le `vid` de chaque format dans `cjVariantId`
+   (`src/config/product.ts`), et le pays de l'entrepôt choisi dans `CJ_FROM_COUNTRY`.
+4. `npm run cj -- livraison <vid> FR` : modes d'envoi possibles, avec prix et délai CJ.
+   Reporter le `logisticName` retenu dans `cjLogisticName` (`src/config/shop.ts`), ainsi
+   que le prix et le délai annoncés au client (`price`, `delay`). Ce n'est qu'une
+   estimation : le port réellement facturé peut être plus élevé (au premier test, 12,97 $
+   facturés pour 9,47 $ estimés). Fixer les prix d'après une commande de test (étape 6).
+5. Approvisionner le solde CJ : avec `CJ_PAY_TYPE=2` (par défaut), chaque commande est
+   payée sur ce solde. Avec `CJ_PAY_TYPE=3`, elle est seulement créée et se paie à la main
+   dans le tableau de bord CJ.
+6. Tester de bout en bout avec `CJ_SANDBOX=1` et `npm run dev` : le paiement est simulé et
+   les commandes partent chez CJ en commandes de test, ni débitées ni expédiées.
+   `npm run cj -- commande LK-XXXXXX` montre ensuite leur état chez CJ.
+
+Fonctionnement :
+
+- La commande n'est envoyée à CJ qu'une fois le paiement confirmé, avec le numéro `LK-…`
+  comme référence. CJ refuse les doublons : une relance reprend la commande existante et
+  la paie si elle ne l'est pas encore.
+- Toutes les 15 minutes (`npm start`), le serveur relit chez CJ l'état des commandes en
+  cours : numéro de suivi, expédition (e-mail au client), livraison. Une commande annulée
+  chez CJ passe en `fulfillment_error`.
+- Les refus de CJ (solde insuffisant, variante ou mode d'envoi invalide, adresse…) sont
+  traduits en consignes dans le champ `fulfillment.error` de la commande.
+- Le jeton d'accès CJ est conservé dans `data/cj-token.json` (lisible par le seul
+  propriétaire) et renouvelé automatiquement. Les appels sont espacés d'au moins
+  1,1 s (limite d'un compte CJ gratuit, réglable par `CJ_MIN_INTERVAL_MS`).
+- Les webhooks CJ ne sont pas utilisés : la relecture périodique les remplace.
+- TVA à l'import dans l'UE (IOSS) : `CJ_IOSS_TYPE=3`, l'IOSS de CJ. CJ déclare la TVA et
+  l'ajoute au montant de chaque commande CJ, à prévoir dans le prix de vente ; le client ne
+  paie rien à la livraison. **Obligatoire** : sans ce réglage, CJ refuse les commandes vers
+  la France (« Please enter a IOSS number »), et la vente reste fermée.
 
 ## Modes
 
@@ -87,7 +128,8 @@ Une commande payée que CJ a refusée passe en `fulfillment_error` (le client, l
 
 | Besoin | Fichier |
 | --- | --- |
-| Nom de marque, slogan, navigation, pages légales, contact | `src/config/site.ts` |
+| Nom de marque, slogan, navigation, contact, identité légale du vendeur (`seller`) | `src/config/site.ts` |
+| Texte des pages légales (mentions, CGV, confidentialité, livraison et retours) | `src/content/legal/*.md` |
 | Formats, prix, identifiants CJ, contenu de la boîte, caractéristiques | `src/config/product.ts` |
 | Devise, pays livrés, modes de livraison, nom du prestataire de paiement | `src/config/shop.ts` |
 | Questions fréquentes | `src/config/faq.ts` |
@@ -103,6 +145,13 @@ la page affiche une pastille « À confirmer » au lieu de présenter l'informat
 acquise. Il suffit de renseigner `value` et de passer `verified` à `true`.
 
 Même règle pour les prix et frais de livraison : `null` tant qu'ils ne sont pas fixés.
+
+### Pages légales
+
+Les textes sont en Markdown simplifié dans `src/content/legal/` (titres `##`, listes `-`,
+encadrés `>`, `**gras**`, `[liens](/cgv)`). Les jetons `{vendeur}`, `{adresse}`, `{email}`,
+`{delai}`… sont remplacés par les valeurs de la configuration (`src/content/legal/fields.ts`) :
+l'identité du vendeur ne se saisit qu'une fois.
 
 ## Médias
 
@@ -144,16 +193,26 @@ Avec « animations réduites », rien n'est épinglé ni animé : chaque section
 
 ## Reste à faire avant mise en ligne
 
-- Confirmer le nom de marque, les prix, le contenu exact de la boîte, l'âge conseillé et
-  les consignes de sécurité.
-- Vérifier que la vidéo montre bien la référence vendue : sa base lumineuse et ses pieds
-  diffèrent de ceux des photos fournisseur.
-- Fixer les prix, les frais et délais de livraison, la devise et les pays livrés.
-- Rédiger les pages légales (mentions, CGV, confidentialité, livraison et retours) pour le
-  marché visé : champ `body` de chaque page dans `site.ts`.
-- Raccorder le paiement et CJ (voir « Ce qui reste à raccorder »).
-- Brancher l'envoi des e-mails au client (`server/notify.ts`), si le prestataire de paiement
-  n'envoie pas déjà de reçu : pour l'instant ils sont seulement écrits dans le journal.
+- Confirmer le nom de marque. Prix fixés le 7 octobre 2026 : 24,90 € à 36,90 € selon le
+  format, livraison offerte, annoncée en 10 jours ouvrés (à ajuster d'après les
+  premières commandes).
+- Contenu et caractéristiques repris de la fiche CJ le 8 octobre 2026 ; ce qu'elle ne dit
+  pas (couleur de la lumière, interrupteur, âge, sécurité) n'est pas affiché. La fiche
+  annonce un seul feutre alors que certaines photos en montrent sept : à vérifier sur un
+  exemplaire. Âge conseillé et consignes de sécurité : à obtenir du fabricant (marquage CE,
+  rapport EN 71) avant de les afficher.
+- Vérifier que la photo du début de page montre bien la référence vendue : sa base est en
+  bois, celle des photos fournisseur est blanche.
+- Compléter l'identité du vendeur (`seller` et `contactEmail` dans `src/config/site.ts`) :
+  nom, statut, adresse, SIREN, TVA, téléphone, directeur de la publication, hébergeur et
+  médiateur de la consommation (adhésion obligatoire). Les pages légales sont rédigées dans
+  `src/content/legal/` ; tant qu'une information manque, elles affichent « à compléter » et,
+  en mode réel, la vente reste fermée. Les faire relire par un professionnel du droit.
+- Raccorder le paiement et configurer CJ (voir « Ce qui reste à raccorder »).
+- Brancher l'envoi des e-mails au client (`server/notify.ts`) : pour l'instant ils sont
+  seulement écrits dans le journal. Obligatoire avant d'ouvrir la vente : les CGV annoncent
+  une confirmation de commande par e-mail (exigée par l'article L. 221-13 du Code de la
+  consommation) et l'envoi du numéro de suivi.
 - Héberger sur un serveur Node.js qui garde ses fichiers (`data/`), avec HTTPS et
   `PUBLIC_URL` renseigné.
 - Passer `og:image` en URL absolue et ajouter les données structurées produit une fois le
