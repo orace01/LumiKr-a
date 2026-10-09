@@ -1,4 +1,4 @@
-Dernière mise à jour : 8 octobre 2026.
+Dernière mise à jour : 9 octobre 2026.
 
 Cette politique explique quelles données personnelles nous recueillons sur le site {site}, pourquoi, avec qui nous les partageons, combien de temps nous les gardons et comment exercer vos droits, conformément au Règlement général sur la protection des données (RGPD) et à la loi Informatique et Libertés.
 
@@ -37,14 +37,14 @@ Nous ne vous envoyons pas de lettre d’information ni d’offre commerciale.
 Seules les personnes chargées des commandes et du service client ont accès à vos données, ainsi que nos prestataires, pour ce qui est strictement nécessaire à leur mission :
 
 - notre fournisseur et partenaire logistique, situé en Chine, qui prépare et expédie votre commande, et les transporteurs qui la livrent : nom, adresse de livraison, téléphone et e-mail ;
-- {paiement}, pour le paiement ;
+- {paiement}, pour le paiement : nom, adresse e-mail, téléphone, pays et montant de la commande ;
 - l’hébergeur du site, qui stocke les données de commande.
 
 Nous ne vendons ni ne louons vos données.
 
 ## Transferts hors de l’Union européenne
 
-Votre commande étant expédiée depuis la Chine, les données nécessaires à la livraison sont transmises à notre partenaire logistique et aux transporteurs, hors de l’Union européenne. Ce transfert est nécessaire à l’exécution de votre commande (article 49.1.b du RGPD) et limité aux seules données utiles à la livraison.
+Votre commande étant expédiée depuis la Chine, les données nécessaires à la livraison sont transmises à notre partenaire logistique et aux transporteurs, hors de l’Union européenne. Le paiement est traité par {paiement}, édité par une société établie aux États-Unis, à qui sont transmises les données nécessaires au paiement. Ces transferts sont nécessaires à l’exécution de votre commande (article 49.1.b du RGPD) et limités aux seules données utiles à la livraison et au paiement.
 
 ## Durées de conservation
 

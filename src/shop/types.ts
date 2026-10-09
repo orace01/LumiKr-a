@@ -52,6 +52,12 @@ export interface CheckoutResponse {
   orderId: string
   /** Page de paiement du prestataire, vers laquelle le site redirige le client. */
   redirectUrl: string
+  /**
+   * Page de confirmation de cette commande (avec sa clé). Gardée par le
+   * navigateur pendant le paiement, pour le cas où le prestataire ne ramène
+   * pas le client sur une adresse propre à la commande (Mepaye).
+   */
+  confirmationPath: string
 }
 
 export interface PricedLine {

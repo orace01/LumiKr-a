@@ -2,8 +2,8 @@
 
 Boutique en ligne du tableau lumineux à dessiner (plaque acrylique effaçable, base LED, USB) :
 page d'accueil, panier, commande, paiement, confirmation et suivi. Tout fonctionne en mode
-démo. CJdropshipping est intégré et n'attend que sa configuration ; il ne reste à écrire que
-le raccordement de l'agrégateur de paiement (voir plus bas).
+démo. CJdropshipping et le paiement Mepaye sont raccordés et n'attendent que leur
+configuration (voir plus bas).
 
 ## Démarrer
 
@@ -44,7 +44,7 @@ aucun effet.
 
 | Raccordement | Fichier | État |
 | --- | --- | --- |
-| Agrégateur de paiement | `server/payment/aggregator.ts` | à écrire : créer la transaction, vérifier la signature des notifications, (facultatif) interroger une transaction |
+| Paiement (Mepaye) | `server/payment/mepaye.ts` | écrit et testé ; reste à le configurer (ci-dessous) |
 | CJdropshipping | `server/fulfillment/cj.ts`, `cj-client.ts` | écrit et testé ; reste à le configurer (ci-dessous) |
 
 Les prix sont fixés (`src/config/product.ts`, livraison offerte). Les clés vont dans les
@@ -52,8 +52,30 @@ variables d'environnement (`.env.example`), jamais dans le code.
 
 **La vente s'ouvre d'elle-même** quand tous les prix sont fixés et que les deux
 raccordements répondent `isConfigured() === true`. Avant cela, le site affiche « La vente en
-ligne ouvre bientôt » et le serveur refuse toute commande. Au démarrage, `npm start` écrit
-dans le journal ce qui manque encore à CJ.
+ligne ouvre bientôt » et le serveur refuse toute commande. Au démarrage, le serveur écrit
+dans le journal ce qui manque encore (Mepaye, CJ, pages légales).
+
+### Configurer Mepaye
+
+Le client paie sur la page hébergée de Mepaye (cartes, PayPal, mobile money) ; le numéro de
+carte ne passe jamais par le site. Mepaye prévient le serveur par un webhook signé.
+
+1. Dans la boutique Mepaye, régler la **devise sur l'euro** : l'API refuse un paiement dans
+   une autre devise que celle de la boutique (`currency_mismatch`).
+2. **Développeur → Webhooks** : URL `https://…/api/payments/notify`, événements
+   `payment.succeeded` et `payment.failed`. Le secret affiché va dans `MEPAYE_WEBHOOK_SECRET`.
+3. **Développeur → API Paiement** : créer une clé (`MEPAYE_API_KEY`), avec pour « Lien de ton
+   site » `https://…/commande/confirmation`. Mepaye y ramène le client après le paiement ; le
+   navigateur retrouve la commande payée (`src/shop/pendingOrder.ts`).
+4. Tester avec une clé `mp_test_…` en mode démo (`SHOP_MODE=demo`) : la page de paiement
+   propose « Simuler un paiement réussi / un échec ». Une clé de test n'ouvre jamais la vente
+   réelle, et le serveur ignore les notifications de test quand la clé est réelle (et
+   inversement).
+5. En production, une clé `mp_live_…`. Une notification dont le montant ou la devise
+   diffère de la commande ne la valide pas.
+
+Mepaye prélève une commission de 5 % ; l'API ne permet pas de relire l'état d'un paiement,
+seul le webhook fait foi.
 
 ### Configurer CJ
 
@@ -103,7 +125,7 @@ Fonctionnement :
 | --- | --- | --- |
 | Mode par défaut | `demo` | `live` |
 | Prix | fictifs pour les formats sans prix | ceux de la configuration uniquement |
-| Paiement | simulé sur `/paiement-demo` | agrégateur |
+| Paiement | simulé sur `/paiement-demo`, ou Mepaye avec une clé de test | Mepaye |
 | Fournisseur | simulé (expédié après 2 min, livré après 5 min) | CJ |
 
 `SHOP_MODE=demo|live` force un mode. En démo, une pastille « Mode démo » reste affichée.
@@ -140,7 +162,8 @@ Une fois pour toutes, dans le projet Vercel :
    longues chaînes aléatoires
    (`node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`) pour `CRON_SECRET` et `ADMIN_TOKEN`.
    `PUBLIC_URL` est facultatif (domaine de production par défaut) ; `SHOP_MODE` reste vide
-   (mode réel). Les variables du paiement viendront avec l'agrégateur.
+   (mode réel). Pour le paiement : `MEPAYE_API_KEY` (clé `mp_live_…`) et
+   `MEPAYE_WEBHOOK_SECRET` (voir « Configurer Mepaye »).
 3. Redéployer, puis vérifier que `https://…/api/shop` répond en JSON. Les journaux de la
    fonction (Logs) listent au démarrage ce qui manque encore.
 

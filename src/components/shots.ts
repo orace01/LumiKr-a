@@ -42,8 +42,8 @@ export const SHOTS: Shot[] = [
     id: 'sirene',
     variantId: '20x20',
     src: shotSirene,
-    width: 744,
-    height: 744,
+    width: 748,
+    height: 760,
     alt: 'Le tableau carré avec une sirène dessinée, allumé dans une pièce sombre.',
   },
   {

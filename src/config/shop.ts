@@ -45,6 +45,6 @@ export const shop = {
   countries,
   shippingMethods,
 
-  /** À CONFIRMER : nom affiché sous le bouton de paiement (« Paiement sécurisé par … »). */
-  paymentProviderName: null as string | null,
+  /** Nom du prestataire affiché au paiement et dans les pages légales (server/payment/mepaye.ts). */
+  paymentProviderName: 'Mepaye' as string | null,
 }

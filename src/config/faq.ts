@@ -26,6 +26,11 @@ export const faq: FaqEntry[] = [
       'Une plaque en acrylique transparent posée sur une base lumineuse LED. On dessine ou on écrit dessus au feutre, et la lumière fait ressortir les traits.',
   },
   {
+    question: 'À quoi peut-il servir ?',
+    answer:
+      'À décorer pour les fêtes (Halloween, Noël, Nouvel An…), à laisser un mot doux ou une citation, à afficher le menu ou l’offre du jour dans un commerce, à faire veilleuse le soir, ou à dessiner avec les enfants. Son support sert aussi de porte-tablette ou de porte-téléphone.',
+  },
+  {
     question: 'Peut-on effacer et recommencer ?',
     answer: 'Oui : la surface s’efface à sec, puis on redessine. La plaque se réutilise autant qu’on veut.',
   },

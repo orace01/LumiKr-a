@@ -13,6 +13,9 @@ export type PaymentOutcome = 'paid' | 'failed' | 'cancelled'
 export interface PaymentEvent {
   reference: string
   outcome: PaymentOutcome
+  /** Montant et devise encaissés, si le prestataire les donne : comparés à la commande. */
+  amountCents?: number
+  currency?: string
 }
 
 /**

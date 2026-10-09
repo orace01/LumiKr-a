@@ -12,11 +12,12 @@ import { product } from '../config/product'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { scrollToHash } from '../router'
 
-// Les trois usages, annoncés en mots géants juste avant leur section.
+// Les usages, annoncés en mots géants juste avant leur section.
 const USAGE_WORDS = [
+  { text: 'Fêter', color: 'var(--orange)' },
+  { text: 'Décorer', color: 'var(--violet)' },
+  { text: 'Écrire', color: 'var(--blue)' },
   { text: 'Créer', color: 'var(--primary)' },
-  { text: 'Décorer', color: 'var(--orange)' },
-  { text: 'Annoncer', color: 'var(--blue)' },
 ]
 
 /**

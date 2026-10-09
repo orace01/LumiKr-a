@@ -8,6 +8,7 @@ import { useLocation } from '../router'
 import { api, ApiError } from '../shop/api'
 import { useCart } from '../shop/useCart'
 import { loadCheckoutDraft, saveCheckoutDraft } from '../shop/checkoutDraft'
+import { savePendingOrder } from '../shop/pendingOrder'
 import { quote } from '../shop/pricing'
 import { useShop } from '../shop/useShop'
 import type { CheckoutCustomer, FieldErrors } from '../shop/types'
@@ -116,9 +117,11 @@ export function CheckoutPage() {
 
     setSending(true)
     try {
-      const { redirectUrl } = await api.checkout({ customer: normalized, lines: cart.lines })
+      const { redirectUrl, confirmationPath } = await api.checkout({ customer: normalized, lines: cart.lines })
       // Direction la page de paiement du prestataire. Le panier est vidé
-      // seulement quand le paiement est confirmé (page de confirmation).
+      // seulement quand le paiement est confirmé (page de confirmation), que
+      // le navigateur saura retrouver au retour (pendingOrder.ts).
+      savePendingOrder(confirmationPath)
       window.location.assign(redirectUrl)
     } catch (error) {
       setSending(false)

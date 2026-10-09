@@ -92,14 +92,29 @@
 }
 
 .stack__media {
+  position: relative;
   min-height: 0;
+  overflow: hidden;
   border-bottom: 2px solid var(--ink);
 }
 
-.stack__media img {
+/* La photo est montrée entière, jamais rognée : on voit tout le produit. */
+.stack__photo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Autour, la même photo très floue remplit le cadre (image minuscule agrandie,
+   floutée d'avance : aucun filtre à recalculer pendant le défilement). */
+.stack__backdrop {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: scale(1.15);
 }
 
 .stack__body {
@@ -119,34 +134,17 @@
   max-width: 52ch;
 }
 
-/* Le packshot a un fond blanc : le mode multiply le fond dans l'aplat jaune. */
-.stack__card--creer,
-.stack__card--creer .stack__media {
+/* Fond jaune pâle sous le texte de la carte des enfants. */
+.stack__card--creer {
   background: var(--glow-soft);
 }
 
-.stack__card--creer .stack__media {
-  border-bottom: 0;
-}
-
-.stack__card--creer .stack__media img {
-  object-fit: contain;
-  mix-blend-mode: multiply;
-}
-
-/* Le message « Good Morning » est à gauche de la photo, la fleur rouge à
-   droite. Quand la carte est moins large que l'image, le cadrage garde le
-   message entier et laisse la fleur sortir du cadre plutôt que la couper. */
-.stack__card--annoncer .stack__media img {
-  object-position: 12% 50%;
-}
-
-.stack__card--annoncer {
+.stack__card--ecrire {
   background: var(--night);
   color: var(--on-night);
 }
 
-.stack__card--annoncer .stack__body p:last-child {
+.stack__card--ecrire .stack__body p:last-child {
   color: var(--on-night-soft);
 }
 
@@ -173,26 +171,17 @@
 }
 
 /* La carte recouverte recule légèrement, comme une pile de cartes. */
-/* Téléphone : une carte haute comme l'écran rognerait les photos en largeur
-   jusqu'à les rendre illisibles. La carte prend la hauteur de son contenu et
-   chaque photo garde des proportions proches de l'original ; l'empilement au
-   défilement est conservé. */
+/* Téléphone : la carte prend la hauteur de son contenu et le cadre les
+   proportions exactes de la photo, entière et sans fond flou autour ;
+   l'empilement au défilement est conservé. */
 @media (max-width: 720px) {
   .stack__card {
     grid-template-rows: auto auto;
     height: auto;
   }
 
-  .stack__media img {
-    aspect-ratio: 5 / 4;
-  }
-
-  .stack__card--creer .stack__media img {
-    aspect-ratio: 1;
-  }
-
-  .stack__card--annoncer .stack__media img {
-    aspect-ratio: 16 / 9;
+  .stack__media {
+    aspect-ratio: var(--ratio);
   }
 }
 

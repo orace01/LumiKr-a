@@ -14,8 +14,8 @@ import { consoleNotifier, type Notifier } from './notify'
 import { CheckoutError, createOrderService } from './orders/service'
 import { RedisOrderStore, RedisRest, readRedisSettings, redisTokenStore } from './orders/redis'
 import { JsonFileOrderStore, MemoryOrderStore, type OrderStore } from './orders/store'
-import { AggregatorPaymentProvider } from './payment/aggregator'
 import { DemoPaymentProvider } from './payment/demo'
+import { MepayePaymentProvider, readMepayeSettings } from './payment/mepaye'
 import type { PaymentProvider } from './payment/types'
 import { createRateLimiter } from './rate-limit'
 
@@ -178,6 +178,9 @@ export function createDefaultDeps(config: ServerConfig = readConfig(), env: Node
   const demo = config.mode === 'demo'
   const cj = readCjSettings(env)
   const useCj = !demo || (cj.sandbox && cj.apiKey !== '')
+  // En démo, Mepaye n'est sollicité qu'avec une clé de test (paiements simulés).
+  const mepaye = readMepayeSettings(env)
+  const useMepaye = !demo || mepaye.apiKey.startsWith('mp_test_')
   const redisSettings = readRedisSettings(env)
   const redis = redisSettings ? new RedisRest(redisSettings) : null
   const serverless = Boolean(env.VERCEL)
@@ -185,7 +188,7 @@ export function createDefaultDeps(config: ServerConfig = readConfig(), env: Node
     config,
     store: redis ? new RedisOrderStore(redis) : serverless ? new MemoryOrderStore() : new JsonFileOrderStore(config.dataDir),
     storageReady: redis !== null || !serverless,
-    payment: demo ? new DemoPaymentProvider() : new AggregatorPaymentProvider(),
+    payment: useMepaye ? new MepayePaymentProvider(mepaye, { allowTestKey: demo }) : new DemoPaymentProvider(),
     fulfillment: useCj
       ? CjFulfillmentProvider.fromEnv(config.dataDir, env, redis ? redisTokenStore(redis) : undefined)
       : new DemoFulfillmentProvider(),
@@ -214,6 +217,9 @@ export function getDefaultApp(fallbackMode: ShopMode = 'demo') {
       console.warn('[boutique] Pages légales hors ligne (legalPagesOnline, src/config/site.ts) : la vente réelle reste fermée.')
     }
     if (legal.length > 0) console.warn(`[boutique] Pages légales à compléter (src/config/site.ts, shop.ts) : ${legal.join(', ')}`)
+    if (deps.payment instanceof MepayePaymentProvider && !deps.payment.isConfigured()) {
+      console.warn(`[boutique] Mepaye pas encore prêt, il manque : ${deps.payment.missing().join(', ')}`)
+    }
     if (deps.fulfillment instanceof CjFulfillmentProvider && !deps.fulfillment.isConfigured()) {
       console.warn(`[boutique] CJ pas encore prêt, il manque : ${deps.fulfillment.missing().join(', ')}`)
     }

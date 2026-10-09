@@ -18,8 +18,10 @@ ff() { ffmpeg -hide_banner -loglevel error -y "$@"; }
 
 # --- Photos fournisseur ------------------------------------------------------
 # Règles de recadrage : on ne garde que le produit. Restent hors cadre les
-# bandeaux et cotes en anglais, les personnes de banque d'images, les textes
-# religieux et les décors de fêtes (Noël, Nouvel An), qui dateraient le site.
+# bandeaux et cotes en anglais, les personnes de banque d'images et les textes
+# religieux, sauf sur la carte « Écrire » des usages, où le produit doit se voir
+# en entier (choix du 2026-10-09). Décors de fêtes : seulement dans les usages
+# et la troisième étape de l'intro.
 crop() { ff -i "$PICS/$1" -vf "crop=$2" -c:v libwebp -quality 84 "$OUT/$3"; }
 # Les petits recadrages affichés en grand sont agrandis ×2 (Lanczos + netteté)
 # plutôt que de laisser le navigateur les étirer.
@@ -50,18 +52,38 @@ ff -i "$PICS/$P_PACKSHOT" -c:v libwebp -quality 82 "$OUT/packshot.webp"
 # ordinateur, à faire défiler sur téléphone).
 shot "$P_FUSEE" 398:392:566:556 shot-fusee.webp
 shot "$P_FLEURS" 620:488:372:262 shot-fleurs.webp
-shot "$P_SIRENE" 372:372:80:572 shot-sirene.webp
+# La sirène : plaque et base entières, sans les cotes ni le bandeau.
+shot "$P_SIRENE" 374:380:78:566 shot-sirene.webp
 crop "$P_BONJOUR" 800:436:100:564 shot-bonjour.webp
 
-# Même scène en plan large, pour la carte « Annoncer » et le partage social.
-crop "$P_BONJOUR" 1000:436:0:564 bonjour-large.webp
+# Même scène, pour le partage social.
 ff -i "$PICS/$P_BONJOUR" -vf "crop=829:435:85:564,scale=1200:630:flags=lanczos" -q:v 4 "$PUBLIC/og-image.jpg"
 
-# La fusée sur fond neutre, pour la troisième étape.
-shot "$P_FORMATS" 235:235:650:668 fusee-claire.webp
+# Troisième étape de l'intro : « Happy New Year » sur le 30 × 20 (sans les cotes).
+shot "$P_FORMATS" 440:348:0:124 fete-nouvel-an.webp
 
-# Dans la boîte : les feutres et le support vu de face, de dos et de profil.
-crop "$P_SCENE" 262:212:700:776 feutres.webp
+# Cartes des usages : chaque photo montre le produit entier (plaque et base),
+# avec une version minuscule très floue qui remplit le cadre autour.
+# - Fêter : Halloween, fournie à part en 1024 × 572 px (2026-10-09), entière.
+ff -i "$SOURCES/halloween.png" -vf "scale=iw*2:ih*2:flags=lanczos,unsharp=5:5:0.6" -c:v libwebp -quality 84 "$OUT/fete-halloween.webp"
+# - Décorer : la veilleuse sur une commode, sans le titre ni les vignettes de
+#   la photo (son bord droit sort déjà du cadre sur l'original).
+crop "$P_SCENE" 682:620:318:95 deco-veilleuse.webp
+# - Écrire : le tableau « Good Morning » entier, citation comprise.
+crop "$P_BONJOUR" 920:650:40:230 message-bonjour.webp
+# - Créer : la fusée du 12 × 12 allumée dans une pièce sombre, sans les cotes.
+shot "$P_FUSEE" 440:440:558:550 creer-fusee.webp
+# (Les étapes de l'intro ont les mêmes fonds flous.)
+for f in fete-halloween deco-veilleuse message-bonjour creer-fusee shot-sirene fete-nouvel-an; do
+  ff -i "$OUT/$f.webp" -vf "scale=48:-2,gblur=sigma=3,scale=480:-2:flags=bicubic" -c:v libwebp -quality 60 "$OUT/$f-flou.webp"
+done
+
+# Le support sert aussi de porte-tablette et de porte-téléphone (vignettes de
+# la même photo, sans leurs titres en anglais).
+crop "$P_SCENE" 310:215:15:775 support-tablette.webp
+crop "$P_SCENE" 310:215:345:775 support-telephone.webp
+
+# Dans la boîte : le support vu de face, de dos et de profil.
 crop "$P_SCENE" 274:146:30:150 support-face.webp
 crop "$P_SCENE" 274:150:30:350 support-dos.webp
 crop "$P_SCENE" 274:152:30:552 support-profil.webp

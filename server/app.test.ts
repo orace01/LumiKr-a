@@ -7,7 +7,7 @@ import { CjFulfillmentProvider } from './fulfillment/cj'
 import { DemoFulfillmentProvider } from './fulfillment/demo'
 import { consoleNotifier } from './notify'
 import { MemoryOrderStore } from './orders/store'
-import { AggregatorPaymentProvider } from './payment/aggregator'
+import { MepayePaymentProvider, readMepayeSettings } from './payment/mepaye'
 import { DemoPaymentProvider } from './payment/demo'
 
 const silentNotifier = { orderPaid: async () => {}, orderShipped: async () => {} } satisfies typeof consoleNotifier
@@ -131,7 +131,7 @@ describe('API en mode réel, avant raccordement', () => {
   const app = createApp({
     config: { mode: 'live', publicUrl: null, dataDir: '', adminToken: null },
     store: new MemoryOrderStore(),
-    payment: new AggregatorPaymentProvider(),
+    payment: new MepayePaymentProvider(readMepayeSettings({})),
     fulfillment: CjFulfillmentProvider.fromEnv('', {}),
     notifier: silentNotifier,
   })

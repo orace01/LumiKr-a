@@ -1,6 +1,8 @@
 import supportDos from '../assets/media/support-dos.webp'
 import supportFace from '../assets/media/support-face.webp'
 import supportProfil from '../assets/media/support-profil.webp'
+import supportTablette from '../assets/media/support-tablette.webp'
+import supportTelephone from '../assets/media/support-telephone.webp'
 import { product, type Fact } from '../config/product'
 import { Reveal } from './Reveal'
 import { ToConfirm } from './ToConfirm'
@@ -10,6 +12,12 @@ const SUPPORT_VIEWS = [
   { src: supportFace, height: 146, label: 'De face' },
   { src: supportDos, height: 150, label: 'De dos' },
   { src: supportProfil, height: 152, label: 'De profil' },
+]
+
+// Autres usages du support, montrés par le fournisseur.
+const SUPPORT_USES = [
+  { src: supportTablette, label: 'Porte-tablette', alt: 'Une tablette tenue à l’horizontale par le support.' },
+  { src: supportTelephone, label: 'Porte-téléphone', alt: 'Un téléphone tenu à l’horizontale par le support.' },
 ]
 
 function FactList({ facts }: { facts: Fact[] }) {
@@ -54,6 +62,17 @@ export function Details() {
                 ))}
               </ul>
               <figcaption>Le support, vu de face, de dos et de profil (photos du fournisseur).</figcaption>
+            </figure>
+            <figure className="details__support">
+              <ul className="details__support-views details__support-views--uses">
+                {SUPPORT_USES.map((use) => (
+                  <li key={use.label}>
+                    <img src={use.src} width={310} height={215} loading="lazy" decoding="async" alt={use.alt} />
+                    <span>{use.label}</span>
+                  </li>
+                ))}
+              </ul>
+              <figcaption>Le support sert aussi à poser une tablette ou un téléphone (photos du fournisseur).</figcaption>
             </figure>
           </Reveal>
           <Reveal className="details__card" delay={120}>

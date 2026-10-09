@@ -4,10 +4,11 @@ import { OrderTimeline } from '../components/OrderTimeline'
 import { shop } from '../config/shop'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { Link } from '../components/Link'
-import { useLocation } from '../router'
+import { navigate, useLocation } from '../router'
 import { api, ApiError } from '../shop/api'
 import { useCart } from '../shop/useCart'
 import { clearCheckoutDraft } from '../shop/checkoutDraft'
+import { clearPendingOrder, loadPendingOrder } from '../shop/pendingOrder'
 import { useShop } from '../shop/useShop'
 import type { PublicOrder } from '../shop/types'
 import './OrderPages.css'
@@ -34,8 +35,15 @@ export function ConfirmationPage() {
   const { money } = useShop()
   const [loaded, setState] = useState<State>({ kind: 'loading' })
   const cleared = useRef(false)
+  // Retour du prestataire sans numéro de commande (Mepaye ramène sur une
+  // adresse fixe) : la commande en cours de paiement gardée par le navigateur.
+  const pending = orderId && key ? null : loadPendingOrder()
   // Un lien sans numéro ou sans clé ne mène à aucune commande.
-  const state: State = orderId && key ? loaded : { kind: 'not-found' }
+  const state: State = orderId && key ? loaded : pending ? { kind: 'loading' } : { kind: 'not-found' }
+
+  useEffect(() => {
+    if (pending) navigate(pending, { replace: true })
+  }, [pending])
 
   const order = state.kind === 'ready' ? state.order : null
   const paid = order !== null && PAID.has(order.status)
@@ -72,6 +80,7 @@ export function ConfirmationPage() {
       cleared.current = true
       cart.clear()
       clearCheckoutDraft()
+      clearPendingOrder()
     }
   }, [paid, cart])
 

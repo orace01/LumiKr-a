@@ -196,7 +196,7 @@ export function createOrderService(deps: OrderServiceDeps) {
       })
       await store.update(id, (current) => ({ ...current, payment: { ...current.payment, reference: session.reference } }))
       console.info(`[commande] ${id} créée, en attente de paiement (${order.totalCents / 100} ${order.currency})`)
-      return { orderId: id, redirectUrl: session.redirectUrl }
+      return { orderId: id, redirectUrl: session.redirectUrl, confirmationPath: `${returnUrl.pathname}${returnUrl.search}` }
     } catch (error) {
       console.error(`[paiement] création impossible pour ${id}`, error)
       await store.update(id, (current) => withStatus(current, 'payment_failed', 'Création du paiement impossible'))
@@ -236,6 +236,18 @@ export function createOrderService(deps: OrderServiceDeps) {
   async function handlePaymentEvent(event: PaymentEvent): Promise<Order | null> {
     const found = await store.findByPaymentReference(event.reference)
     if (!found) return null
+
+    // Un paiement d'un autre montant que la commande ne la valide pas.
+    if (
+      event.outcome === 'paid' &&
+      ((event.amountCents !== undefined && event.amountCents !== found.totalCents) ||
+        (event.currency !== undefined && event.currency.toUpperCase() !== found.currency))
+    ) {
+      console.error(
+        `[paiement] ${found.id} : montant reçu ${event.amountCents} ${event.currency} au lieu de ${found.totalCents} ${found.currency}, commande non validée`,
+      )
+      return found
+    }
 
     // Vérification et changement d'état d'un seul tenant : deux notifications
     // simultanées ne peuvent pas déclencher deux envois au fournisseur.

@@ -62,7 +62,7 @@ export const site = {
   /** À CONFIRMER : nom de marque provisoire. */
   brand: 'Lumikréa',
   locale: 'fr-FR',
-  tagline: 'Leur imagination n’a jamais été aussi lumineuse.',
+  tagline: 'Vos idées, en pleine lumière.',
 
   // Ancres de la page d'accueil, préfixées par « / » pour fonctionner depuis
   // toutes les pages du site.
