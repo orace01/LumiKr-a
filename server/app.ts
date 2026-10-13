@@ -10,7 +10,7 @@ import { readConfig, type ServerConfig } from './config'
 import { CjFulfillmentProvider, readCjSettings } from './fulfillment/cj'
 import { DemoFulfillmentProvider } from './fulfillment/demo'
 import type { FulfillmentProvider } from './fulfillment/types'
-import { consoleNotifier, type Notifier } from './notify'
+import { consoleNotifier, createEmailNotifier, readMailSettings, type Notifier } from './notify'
 import { CheckoutError, createOrderService } from './orders/service'
 import { RedisOrderStore, RedisRest, readRedisSettings, redisTokenStore } from './orders/redis'
 import { JsonFileOrderStore, MemoryOrderStore, type OrderStore } from './orders/store'
@@ -184,6 +184,8 @@ export function createDefaultDeps(config: ServerConfig = readConfig(), env: Node
   const redisSettings = readRedisSettings(env)
   const redis = redisSettings ? new RedisRest(redisSettings) : null
   const serverless = Boolean(env.VERCEL)
+  // E-mails au client : il faut le serveur d'envoi et l'adresse du site (liens).
+  const mail = readMailSettings(env)
   return {
     config,
     store: redis ? new RedisOrderStore(redis) : serverless ? new MemoryOrderStore() : new JsonFileOrderStore(config.dataDir),
@@ -192,7 +194,7 @@ export function createDefaultDeps(config: ServerConfig = readConfig(), env: Node
     fulfillment: useCj
       ? CjFulfillmentProvider.fromEnv(config.dataDir, env, redis ? redisTokenStore(redis) : undefined)
       : new DemoFulfillmentProvider(),
-    notifier: consoleNotifier,
+    notifier: mail && config.publicUrl ? createEmailNotifier(mail, config.publicUrl) : consoleNotifier,
   }
 }
 
@@ -217,6 +219,9 @@ export function getDefaultApp(fallbackMode: ShopMode = 'demo') {
       console.warn('[boutique] Pages légales hors ligne (legalPagesOnline, src/config/site.ts) : la vente réelle reste fermée.')
     }
     if (legal.length > 0) console.warn(`[boutique] Pages légales à compléter (src/config/site.ts, shop.ts) : ${legal.join(', ')}`)
+    if (deps.notifier === consoleNotifier && deps.config.mode === 'live') {
+      console.warn('[boutique] E-mails aux clients non branchés : renseigner SMTP_HOST, SMTP_USER, SMTP_PASSWORD (et PUBLIC_URL hors Vercel).')
+    }
     if (deps.payment instanceof MepayePaymentProvider && !deps.payment.isConfigured()) {
       console.warn(`[boutique] Mepaye pas encore prêt, il manque : ${deps.payment.missing().join(', ')}`)
     }

@@ -74,8 +74,8 @@ export const site = {
   ],
   primaryCta: { label: 'Choisir mon format', href: '/#formats' },
 
-  /** À CONFIRMER : adresse de contact du service client. */
-  contactEmail: null as string | null,
+  /** Adresse de contact du service client (boîte LWS, créée le 13 octobre 2026). */
+  contactEmail: 'contact@lumikrea.store' as string | null,
 
   /** Pages légales en ligne : aucune tant que `legalPagesOnline` vaut `false`. */
   legalPages: legalPagesOnline ? legalPages : [],

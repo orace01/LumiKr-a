@@ -148,6 +148,10 @@ Une commande payée que CJ a refusée passe en `fulfillment_error` (le client, l
 
 ## Mise en ligne sur Vercel
 
+Le site est servi sur `https://www.lumikrea.store` (domaine chez LWS : enregistrements A `@`
+et CNAME `www` vers Vercel, messagerie restée chez LWS). L'adresse `lumi-krea.vercel.app`
+doit rester active, sans redirection : le webhook Mepaye y est déclaré.
+
 `vercel.json` fait construire le projet avec `npm run build:vercel` : le site en fichiers
 statiques et toute l'API `/api/*` en une fonction (`server/vercel.ts`, assemblée par
 `scripts/vercel-output.mjs`). Les adresses directes (`/suivi`, `/cgv`…) renvoient le site.
@@ -163,7 +167,11 @@ Une fois pour toutes, dans le projet Vercel :
    (`node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`) pour `CRON_SECRET` et `ADMIN_TOKEN`.
    `PUBLIC_URL` est facultatif (domaine de production par défaut) ; `SHOP_MODE` reste vide
    (mode réel). Pour le paiement : `MEPAYE_API_KEY` (clé `mp_live_…`) et
-   `MEPAYE_WEBHOOK_SECRET` (voir « Configurer Mepaye »).
+   `MEPAYE_WEBHOOK_SECRET` (voir « Configurer Mepaye »). Pour les e-mails aux clients
+   (confirmation de commande, numéro de suivi, `server/notify.ts`) : `SMTP_HOST`,
+   `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` de la boîte de contact, et `PUBLIC_URL`
+   (`https://www.lumikrea.store`) pour leurs liens. Sans eux, ces messages sont seulement
+   écrits dans le journal.
 3. Redéployer, puis vérifier que `https://…/api/shop` répond en JSON. Les journaux de la
    fonction (Logs) listent au démarrage ce qui manque encore.
 
@@ -250,17 +258,14 @@ Avec « animations réduites », rien n'est épinglé ni animé : chaque section
   rapport EN 71) avant de les afficher.
 - Vérifier que la photo du début de page montre bien la référence vendue : sa base est en
   bois, celle des photos fournisseur est blanche.
-- Renseigner l'e-mail du service client (`contactEmail`, `src/config/site.ts`) : seule
-  information indispensable des pages légales, réduites au minimum le 8 octobre 2026 (pas
-  d'entreprise enregistrée). Les lignes d'entreprise (`seller` : nom, statut, adresse,
+- Pages légales réduites au minimum le 8 octobre 2026 (pas d'entreprise enregistrée) :
+  seule l'adresse de contact est indispensable (`contactEmail`, `src/config/site.ts`,
+  `contact@lumikrea.store` depuis le 13 octobre 2026). Les lignes d'entreprise (`seller` : nom, statut, adresse,
   SIREN, TVA, téléphone, hébergeur, médiateur) n'apparaissent qu'une fois renseignées : à
   remplir dès que l'activité est déclarée. Les textes sont dans `src/content/legal/` ; les
   faire relire par un professionnel du droit.
-- Raccorder le paiement et configurer CJ (voir « Ce qui reste à raccorder »).
-- Brancher l'envoi des e-mails au client (`server/notify.ts`) : pour l'instant ils sont
-  seulement écrits dans le journal. Obligatoire avant d'ouvrir la vente : les CGV annoncent
-  une confirmation de commande par e-mail (exigée par l'article L. 221-13 du Code de la
-  consommation) et l'envoi du numéro de suivi.
+- Garder le solde CJ approvisionné : sans lui, une commande payée reste en
+  `fulfillment_error` jusqu'à sa relance (voir « Commandes et administration »).
 - Sur Vercel : créer la base Upstash for Redis et renseigner les variables (voir « Mise en
   ligne sur Vercel »).
 - Passer `og:image` en URL absolue et ajouter les données structurées produit une fois le
