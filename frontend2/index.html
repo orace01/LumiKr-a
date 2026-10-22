@@ -68,14 +68,39 @@
         <p class="sub">Un mot laissé près du lit, qui veille jusqu'au matin.</p>
       </article>
 
-      <div class="finale" id="finale" data-in="28.0" data-script="28.3">
-        <h1 class="title"><span class="caps">La nuit</span><span class="script">s'allume</span></h1>
-        <p class="finale-sub">de leurs idées</p>
-        <a class="cta" href="#formats">
-          <span>Choisir mon format</span>
-          <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
-        </a>
+      <!-- Fin : la boule lumineuse écrit le titre (un .l = un tracé), devient le point final,
+           puis descend en laissant un fil derrière elle pendant que le sous-titre s'éclaire. -->
+      <svg class="trace" id="trace" aria-hidden="true"><path class="fil-halo"/><path class="fil-core"/></svg>
+      <div class="fin-bloc">
+        <h1 class="titre" id="titre">
+          <span class="l l1">Vos idées,</span>
+          <span class="l l2">en pleine</span>
+          <span class="l l3 lumiere">lumière</span><span class="visually-hidden">.</span>
+        </h1>
+        <p class="sub fin-sub" id="finSub">Une plaque d'acrylique sur une base LED : déco de fête, mot doux, menu du jour ou dessin d'enfant, on l'écrit au feutre, la lumière le révèle, on efface et on recommence.</p>
       </div>
+      <div class="boule" id="boule" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="suite" id="suite">
+  <!-- Fil lumineux dessiné au scroll derrière les sections ; la boule du hero en devient la tête
+       et va allumer la tablette au centre de sa plaque. -->
+  <svg class="fil" id="fil" aria-hidden="true"><path class="fil-halo"/><path class="fil-core"/></svg>
+  <div class="tete" id="tete" aria-hidden="true"></div>
+
+  <section class="dessin" id="dessin" aria-labelledby="dessin-titre">
+    <h2 class="dessin-titre" id="dessin-titre">Dessinez, puis éteignez la pièce.</h2>
+    <div class="tablette" id="tablette">
+      <div class="plaque">
+        <canvas class="toile" id="toile" role="img" aria-label="Zone de dessin : tracez au doigt, à la souris ou au stylet."></canvas>
+        <p class="indice" id="indice" aria-hidden="true">Dessinez ici</p>
+      </div>
+      <div class="socle" aria-hidden="true"></div>
+    </div>
+    <div class="outils">
+      <div class="feutres" id="feutres" role="radiogroup" aria-label="Couleur du feutre"></div>
+      <button type="button" class="effacer" id="effacer">Tout effacer</button>
     </div>
   </section>
 
@@ -96,8 +121,10 @@
       <p class="formats-note">Prototype : la commande se fait sur la boutique actuelle, livraison offerte.</p>
     </div>
   </section>
+  </div>
 </main>
 
 <script src="app.js"></script>
+<script src="dessin.js"></script>
 </body>
 </html>
