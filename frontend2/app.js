@@ -188,7 +188,19 @@
   // Stations : la tablette, puis chaque photo et section ([data-station], dans l'ordre de la page). La boule passe
   // par le centre de chacune ; une station s'allume quand la boule l'atteint (et s'éteint si l'on remonte).
   const stations = [...document.querySelectorAll("[data-station]")];
-  let filLen = 0, filTable = [], suiteTop = 0, lastFil = -1, y0 = 0, sy = 0, stationLens = [], sceneH = 1;
+  let filLen = 0, filTable = [], suiteTop = 0, lastFil = -1, y0 = 0, sy = 0, stationLens = [], sceneH = 1, pauses = [];
+
+  // Hauteur atteinte sur le trajet pour une hauteur de scroll : identique, sauf aux tablettes. Là, la boule reste au
+  // centre de la plaque (elle monte avec la page, dans la tablette) tant que la section n'est pas passée, puis
+  // ressort et rattrape sa hauteur habituelle sur R pixels de scroll.
+  function hauteurTrajet(yT) {
+    for (const t of pauses) {
+      if (yT < t.y) break;
+      if (yT < t.y + t.D) return t.y;
+      if (yT < t.y + t.D + t.R) { const u = ease((yT - t.y - t.D) / t.R); return mix(yT - t.D, yT, u); }
+    }
+    return yT;
+  }
   const lit = stations.map(() => false);
   function buildFil() {
     const w = suite.clientWidth, h = suite.offsetHeight, portrait = fmt === "9x16";
@@ -199,9 +211,14 @@
     y0 = sceneH * suivi - sceneH;
     let x = w / 2, y = y0, d = `M ${x} ${y0}`, right = true;
     const ends = [];                                      // longueur du tracé jusqu'à chaque station
+    pauses = [];
     for (const st of stations) {
       const p = st.getBoundingClientRect();
       const bx = p.left - r.left + p.width / 2, by = p.top - r.top + p.height / 2;
+      if (st.dataset.station === "tablette") {             // la boule reste dans la plaque jusqu'au bas de la section
+        const bas = st.closest("section").getBoundingClientRect().bottom - r.top;
+        pauses.push({ y: by, D: Math.max(0, bas - by), R: sceneH * 0.5 });
+      }
       const n = Math.max(1, Math.round((by - y) / step)), ys = y;
       for (let i = 1; i <= n; i++) {                     // courbes alternées droite-gauche, la dernière finit au centre
         const ny = ys + (by - ys) * i / n, nx = i === n ? bx : (right ? xr : xl), c = (ny - y) * 0.55;
@@ -230,18 +247,25 @@
     const cachee = yTarget < y0 - 1;
     if (tete._c !== cachee) { tete._c = cachee; tete.classList.toggle("is-cachee", cachee); }
     let len = 0;
-    if (yTarget > y0) {
+    const yT = hauteurTrajet(yTarget);
+    if (yT > y0) {
       let i = 1;
-      while (i < filTable.length && filTable[i][1] < yTarget) i++;
+      while (i < filTable.length && filTable[i][1] < yT) i++;
       if (i >= filTable.length) len = filLen;
-      else { const [l0, y0] = filTable[i - 1], [l1, y1] = filTable[i]; len = l0 + (l1 - l0) * clamp((yTarget - y0) / ((y1 - y0) || 1)); }
+      else { const [l0, y0] = filTable[i - 1], [l1, y1] = filTable[i]; len = l0 + (l1 - l0) * clamp((yT - y0) / ((y1 - y0) || 1)); }
     }
     len = Math.round(len * 10) / 10;
     if (len === lastFil) return;
     lastFil = len;
     fil.style.setProperty("--off", (filLen - len).toFixed(1));
     const p = filPaths[0].getPointAtLength(len);
-    tete.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px)`;
+    // Tablettes (dessin, questions) : la boule y entre en rétrécissant jusqu'à disparaître au centre de la plaque
+    // qui s'allume, y reste tant que la section est à l'écran, puis en ressort.
+    let k = 1;
+    stations.forEach((st, i) => {
+      if (st.dataset.station === "tablette") k = Math.min(k, clamp(Math.abs(len - stationLens[i]) / (sceneH * 0.12)));
+    });
+    tete.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) scale(${ease(k).toFixed(3)})`;
     stations.forEach((st, i) => {
       const on = filLen > 0 && len >= stationLens[i] - 1;
       if (on !== lit[i]) { lit[i] = on; st.classList.toggle("is-allumee", on); }
