@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lumikréa · La nuit s'allume de leurs idées</title>
+<meta name="description" content="Lumikréa, le tableau lumineux à dessiner : une plaque d'acrylique sur une base LED en bois clair. On écrit au feutre, la lumière le révèle.">
+<meta name="theme-color" content="#17182D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600;700;800&family=Sacramento&display=swap">
+<link rel="stylesheet" href="styles.css">
+<link rel="preload" as="image" href="media/hero-9x16.webp" media="(orientation: portrait)">
+<link rel="preload" as="image" href="media/hero-16x9.webp" media="(orientation: landscape)">
+</head>
+<body class="is-intro">
+
+<!-- Intro : le logo s'écrit, puis boucle pendant le chargement, puis se ferme sur le site -->
+<div class="intro" id="intro" aria-hidden="true">
+  <video class="intro-video" id="introVideo" muted playsinline preload="auto"></video>
+  <div class="loader" id="loader">
+    <div class="loader-track"><div class="loader-fill" id="loaderFill"></div></div>
+    <span class="loader-pct" id="loaderPct">0 %</span>
+  </div>
+  <div class="veil" id="veil"></div>
+</div>
+
+<header class="top">
+  <a class="top-logo" href="#hero" aria-label="Lumikréa, retour en haut"><img src="media/logo.svg" alt="Lumikréa" width="140" height="40"></a>
+  <a class="top-cta" href="#formats">Choisir mon format</a>
+</header>
+
+<main>
+  <section class="hero" id="hero" aria-label="L'histoire d'un dessin qui s'allume">
+    <div class="stage">
+      <video class="hero-video" id="heroVideo" muted playsinline preload="none" aria-hidden="true"></video>
+      <div class="eteint" id="eteint" aria-hidden="true"></div>
+
+      <div class="rail" id="rail" aria-hidden="true">
+        <div class="rail-track"></div>
+        <div class="rail-fill" id="railFill"></div>
+        <ol class="rail-nums" id="railNums"></ol>
+      </div>
+
+      <!-- Chapitres : data-in / data-script / data-sub / data-subend / data-out en secondes du récit (0 à 30,5) -->
+      <article class="chapter pos-1" data-in="0.3" data-script="0.7" data-sub="1.1" data-subend="2.5" data-out="3.0">
+        <p class="label">01 — Le geste</p>
+        <h2 class="title"><span class="caps">Un</span><span class="script">dessin.</span></h2>
+        <p class="sub">Un feutre, une plaque, une idée d'enfant.</p>
+      </article>
+
+      <article class="chapter pos-2" data-in="7.4" data-script="7.9" data-sub="8.4" data-subend="10.6" data-out="11.6">
+        <p class="label">02 — Le fil</p>
+        <h2 class="title"><span class="caps">Un</span><span class="script">halo.</span></h2>
+        <p class="sub">La lumière quitte la plaque et traverse la maison.</p>
+      </article>
+
+      <article class="chapter pos-3" data-in="14.6" data-script="15.0" data-sub="15.6" data-subend="17.6" data-out="19.1">
+        <p class="label">03 — Le lien</p>
+        <h2 class="title"><span class="caps">Un</span><span class="script">lien.</span></h2>
+        <p class="sub">De sa chambre à la vôtre, un fil de lumière.</p>
+      </article>
+
+      <article class="chapter pos-4" data-in="21.8" data-script="22.3" data-subshow="25.6" data-sub="25.9" data-subend="27.1" data-out="27.5">
+        <p class="label">04 — Le mot</p>
+        <h2 class="title"><span class="caps">Un</span><span class="script">souvenir.</span></h2>
+        <p class="sub">Un mot laissé près du lit, qui veille jusqu'au matin.</p>
+      </article>
+
+      <div class="finale" id="finale" data-in="28.0" data-script="28.3">
+        <h1 class="title"><span class="caps">La nuit</span><span class="script">s'allume</span></h1>
+        <p class="finale-sub">de leurs idées</p>
+        <a class="cta" href="#formats">
+          <span>Choisir mon format</span>
+          <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="formats" id="formats" aria-labelledby="formats-titre">
+    <div class="formats-in">
+      <h2 class="formats-titre" id="formats-titre"><span class="caps">Votre</span><span class="script">format.</span></h2>
+      <p class="formats-intro">Une plaque d'acrylique transparent, une base LED en bois clair, un feutre. Branchement USB.</p>
+      <ul class="formats-liste">
+        <li><span class="f-taille">12 × 12 cm</span><span class="f-prix">24,90 €</span></li>
+        <li><span class="f-taille">15 × 15 cm</span><span class="f-prix">27,90 €</span></li>
+        <li><span class="f-taille">20 × 20 cm</span><span class="f-prix">32,90 €</span></li>
+        <li><span class="f-taille">30 × 20 cm</span><span class="f-prix">36,90 €</span></li>
+      </ul>
+      <a class="cta cta-static" href="https://www.lumikrea.store/#formats">
+        <span>Commander sur la boutique</span>
+        <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
+      </a>
+      <p class="formats-note">Prototype : la commande se fait sur la boutique actuelle, livraison offerte.</p>
+    </div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
