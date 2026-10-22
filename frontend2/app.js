@@ -115,20 +115,44 @@
     return h264;
   }
 
+  // Télécharge le fichier pour mesurer la progression et remplir le cache HTTP.
+  // La vidéo lit ensuite l'adresse directe : WebKit (iPhone) lit mal une vidéo passée en URL blob.
   async function download(url, onProgress) {
     const res = await fetch(url);
     if (!res.ok || !res.body) throw new Error(`Téléchargement impossible (${res.status})`);
     const total = Number(res.headers.get("content-length")) || 0;
     const reader = res.body.getReader();
-    const chunks = [];
     let got = 0;
     for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
-      chunks.push(value); got += value.length;
+      got += value.length;
       if (total) onProgress(got / total);
     }
-    return URL.createObjectURL(new Blob(chunks, { type: "video/mp4" }));
+  }
+
+  // Charge la vidéo par son adresse directe ; vrai si une image est prête.
+  function loadHero(src) {
+    return new Promise((resolve) => {
+      let done = false;
+      const finish = (ok) => {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        heroVideo.removeEventListener("loadeddata", onData);
+        heroVideo.removeEventListener("error", onError);
+        resolve(ok);
+      };
+      const onData = () => { heroVideo.currentTime = 0; finish(true); };
+      const onError = () => finish(false);
+      const timer = setTimeout(() => finish(heroVideo.readyState >= 2), 10000);
+      heroVideo.addEventListener("loadeddata", onData);
+      heroVideo.addEventListener("error", onError);
+      heroVideo.preload = "auto";
+      heroVideo.src = src;
+      heroVideo.load();
+      // iOS ne charge les images qu'après une lecture : on lance, la boucle d'affichage remet aussitôt en pause.
+      heroVideo.play().catch(() => { /* lecture refusée (économie d'énergie) : l'image d'attente reste */ });
+    });
   }
 
   let shownProgress = 0;
@@ -138,23 +162,38 @@
     loaderPct.textContent = `${Math.round(shownProgress * 100)} %`;
   };
 
+  let heroSrc = "";
   const heroReady = (async () => {
-    const src = await pickHeroSource();
-    let url;
+    heroSrc = await pickHeroSource();
     try {
-      url = await download(src, (p) => setProgress(p * 0.95));
-    } catch {
-      url = src;                                   // repli : le navigateur charge la vidéo lui-même
-    }
+      await download(heroSrc, (p) => setProgress(p * 0.95));
+    } catch { /* la vidéo se chargera directement */ }
     await document.fonts.ready;
-    heroVideo.preload = "auto";
-    heroVideo.src = url;
-    await new Promise((r) => heroVideo.readyState >= 2 ? r() : heroVideo.addEventListener("loadeddata", r, { once: true }));
-    // iOS n'affiche une image qu'après une lecture : on lance puis on arrête aussitôt.
-    try { await heroVideo.play(); heroVideo.pause(); } catch { /* lecture refusée : l'image d'attente reste */ }
-    heroVideo.currentTime = 0;
+    let ok = await loadHero(heroSrc);
+    if (!ok && heroSrc.includes(".av1.")) {        // AV1 refusé par l'appareil : repli H.264
+      heroSrc = `media/hero-${fmt}.h264.mp4`;
+      ok = await loadHero(heroSrc);
+    }
     setProgress(1);
   })();
+
+  // ?debug : état de la vidéo affiché à l'écran (pour diagnostiquer sur téléphone).
+  if (params.has("debug")) {
+    const box = document.createElement("pre");
+    box.style.cssText = "position:fixed;z-index:99;left:8px;bottom:8px;max-width:92vw;margin:0;padding:8px;font:11px/1.35 ui-monospace,monospace;color:#fff;background:rgba(0,0,0,.75);white-space:pre-wrap;pointer-events:none";
+    document.body.append(box);
+    const states = ["VIDE", "META", "IMAGE", "SUITE", "ASSEZ"];
+    setInterval(() => {
+      const v = heroVideo, b = v.buffered.length ? v.buffered.end(v.buffered.length - 1).toFixed(1) : "0";
+      box.textContent = [
+        `format ${fmt} · source ${heroSrc || "(choix en cours)"}`,
+        `readyState ${v.readyState} ${states[v.readyState] || ""} · network ${v.networkState} · erreur ${v.error ? v.error.code + " " + (v.error.message || "") : "aucune"}`,
+        `paused ${v.paused} · temps ${v.currentTime.toFixed(2)} · tampon ${b} s · taille ${v.videoWidth}×${v.videoHeight}`,
+        `AV1 ${v.canPlayType(AV1) || "non"} · H.264 ${v.canPlayType('video/mp4; codecs="avc1.64001F"') || "non"}`,
+        navigator.userAgent.slice(0, 120),
+      ].join("\n");
+    }, 500);
+  }
 
   // ---------- Intro : écriture, boucle d'attente, fermeture ----------
   const cfg = INTRO[fmt];

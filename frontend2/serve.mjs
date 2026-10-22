@@ -24,10 +24,12 @@ http.createServer((req, res) => {
   if (range) {
     const start = range[1] ? Number(range[1]) : 0;
     const end = range[2] ? Number(range[2]) : size - 1;
-    res.writeHead(206, { "Content-Type": type, "Content-Range": `bytes ${start}-${end}/${size}`, "Accept-Ranges": "bytes", "Content-Length": end - start + 1 });
+    res.writeHead(206, { "Content-Type": type, "Content-Range": `bytes ${start}-${end}/${size}`, "Accept-Ranges": "bytes", "Content-Length": end - start + 1, "Cache-Control": "public, max-age=3600" });
     fs.createReadStream(file, { start, end }).pipe(res);
     return;
   }
-  res.writeHead(200, { "Content-Type": type, "Content-Length": size, "Accept-Ranges": "bytes", "Cache-Control": "no-cache" });
+  // Les médias restent en cache une heure (le téléchargement de progression sert ensuite à la vidéo) ; le code est toujours revalidé.
+  const cache = /\.(mp4|webp|svg)$/.test(file) ? "public, max-age=3600" : "no-cache";
+  res.writeHead(200, { "Content-Type": type, "Content-Length": size, "Accept-Ranges": "bytes", "Cache-Control": cache });
   fs.createReadStream(file).pipe(res);
 }).listen(PORT, () => console.log(`Prototype Lumikréa : http://localhost:${PORT}`));
