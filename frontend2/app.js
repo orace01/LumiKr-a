@@ -22,6 +22,10 @@
   const span = (t, a, b) => ease((t - a) / (b - a));
 
   const params = new URLSearchParams(location.search);
+  // Chaque arrivée rejoue l'intro : on repart du haut de la page, et une page restaurée par « retour » est rechargée.
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  window.scrollTo(0, 0);
+  addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const portraitQuery = matchMedia("(orientation: portrait)");
   const fmt = portraitQuery.matches ? "9x16" : "16x9";
@@ -155,12 +159,20 @@
     });
   }
 
-  let shownProgress = 0;
-  const setProgress = (p) => {
-    shownProgress = Math.max(shownProgress, p);
-    loaderFill.style.setProperty("--p", shownProgress.toFixed(3));
-    loaderPct.textContent = `${Math.round(shownProgress * 100)} %`;
-  };
+  // La barre affiche le vrai téléchargement, mais met toujours au moins MIN_FILL secondes à se remplir :
+  // même si la vidéo est déjà en cache, l'arrivée montre le logo, la barre et la boucle.
+  const MIN_FILL = 1.6;
+  let realProgress = 0, shownProgress = 0;
+  const setProgress = (p) => { realProgress = Math.max(realProgress, p); };
+  function drawProgress(now) {
+    if (!loaderShownAt) return;
+    const p = Math.min(realProgress, (now - loaderShownAt) / (MIN_FILL * 1000));
+    if (p > shownProgress) {
+      shownProgress = p;
+      loaderFill.style.setProperty("--p", p.toFixed(3));
+      loaderPct.textContent = `${Math.round(p * 100)} %`;
+    }
+  }
 
   let heroSrc = "";
   const heroReady = (async () => {
@@ -217,7 +229,8 @@
     const tick = (now, meta) => {
       const time = meta ? meta.mediaTime : introVideo.currentTime;
       if (!loaderShownAt && time >= cfg.written) { loaderShownAt = performance.now(); loader.classList.add("is-on"); }
-      if (!closing && loaded && loaderShownAt && performance.now() - loaderShownAt > 900) {
+      drawProgress(performance.now());
+      if (!closing && loaded && shownProgress >= 1) {
         closing = true;                              // à 100 % : on laisse la vidéo continuer vers la fermeture
         loader.classList.add("is-off");
       }
