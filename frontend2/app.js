@@ -11,7 +11,7 @@
   // (éclairé mot à mot) en laissant un fil, jusqu'au bas de l'écran où commence le fil des sections.
   const FIN = {
     dark: [28.0, 30.0], ball: [29.3, 29.9], toLine: [29.9, 30.2], write: [30.2, 32.4], toPoint: [32.4, 32.8],
-    sub: [33.2, 33.6], words: [33.4, 35.6], down: [34.0, 36.3], handoff: [36.3, 36.5],
+    sub: [33.2, 33.6], words: [33.4, 35.6], down: [34.0, 36.3], handoff: [36.42, 36.5],
   };
   const INTRO = {                       // repères de l'intro, en secondes de la vidéo
     "9x16": { src: "media/intro-9x16.mp4", written: 3.0, loopStart: 3.5, loopEnd: 5.1667 },
@@ -116,7 +116,7 @@
   // ---------- Fin : la boule écrit le titre, devient le point final, puis descend ----------
   // Géométrie mesurée au redimensionnement (repère de la scène) : centre, bas, chaque ligne du titre
   // (début, largeur, minutage), position et taille du point final, tracé de la descente sous le sous-titre.
-  let geo = null, lastBall = "", traceLen = 0;
+  let geo = null, lastBall = "", traceLen = 0, suivi = 0.62;
   function measureFin() {
     const s = stage.getBoundingClientRect();
     const fs = parseFloat(getComputedStyle(titre).fontSize);
@@ -129,10 +129,13 @@
     // Le point final : juste après « lumière », posé sur la ligne de base, de la taille d'un point de la police.
     const point = { x: end.x + end.w + fs * 0.1, y: end.y + fs * 0.27, s: (fs * 0.19) / 22 };
     const sub = finSub.getBoundingClientRect(), subBottom = sub.bottom - s.top;
-    const W = s.width, H = s.height, bottom = H - 2;
-    // Descente : du point, droit vers le bas derrière la fin du sous-titre, puis vers le centre du bas de l'écran.
-    const c1y = Math.min(bottom, subBottom + H * 0.06);
-    const d = `M ${point.x} ${point.y} C ${point.x} ${c1y}, ${W / 2} ${Math.min(bottom, subBottom + H * 0.02)}, ${W / 2} ${bottom}`;
+    const W = s.width, H = s.height;
+    // Hauteur de suivi : la boule finit sa descente juste sous le sous-titre, puis reste à cette hauteur de l'écran
+    // pendant tout le scroll des sections (même rapport dans drawFil) : elle suit le scroll sans saut.
+    suivi = clamp(subBottom / innerHeight + 0.06, 0.62, 0.85);
+    const endY = innerHeight * suivi;
+    // Descente : du point, vers le bas derrière la fin du sous-titre, puis vers le centre, à la hauteur de suivi.
+    const d = `M ${point.x} ${point.y} C ${point.x} ${endY}, ${W / 2} ${endY - (endY - point.y) * 0.25}, ${W / 2} ${endY}`;
     trace.setAttribute("viewBox", `0 0 ${W} ${H}`);
     tracePaths.forEach((p) => p.setAttribute("d", d));
     traceLen = tracePaths[0].getTotalLength();
@@ -177,17 +180,20 @@
     if (trace._off !== off) { trace._off = off; trace.style.setProperty("--off", off); }
   }
 
-  // ---------- Fil lumineux derrière les sections, jusqu'au centre de la tablette ----------
-  let filLen = 0, filTable = [], suiteTop = 0, lastFil = -1, allumee = false;
+  // ---------- Trajet de la boule derrière les sections, jusqu'au centre de la tablette ----------
+  // Il part là où la boule a fini sa descente : au centre, à la hauteur de suivi de l'écran, quand le hero se termine
+  // (le bas de la scène touche alors le haut de .suite, d'où y0 négatif).
+  let filLen = 0, filTable = [], suiteTop = 0, lastFil = -1, allumee = false, y0 = 0, sy = 0;
   function buildFil() {
     const w = suite.clientWidth, h = suite.offsetHeight, portrait = fmt === "9x16";
     const r = suite.getBoundingClientRect(), p = plaque.getBoundingClientRect();
     const bx = p.left - r.left + p.width / 2, by = p.top - r.top + p.height / 2;     // centre de la plaque
-    const n = Math.max(1, Math.round(by / (innerHeight * (portrait ? 0.5 : 0.7))));
+    y0 = innerHeight * suivi - stage.offsetHeight;
+    const n = Math.max(1, Math.round((by - y0) / (innerHeight * (portrait ? 0.5 : 0.7))));
     const xl = w * (portrait ? 0.12 : 0.18), xr = w * (portrait ? 0.88 : 0.82);
-    let x = w / 2, y = 0, d = `M ${x} 0`;
+    let x = w / 2, y = y0, d = `M ${x} ${y0}`;
     for (let i = 1; i <= n; i++) {                       // courbes alternées droite-gauche, la dernière finit au centre
-      const ny = by * i / n, nx = i === n ? bx : (i % 2 ? xr : xl), c = (ny - y) * 0.55;
+      const ny = y0 + (by - y0) * i / n, nx = i === n ? bx : (i % 2 ? xr : xl), c = (ny - y) * 0.55;
       d += ` C ${x} ${y + c}, ${nx} ${ny - c}, ${nx} ${ny}`;
       x = nx; y = ny;
     }
@@ -201,12 +207,15 @@
     lastFil = -1;
   }
 
-  // La tête du fil se place à 62 % de la hauteur de l'écran : le trait se dessine en descendant, et s'efface en remontant.
-  // Quand elle atteint le centre de la plaque, la tablette s'allume (et s'éteint si l'on remonte).
+  // La boule reste à la hauteur de suivi de l'écran et avance sur son trajet avec le scroll (lissé comme le hero).
+  // Elle prend le relais de la boule du hero à la fin de celui-ci ; au centre de la plaque, la tablette s'allume
+  // (et s'éteint si l'on remonte).
   function drawFil() {
-    const yTarget = scrollY + innerHeight * 0.62 - suiteTop;
+    const yTarget = sy + innerHeight * suivi - suiteTop;
+    const cachee = yTarget < y0 - 1;
+    if (tete._c !== cachee) { tete._c = cachee; tete.classList.toggle("is-cachee", cachee); }
     let len = 0;
-    if (yTarget > 0) {
+    if (yTarget > y0) {
       let i = 1;
       while (i < filTable.length && filTable[i][1] < yTarget) i++;
       if (i >= filTable.length) len = filLen;
@@ -415,7 +424,9 @@
     // (même rendu sur un écran à 120 Hz, et pas de retard qui s'accumule si une image saute).
     const dt = last ? Math.min(now - last, 100) : 16.7;
     last = now;
-    current += (target - current) * (1 - Math.pow(0.8, dt / 16.7));
+    const k = 1 - Math.pow(0.8, dt / 16.7);
+    current += (target - current) * k;
+    sy += (scrollY - sy) * k;                             // même lissage pour la boule des sections
     if (Math.abs(target - current) < 0.002) current = target;
     const vt = Math.min(current, VIDEO_END - 0.5 / FPS);
     if (!heroVideo.paused) heroVideo.pause();       // la vidéo ne joue jamais seule : seul le scroll la fait avancer
@@ -436,7 +447,7 @@
     measure();
     if (goto === "dessin") { const p = plaque.getBoundingClientRect(); scrollTo(0, scrollY + p.top + p.height / 2 - innerHeight * 0.62 + 4); }
     else scrollTo(0, heroTop + clamp(+goto / STORY_END) * run);
-    readScroll(); current = target;
+    readScroll(); current = target; sy = scrollY;
     // ?debug : positions à l'écran des éléments de la fin, écrites dans la page (lisibles sans capture).
     if (params.has("debug")) setTimeout(() => {
       const box = (el) => { const r = el.getBoundingClientRect(); return [r.left, r.top, r.width, r.height].map(Math.round); };

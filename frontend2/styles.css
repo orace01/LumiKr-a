@@ -126,11 +126,15 @@ a { color: inherit; }
 /* ---------- Suite du site : fil lumineux en arrière-plan ---------- */
 .suite { position: relative; background: var(--nuit); }
 .fil { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+/* La boule continue seule, sans fil derrière elle : les tracés restent dans la page (invisibles)
+   parce qu'ils donnent son trajet, jusqu'au centre de la tablette. */
+.fil, .trace { visibility: hidden; }
 .fil path, .trace path { fill: none; stroke-linecap: round; stroke-dasharray: var(--len, 1) var(--len, 1); stroke-dashoffset: var(--off, 1); }
 .fil-halo { stroke: rgba(255, 190, 60, .22); stroke-width: 12; }
 .fil-core { stroke: var(--halo); stroke-width: 2.5; opacity: .85; }
-.tete { width: 14px; height: 14px; margin: -7px 0 0 -7px; z-index: 0; box-shadow: 0 0 12px 4px rgba(255, 200, 60, .7); transition: opacity .5s ease; }
-.tete.is-arrivee { opacity: 0; }                      /* elle se fond dans la plaque qu'elle vient d'allumer */
+.tete { width: 14px; height: 14px; margin: -7px 0 0 -7px; z-index: 0; box-shadow: 0 0 12px 4px rgba(255, 200, 60, .7); transition: opacity .12s linear; }
+.tete.is-arrivee { opacity: 0; transition-duration: .5s; }                     /* elle se fond dans la plaque qu'elle vient d'allumer */
+.tete.is-cachee { opacity: 0; transition: none; }      /* tant que la boule du hero n'a pas passé le relais */
 
 /* ---------- Dessin : la tablette éteinte, allumée par la boule ---------- */
 .dessin { position: relative; z-index: 1; padding: 16svh var(--gutter) 10svh; }
