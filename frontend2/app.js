@@ -26,7 +26,7 @@
   const stage = $(".stage"), titre = $("#titre"), lignes = [...titre.querySelectorAll(".l")], boule = $("#boule");
   const finSub = $("#finSub"), trace = $("#trace"), tracePaths = [...trace.querySelectorAll("path")];
   const suite = $("#suite"), fil = $("#fil"), filPaths = [...fil.querySelectorAll("path")], tete = $("#tete");
-  const tablette = $("#tablette"), plaque = $(".plaque");
+  const plaque = $(".plaque");
 
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const ease = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
@@ -132,8 +132,10 @@
     const W = s.width, H = s.height;
     // Hauteur de suivi : la boule finit sa descente juste sous le sous-titre, puis reste à cette hauteur de l'écran
     // pendant tout le scroll des sections (même rapport dans drawFil) : elle suit le scroll sans saut.
-    suivi = clamp(subBottom / innerHeight + 0.06, 0.62, 0.85);
-    const endY = innerHeight * suivi;
+    // Hauteurs prises sur la scène (100lvh, fixe) et non sur la zone visible, qui change quand les barres du
+    // navigateur mobile se replient : la géométrie reste la même pendant tout le scroll.
+    suivi = clamp(subBottom / H + 0.06, 0.62, 0.85);
+    const endY = H * suivi;
     // Descente : du point, vers le bas derrière la fin du sous-titre, puis vers le centre, à la hauteur de suivi.
     const d = `M ${point.x} ${point.y} C ${point.x} ${endY}, ${W / 2} ${endY - (endY - point.y) * 0.25}, ${W / 2} ${endY}`;
     trace.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -183,20 +185,34 @@
   // ---------- Trajet de la boule derrière les sections, jusqu'au centre de la tablette ----------
   // Il part là où la boule a fini sa descente : au centre, à la hauteur de suivi de l'écran, quand le hero se termine
   // (le bas de la scène touche alors le haut de .suite, d'où y0 négatif).
-  let filLen = 0, filTable = [], suiteTop = 0, lastFil = -1, allumee = false, y0 = 0, sy = 0;
+  // Stations : la tablette, puis chaque photo et section ([data-station], dans l'ordre de la page). La boule passe
+  // par le centre de chacune ; une station s'allume quand la boule l'atteint (et s'éteint si l'on remonte).
+  const stations = [...document.querySelectorAll("[data-station]")];
+  let filLen = 0, filTable = [], suiteTop = 0, lastFil = -1, y0 = 0, sy = 0, stationLens = [], sceneH = 1;
+  const lit = stations.map(() => false);
   function buildFil() {
     const w = suite.clientWidth, h = suite.offsetHeight, portrait = fmt === "9x16";
-    const r = suite.getBoundingClientRect(), p = plaque.getBoundingClientRect();
-    const bx = p.left - r.left + p.width / 2, by = p.top - r.top + p.height / 2;     // centre de la plaque
-    y0 = innerHeight * suivi - stage.offsetHeight;
-    const n = Math.max(1, Math.round((by - y0) / (innerHeight * (portrait ? 0.5 : 0.7))));
+    const r = suite.getBoundingClientRect();
+    sceneH = stage.offsetHeight;
+    const step = sceneH * (portrait ? 0.5 : 0.7);
     const xl = w * (portrait ? 0.12 : 0.18), xr = w * (portrait ? 0.88 : 0.82);
-    let x = w / 2, y = y0, d = `M ${x} ${y0}`;
-    for (let i = 1; i <= n; i++) {                       // courbes alternées droite-gauche, la dernière finit au centre
-      const ny = y0 + (by - y0) * i / n, nx = i === n ? bx : (i % 2 ? xr : xl), c = (ny - y) * 0.55;
-      d += ` C ${x} ${y + c}, ${nx} ${ny - c}, ${nx} ${ny}`;
-      x = nx; y = ny;
+    y0 = sceneH * suivi - sceneH;
+    let x = w / 2, y = y0, d = `M ${x} ${y0}`, right = true;
+    const ends = [];                                      // longueur du tracé jusqu'à chaque station
+    for (const st of stations) {
+      const p = st.getBoundingClientRect();
+      const bx = p.left - r.left + p.width / 2, by = p.top - r.top + p.height / 2;
+      const n = Math.max(1, Math.round((by - y) / step)), ys = y;
+      for (let i = 1; i <= n; i++) {                     // courbes alternées droite-gauche, la dernière finit au centre
+        const ny = ys + (by - ys) * i / n, nx = i === n ? bx : (right ? xr : xl), c = (ny - y) * 0.55;
+        d += ` C ${x} ${y + c}, ${nx} ${ny - c}, ${nx} ${ny}`;
+        x = nx; y = ny;
+        if (i < n) right = !right;
+      }
+      filPaths[1].setAttribute("d", d);                  // tracé provisoire, pour mesurer la longueur jusqu'ici
+      ends.push(filPaths[1].getTotalLength());
     }
+    stationLens = ends;
     fil.setAttribute("viewBox", `0 0 ${w} ${h}`);
     filPaths.forEach((path) => path.setAttribute("d", d));
     filLen = filPaths[0].getTotalLength();
@@ -208,10 +224,9 @@
   }
 
   // La boule reste à la hauteur de suivi de l'écran et avance sur son trajet avec le scroll (lissé comme le hero).
-  // Elle prend le relais de la boule du hero à la fin de celui-ci ; au centre de la plaque, la tablette s'allume
-  // (et s'éteint si l'on remonte).
+  // Elle prend le relais de la boule du hero à la fin de celui-ci et allume les stations qu'elle atteint.
   function drawFil() {
-    const yTarget = sy + innerHeight * suivi - suiteTop;
+    const yTarget = sy + sceneH * suivi - suiteTop;
     const cachee = yTarget < y0 - 1;
     if (tete._c !== cachee) { tete._c = cachee; tete.classList.toggle("is-cachee", cachee); }
     let len = 0;
@@ -227,8 +242,13 @@
     fil.style.setProperty("--off", (filLen - len).toFixed(1));
     const p = filPaths[0].getPointAtLength(len);
     tete.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px)`;
-    const on = filLen > 0 && len >= filLen - 0.5;
-    if (on !== allumee) { allumee = on; tablette.classList.toggle("is-allumee", on); tete.classList.toggle("is-arrivee", on); }
+    stations.forEach((st, i) => {
+      const on = filLen > 0 && len >= stationLens[i] - 1;
+      if (on !== lit[i]) { lit[i] = on; st.classList.toggle("is-allumee", on); }
+    });
+    // Au bout du trajet (le produit du dernier écran), la boule se fond dans la lumière qu'elle a allumée.
+    const fin = filLen > 0 && len >= filLen - 0.5;
+    if (tete._fin !== fin) { tete._fin = fin; tete.classList.toggle("is-arrivee", fin); }
   }
 
   // ---------- Mouvement réduit : pas de vidéo pilotée ----------
@@ -237,7 +257,7 @@
     body.classList.add("reduced");
     intro.remove();
     heroVideo.poster = `media/hero-${fmt}-fin.webp`;
-    tablette.classList.add("is-allumee");                // tablette allumée, fil entier et fixe
+    stations.forEach((st) => st.classList.add("is-allumee"));   // tout est allumé, sans boule
     document.fonts.ready.then(buildFil);
     addEventListener("resize", buildFil);
     return;
@@ -408,13 +428,22 @@
   // sans forcer le navigateur à recalculer la mise en page à chaque événement.
   let heroTop = 0, run = 1;
   const measure = () => {
-    heroTop = hero.offsetTop; run = Math.max(1, hero.offsetHeight - innerHeight); readScroll();
+    // Course du hero = tant que la scène (100lvh) reste collée en haut : le récit atteint sa fin exactement quand
+    // elle se libère, téléphone compris (la zone visible y est plus petite que la scène quand les barres sont là).
+    heroTop = hero.offsetTop; run = Math.max(1, hero.offsetHeight - stage.offsetHeight); readScroll();
     measureFin(); buildFil();
   };
   document.fonts.ready.then(measure);                    // le titre se mesure avec sa vraie police
+  new ResizeObserver(() => buildFil()).observe(suite);   // hauteur des sections changée (polices, photos) : trajet recalculé
   const readScroll = () => { target = clamp((scrollY - heroTop) / run) * STORY_END; };
   addEventListener("scroll", readScroll, { passive: true });
-  addEventListener("resize", measure);
+  // Les barres du navigateur mobile déclenchent « resize » en se repliant : on ne recalcule toute la géométrie que si
+  // la largeur ou la hauteur de la scène changent vraiment (rotation, fenêtre redimensionnée).
+  let tailleW = innerWidth, tailleH = 0;
+  addEventListener("resize", () => {
+    if (innerWidth !== tailleW || stage.offsetHeight !== tailleH) { tailleW = innerWidth; tailleH = stage.offsetHeight; measure(); }
+    else readScroll();
+  });
   heroVideo.addEventListener("seeked", () => {
     if (pendingSeek !== null) { const t = pendingSeek; pendingSeek = null; heroVideo.currentTime = t; }
   });
@@ -441,18 +470,20 @@
   render(0);
   requestAnimationFrame(frame);
 
-  // ?t=33.5 ouvre la page directement à ce moment du récit ; ?t=dessin, sur la tablette (vérifications, captures).
+  // ?t=33.5 ouvre la page directement à ce moment du récit ; ?t=dessin, usages, formats, boite, questions ou fin :
+  // la boule posée sur la première station de cette section (vérifications, captures).
   const goto = params.get("t");
   if (goto) document.fonts.ready.then(() => requestAnimationFrame(() => {
     measure();
-    if (goto === "dessin") { const p = plaque.getBoundingClientRect(); scrollTo(0, scrollY + p.top + p.height / 2 - innerHeight * 0.62 + 4); }
+    const st = isNaN(+goto) && document.querySelector(`#${CSS.escape(goto)} [data-station]`);
+    if (st) { const p = st.getBoundingClientRect(); scrollTo(0, scrollY + p.top + p.height / 2 - sceneH * suivi + 4); }
     else scrollTo(0, heroTop + clamp(+goto / STORY_END) * run);
     readScroll(); current = target; sy = scrollY;
     // ?debug : positions à l'écran des éléments de la fin, écrites dans la page (lisibles sans capture).
     if (params.has("debug")) setTimeout(() => {
       const box = (el) => { const r = el.getBoundingClientRect(); return [r.left, r.top, r.width, r.height].map(Math.round); };
-      body.dataset.geo = JSON.stringify({ vue: [innerWidth, innerHeight], titre: lignes.map(box), sous: box(finSub), boule: box(boule),
-        bouleOp: boule.style.opacity, plaque: box(plaque), tete: box(tete), allumee: allumee, h: eteint.style.getPropertyValue("--h") });
+      body.dataset.geo = JSON.stringify({ vue: [innerWidth, innerHeight], largeur: document.documentElement.scrollWidth, titre: lignes.map(box), sous: box(finSub), boule: box(boule),
+        bouleOp: boule.style.opacity, plaque: box(plaque), tete: box(tete), allumees: lit.filter(Boolean).length, h: eteint.style.getPropertyValue("--h") });
     }, 1500);
   }));
 })();
