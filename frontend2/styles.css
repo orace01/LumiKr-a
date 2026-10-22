@@ -58,8 +58,11 @@ a { color: inherit; }
 .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: var(--nuit) center / cover no-repeat; }
 /* Extinction : le bleu nuit part des quatre coins et se referme vers le centre.
    --h = rayon du trou clair (1,25 = rien de visible, 0 = écran entièrement bleu nuit). */
+/* Les arrêts restent ≥ 0 (Safari abandonne le dégradé quand ils deviennent négatifs, et la pièce réapparaissait
+   derrière le titre) ; un aplat bleu nuit (--plein) prend le relais à la fermeture et reste derrière le titre. */
 .eteint { position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(circle farthest-corner at 50% 50%, rgba(23, 24, 45, 0) calc(var(--h, 1.25) * 100% - 30%), rgba(23, 24, 45, .72) calc(var(--h, 1.25) * 100% - 12%), var(--nuit) calc(var(--h, 1.25) * 100%)); }
+  background: radial-gradient(circle farthest-corner at 50% 50%, rgba(23, 24, 45, 0) max(0%, calc(var(--h, 1.25) * 100% - 30%)), rgba(23, 24, 45, .72) max(0%, calc(var(--h, 1.25) * 100% - 12%)), var(--nuit) max(0%, calc(var(--h, 1.25) * 100%))); }
+.eteint::after { content: ""; position: absolute; inset: 0; background: var(--nuit); opacity: var(--plein, 0); }
 
 /* Fil doré de progression */
 .rail { position: absolute; left: 4.6vw; top: 20svh; height: 60svh; width: 2px; opacity: var(--ra, 0); }

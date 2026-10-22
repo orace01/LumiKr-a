@@ -101,6 +101,7 @@
     }
     const ec = eteint._c || (eteint._c = {});
     setVar(eteint, ec, "--h", 1.25 * (1 - span(t, ...FIN.dark)));
+    setVar(eteint, ec, "--plein", span(t, FIN.dark[1] - 0.5, FIN.dark[1]));   // aplat plein : derrière tout le titre
     renderFin(t);
 
     const rc = rail._c || (rail._c = {});
