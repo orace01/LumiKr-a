@@ -25,7 +25,9 @@ a { color: inherit; }
 /* ---------- Intro et écran de chargement ---------- */
 .intro { position: fixed; inset: 0; z-index: 50; background: var(--intro-fond); }
 .intro-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.loader { position: absolute; left: 50%; top: 59svh; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transition: opacity .6s ease; }
+/* La barre se place en % de la hauteur de la VIDÉO (recadrée en cover), pas de la fenêtre :
+   hauteur affichée = max(écran, largeur × ratio). Logo : 47–52 % en 9:16, 42–58 % en 16:9. */
+.loader { position: absolute; left: 50%; top: calc(50svh + .09 * max(100svh, 177.78vw)); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transition: opacity .6s ease; }
 .loader.is-on { opacity: 1; }
 .loader.is-off { opacity: 0; transition-duration: .35s; }
 .loader-track { width: min(34vw, 260px); height: 2px; background: rgba(244, 239, 230, .14); border-radius: 2px; overflow: hidden; }
@@ -115,6 +117,8 @@ a { color: inherit; }
 /* ---------- Paysage (16:9) : textes sur le côté libre ---------- */
 @media (orientation: landscape) {
   :root { --gutter: max(24px, 6.5vw); }
+  .loader { top: calc(50svh + .16 * max(100svh, 56.25vw)); }
+  .loader-track { width: min(22vw, 320px); }
   .rail { left: 2.6vw; }
   .caps { font-size: min(8.4vw, 15svh); }
   .script { font-size: min(10.2vw, 18svh); }

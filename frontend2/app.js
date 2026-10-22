@@ -109,12 +109,15 @@
   // ---------- Hero : choix du fichier et téléchargement avec progression ----------
   // Version des vidéos : à changer à chaque ré-encodage, sinon le cache (1 h) garde les anciennes.
   const MEDIA_V = "2";
-  const heroUrl = (codec) => `media/hero-${fmt}.${codec}.mp4?v=${MEDIA_V}`;
+  // Grand écran en paysage (largeur réelle ≥ 1700 px) : version HD (AV1 2560×1440, H.264 1920×1080).
+  const hd = fmt === "16x9" && Math.max(screen.width, innerWidth) * (devicePixelRatio || 1) >= 1700;
+  const heroName = hd ? "16x9-hd" : fmt;
+  const heroUrl = (codec) => `media/hero-${heroName}.${codec}.mp4?v=${MEDIA_V}`;
   async function pickHeroSource() {
     const h264 = heroUrl("h264");
     if (!heroVideo.canPlayType(AV1)) return h264;
     try {
-      const [w, h] = fmt === "9x16" ? [1080, 1920] : [1920, 1080];
+      const [w, h] = fmt === "9x16" ? [1080, 1920] : hd ? [2560, 1440] : [1920, 1080];
       const info = await navigator.mediaCapabilities.decodingInfo({ type: "file", video: { contentType: AV1, width: w, height: h, bitrate: 1200000, framerate: FPS } });
       // AV1 seulement si le décodage est matériel : sinon le scrub saccade sur téléphone.
       if (info.supported && info.powerEfficient) return heroUrl("av1");
