@@ -15,7 +15,7 @@
   const $ = (s) => document.querySelector(s);
   const body = document.body;
   const intro = $("#intro"), introVideo = $("#introVideo"), loader = $("#loader"), loaderFill = $("#loaderFill"), loaderPct = $("#loaderPct");
-  const hero = $("#hero"), heroVideo = $("#heroVideo"), eteint = $("#eteint"), rail = $("#rail"), railFill = $("#railFill"), railNums = $("#railNums"), finale = $("#finale");
+  const hero = $("#hero"), heroVideo = $("#heroVideo"), eteint = $("#eteint"), rail = $("#rail"), railNums = $("#railNums"), finale = $("#finale");
 
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const ease = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
@@ -90,7 +90,7 @@
 
     const rc = rail._c || (rail._c = {});
     setVar(rail, rc, "--ra", span(t, 0.2, 0.8) * (1 - span(t, 25.6, 26.4)));
-    setVar(railFill, rc, "--p", clamp(t / VIDEO_END));
+    setVar(rail, rc, "--p", clamp(t / VIDEO_END));
     chapters.forEach((c, i) => {
       const on = t >= c.tIn && (i === chapters.length - 1 || t < chapters[i + 1].tIn);
       c.num.classList.toggle("is-on", on);
@@ -107,14 +107,17 @@
   }
 
   // ---------- Hero : choix du fichier et téléchargement avec progression ----------
+  // Version des vidéos : à changer à chaque ré-encodage, sinon le cache (1 h) garde les anciennes.
+  const MEDIA_V = "2";
+  const heroUrl = (codec) => `media/hero-${fmt}.${codec}.mp4?v=${MEDIA_V}`;
   async function pickHeroSource() {
-    const h264 = `media/hero-${fmt}.h264.mp4`;
+    const h264 = heroUrl("h264");
     if (!heroVideo.canPlayType(AV1)) return h264;
     try {
       const [w, h] = fmt === "9x16" ? [1080, 1920] : [1920, 1080];
       const info = await navigator.mediaCapabilities.decodingInfo({ type: "file", video: { contentType: AV1, width: w, height: h, bitrate: 1200000, framerate: FPS } });
       // AV1 seulement si le décodage est matériel : sinon le scrub saccade sur téléphone.
-      if (info.supported && info.powerEfficient) return `media/hero-${fmt}.av1.mp4`;
+      if (info.supported && info.powerEfficient) return heroUrl("av1");
     } catch { /* navigateur sans mediaCapabilities */ }
     return h264;
   }
@@ -183,7 +186,7 @@
     await document.fonts.ready;
     let ok = await loadHero(heroSrc);
     if (!ok && heroSrc.includes(".av1.")) {        // AV1 refusé par l'appareil : repli H.264
-      heroSrc = `media/hero-${fmt}.h264.mp4`;
+      heroSrc = heroUrl("h264");
       ok = await loadHero(heroSrc);
     }
     setProgress(1);
@@ -195,9 +198,21 @@
     box.style.cssText = "position:fixed;z-index:99;left:8px;bottom:8px;max-width:92vw;margin:0;padding:8px;font:11px/1.35 ui-monospace,monospace;color:#fff;background:rgba(0,0,0,.75);white-space:pre-wrap;pointer-events:none";
     document.body.append(box);
     const states = ["VIDE", "META", "IMAGE", "SUITE", "ASSEZ"];
+    // Fluidité : images affichées par la page et par la vidéo chaque seconde, durée des recherches vidéo.
+    let pageFrames = 0, videoFrames = 0, seekAt = 0, seekMs = [];
+    const countPage = () => { pageFrames++; requestAnimationFrame(countPage); };
+    requestAnimationFrame(countPage);
+    const countVideo = () => { videoFrames++; heroVideo.requestVideoFrameCallback(countVideo); };
+    if ("requestVideoFrameCallback" in heroVideo) heroVideo.requestVideoFrameCallback(countVideo);
+    heroVideo.addEventListener("seeking", () => { seekAt = performance.now(); });
+    heroVideo.addEventListener("seeked", () => { seekMs.push(performance.now() - seekAt); if (seekMs.length > 60) seekMs.shift(); });
     setInterval(() => {
       const v = heroVideo, b = v.buffered.length ? v.buffered.end(v.buffered.length - 1).toFixed(1) : "0";
+      const sorted = seekMs.slice().sort((x, y) => x - y), med = sorted.length ? sorted[sorted.length >> 1].toFixed(0) : "–";
+      const fps = `page ${pageFrames * 2} i/s · vidéo ${videoFrames * 2} i/s · recherche ${med} ms`;
+      pageFrames = 0; videoFrames = 0;
       box.textContent = [
+        fps,
         `format ${fmt} · source ${heroSrc || "(choix en cours)"}`,
         `readyState ${v.readyState} ${states[v.readyState] || ""} · network ${v.networkState} · erreur ${v.error ? v.error.code + " " + (v.error.message || "") : "aucune"}`,
         `paused ${v.paused} · temps ${v.currentTime.toFixed(2)} · tampon ${b} s · taille ${v.videoWidth}×${v.videoHeight}`,
@@ -248,20 +263,24 @@
   }
 
   // ---------- Scroll → temps du récit → vidéo et textes ----------
-  let target = 0, current = 0, pendingSeek = null;
-  const readScroll = () => {
-    const r = hero.getBoundingClientRect();
-    const run = hero.offsetHeight - innerHeight;
-    target = clamp(-r.top / run) * STORY_END;
-  };
+  let target = 0, current = 0, pendingSeek = null, last = 0;
+  // Position et hauteur du hero mesurées au redimensionnement seulement : le scroll ne lit que scrollY,
+  // sans forcer le navigateur à recalculer la mise en page à chaque événement.
+  let heroTop = 0, run = 1;
+  const measure = () => { heroTop = hero.offsetTop; run = Math.max(1, hero.offsetHeight - innerHeight); readScroll(); };
+  const readScroll = () => { target = clamp((scrollY - heroTop) / run) * STORY_END; };
   addEventListener("scroll", readScroll, { passive: true });
-  addEventListener("resize", readScroll);
+  addEventListener("resize", measure);
   heroVideo.addEventListener("seeked", () => {
     if (pendingSeek !== null) { const t = pendingSeek; pendingSeek = null; heroVideo.currentTime = t; }
   });
 
-  function frame() {
-    current += (target - current) * 0.2;
+  function frame(now) {
+    // Lissage : 20 % de l'écart par image à 60 Hz, ramené à la durée réelle de l'image
+    // (même rendu sur un écran à 120 Hz, et pas de retard qui s'accumule si une image saute).
+    const dt = last ? Math.min(now - last, 100) : 16.7;
+    last = now;
+    current += (target - current) * (1 - Math.pow(0.8, dt / 16.7));
     if (Math.abs(target - current) < 0.002) current = target;
     const vt = Math.min(current, VIDEO_END - 0.5 / FPS);
     if (!heroVideo.paused) heroVideo.pause();       // la vidéo ne joue jamais seule : seul le scroll la fait avancer
@@ -271,7 +290,7 @@
     render(current);
     requestAnimationFrame(frame);
   }
-  readScroll();
+  measure();
   render(0);
   requestAnimationFrame(frame);
 })();
