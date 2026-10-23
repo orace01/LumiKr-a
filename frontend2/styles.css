@@ -1,0 +1,350 @@
+/* Lumikréa — prototype de page d'accueil immersive (mobile d'abord).
+   Couleurs du moodboard 01 ; capitales Onest, mot lumineux Sacramento. */
+:root {
+  --nuit: #17182D;
+  --intro-fond: #0B0A1B;
+  --indigo: #30385B;
+  --ivoire: #F4EFE6;
+  --texte: #D9D4CB;
+  --halo: #FFD23F;
+  --voile: rgb(252, 224, 137);
+  --caps: "Onest", "Arial Narrow", system-ui, sans-serif;
+  --script: "Sacramento", "Brush Script MT", cursive;
+  --gutter: max(16px, 7.8vw);
+  /* Hauteur réservée au header : les textes du hero et des scènes collées commencent en dessous. */
+  --entete: calc(env(safe-area-inset-top, 0px) + 76px);
+  --ombre: 0 2px 24px rgba(8, 8, 20, .62), 0 1px 3px rgba(8, 8, 20, .5);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--nuit); -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--nuit); color: var(--ivoire); font-family: var(--caps); }
+img, video { display: block; max-width: 100%; }
+a { color: inherit; }
+.is-intro { overflow: hidden; }
+
+/* ---------- Intro et écran de chargement ---------- */
+.intro { position: fixed; inset: 0; z-index: 50; background: var(--intro-fond); }
+.intro-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* La barre se place en % de la hauteur de la VIDÉO (recadrée en cover), pas de la fenêtre :
+   hauteur affichée = max(écran, largeur × ratio). Logo : 47–52 % en 9:16, 42–58 % en 16:9. */
+.loader { position: absolute; left: 50%; top: calc(50svh + .09 * max(100svh, 177.78vw)); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transition: opacity .6s ease; }
+.loader.is-on { opacity: 1; }
+.loader.is-off { opacity: 0; transition-duration: .35s; }
+.loader-track { width: min(34vw, 260px); height: 2px; background: rgba(244, 239, 230, .14); border-radius: 2px; overflow: hidden; }
+.loader-fill { height: 100%; width: calc(var(--p, 0) * 100%); background: var(--halo); box-shadow: 0 0 10px rgba(255, 200, 60, .9); transition: width .25s linear; }
+.loader-pct { font: 600 11px/1 var(--caps); letter-spacing: .22em; color: rgba(244, 239, 230, .7); font-variant-numeric: tabular-nums; }
+.veil { position: absolute; inset: 0; background: var(--voile); opacity: 0; pointer-events: none; }
+.intro.is-revealing { background: transparent; pointer-events: none; }
+.intro.is-revealing .intro-video, .intro.is-revealing .loader { display: none; }
+.intro.is-revealing .veil { opacity: 1; animation: voile 1s cubic-bezier(.4, 0, .2, 1) .15s forwards; }
+@keyframes voile { to { opacity: 0; } }
+.is-revealing-site .stage { animation: net 1.15s cubic-bezier(.4, 0, .2, 1) forwards; }
+@keyframes net { from { filter: blur(14px); } to { filter: blur(0); } }
+
+/* ---------- Header ---------- */
+.top { position: fixed; z-index: 20; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px));
+  pointer-events: none; transition: opacity .6s ease; }
+.top > * { pointer-events: auto; }
+.is-intro .top { opacity: 0; }
+.top-logo img { height: 32px; width: auto; }
+.top-cta { font: 700 11px/1 var(--caps); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; padding: 12px 0; border-bottom: 1px solid rgba(255, 210, 63, .7); text-shadow: var(--ombre); }
+
+/* ---------- Hero piloté par le scroll ---------- */
+.hero { position: relative; height: var(--hero-h, 1000svh); }
+/* La scène prend la GRANDE hauteur d'écran (barres du navigateur masquées) : quand elles se replient au scroll,
+   l'image remplit toujours tout l'écran, sans bande en bas. Les textes du bas sont recalés sur la zone visible. */
+.stage { position: sticky; top: 0; height: 100vh; height: 100lvh; overflow: hidden; background: var(--nuit); --barres: calc(100lvh - 100svh); }
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: var(--nuit) center / cover no-repeat; }
+/* Extinction : le bleu nuit part des quatre coins et se referme vers le centre.
+   --h = rayon du trou clair (1,25 = rien de visible, 0 = écran entièrement bleu nuit). */
+/* Les arrêts restent ≥ 0 (Safari abandonne le dégradé quand ils deviennent négatifs, et la pièce réapparaissait
+   derrière le titre) ; un aplat bleu nuit (--plein) prend le relais à la fermeture et reste derrière le titre. */
+.eteint { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle farthest-corner at 50% 50%, rgba(23, 24, 45, 0) max(0%, calc(var(--h, 1.25) * 100% - 30%)), rgba(23, 24, 45, .72) max(0%, calc(var(--h, 1.25) * 100% - 12%)), var(--nuit) max(0%, calc(var(--h, 1.25) * 100%))); }
+.eteint::after { content: ""; position: absolute; inset: 0; background: var(--nuit); opacity: var(--plein, 0); }
+
+
+/* Chapitres */
+.chapter { position: absolute; opacity: var(--a, 0); transform: translateY(calc(var(--y, 0) * 1px)); will-change: opacity, transform; }
+.title { margin: 0; font-weight: 400; }
+.caps { display: block; font: 800 15.6vw/.84 var(--caps); letter-spacing: -.03em; text-transform: uppercase; color: var(--ivoire); text-shadow: var(--ombre); }
+/* Chapitres du hero : capitales de plusieurs mots (« Quelques minutes ») sur deux lignes au plus. */
+.chapter .caps { font-size: 12.4vw; max-width: 86vw; }
+.script { display: block; width: max-content; font: 400 19vw/.82 var(--script); color: var(--halo); margin: -.06em 0 0 .46em; transform: rotate(-4deg); transform-origin: 0 60%;
+  text-shadow: 0 0 .05em rgba(255, 210, 63, .9), 0 0 .22em rgba(255, 160, 40, .55);
+  clip-path: inset(-30% calc((1 - var(--s, 0)) * 100%) -40% -6%); }
+.sub { margin: .9em 0 0; max-width: 64vw; font: 400 clamp(15px, 4.3vw, 19px)/1.3 var(--caps); color: var(--ivoire); text-shadow: var(--ombre); }
+.sub .w { opacity: var(--w, .26); }
+
+.pos-1 { left: var(--gutter); top: calc(var(--entete) + 3svh); }
+.pos-2 { right: var(--gutter); top: calc(var(--entete) + 3svh); text-align: right; }
+.pos-2 .script { margin-left: auto; margin-right: .1em; transform-origin: 100% 60%; }
+.pos-2 .sub { margin-left: auto; }
+.pos-3 { left: var(--gutter); top: calc(var(--entete) + 3svh); }
+.pos-4 { left: var(--gutter); top: calc(var(--entete) + 3svh); }
+.pos-4 .sub { position: absolute; left: 0; top: 70svh; width: 86vw; max-width: none; opacity: var(--sa, 0); }
+
+/* Fin du hero : titre écrit par la boule (chaque .l révélée de gauche à droite par --r, la boule au bord),
+   sous-titre éclairé mot à mot, fil laissé par la boule quand elle descend. */
+.fin-bloc { position: absolute; left: var(--gutter); right: var(--gutter); top: 50%; transform: translateY(-58%); text-align: center; pointer-events: none; }
+.titre { margin: 0; font: 800 12.2vw/.92 var(--caps); letter-spacing: -.03em; text-transform: uppercase; color: var(--ivoire); }
+.titre .l { display: block; width: max-content; margin: 0 auto; padding: 0 .03em;
+  text-shadow: 0 0 .05em rgba(255, 210, 63, .35), 0 0 .3em rgba(255, 170, 40, .16);
+  clip-path: inset(-20% calc((1 - var(--r, 0)) * 100%) -20% -3%); }
+/* « Lumière » : le mot que la lumière allume (pas de surlignage au marqueur). */
+.titre .lumiere { color: var(--halo); text-shadow: 0 0 .05em rgba(255, 210, 63, .9), 0 0 .28em rgba(255, 160, 40, .5); }
+.fin-sub { max-width: 34ch; margin: 1.6em auto 0; opacity: var(--sa, 0); text-align: center; }
+.trace { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+
+/* La boule (et la tête du fil) : cœur blanc, halo doré, éclat qui respire. */
+.boule, .tete { position: absolute; left: 0; top: 0; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #fff 0%, #fff6d6 30%, var(--halo) 60%, rgba(255, 210, 63, 0) 74%); will-change: transform; }
+.boule { width: 22px; height: 22px; margin: -11px 0 0 -11px; opacity: 0; box-shadow: 0 0 16px 5px rgba(255, 200, 60, .75); }
+.boule::after, .tete::after { content: ""; position: absolute; inset: -160%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 205, 70, .42) 0%, rgba(255, 170, 40, .14) 38%, rgba(255, 170, 40, 0) 70%);
+  animation: respire 2.6s ease-in-out infinite alternate; }
+@keyframes respire { from { transform: scale(.78); opacity: .65; } to { transform: scale(1.18); opacity: 1; } }
+
+/* Bouton : texte souligné d'un trait de feutre doré */
+.cta { position: relative; display: inline-block; padding: 10px 0 18px; font: 700 clamp(13px, 3.3vw, 16px)/1 var(--caps); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--ivoire); text-shadow: var(--ombre); }
+.cta-trait { position: absolute; left: -2%; bottom: 2px; width: 104%; height: 14px; overflow: visible; }
+.cta-trait path { fill: none; stroke: var(--halo); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--t, 0)); filter: drop-shadow(0 0 4px rgba(255, 200, 60, .9)); vector-effect: non-scaling-stroke; }
+.cta-static { --t: 1; }
+.cta:hover .cta-trait path, .cta:focus-visible .cta-trait path { animation: trait .7s ease forwards; }
+@keyframes trait { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.cta:focus-visible, .top-cta:focus-visible { outline: 2px solid var(--halo); outline-offset: 4px; }
+
+/* ---------- Suite du site : fil lumineux en arrière-plan ---------- */
+.suite { position: relative; background: var(--nuit); }
+.fil { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+/* La boule continue seule, sans fil derrière elle : les tracés restent dans la page (invisibles)
+   parce qu'ils donnent son trajet, jusqu'au centre de la tablette. */
+.fil, .trace { visibility: hidden; }
+.fil path, .trace path { fill: none; stroke-linecap: round; stroke-dasharray: var(--len, 1) var(--len, 1); stroke-dashoffset: var(--off, 1); }
+.fil-halo { stroke: rgba(255, 190, 60, .22); stroke-width: 12; }
+.fil-core { stroke: var(--halo); stroke-width: 2.5; opacity: .85; }
+.tete { width: 14px; height: 14px; margin: -7px 0 0 -7px; z-index: 0; box-shadow: 0 0 12px 4px rgba(255, 200, 60, .7); transition: opacity .12s linear; }
+.tete.is-arrivee { opacity: 0; transition-duration: .5s; }                     /* elle se fond dans la plaque qu'elle vient d'allumer */
+.tete.is-cachee { opacity: 0; transition: none; }      /* tant que la boule du hero n'a pas passé le relais */
+
+/* ---------- Dessin : la tablette éteinte, allumée par la boule ---------- */
+.dessin { position: relative; z-index: 1; padding: 16svh var(--gutter) 10svh; }
+.dessin-titre { max-width: 12ch; margin: 0 0 9svh; font: 800 clamp(34px, 9.4vw, 64px)/.95 var(--caps); letter-spacing: -.03em; text-transform: uppercase; color: var(--ivoire); text-shadow: var(--ombre); }
+.tablette { width: min(84vw, 760px); margin: 0 auto; }
+.plaque { position: relative; aspect-ratio: 3 / 2; border: 1.5px solid rgba(244, 239, 230, .2); border-radius: 12px 12px 3px 3px; overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .01) 45%, rgba(255, 255, 255, .04)); transition: border-color .8s ease, box-shadow .8s ease; }
+/* La lumière part du centre de la plaque, là où la boule arrive. */
+.plaque::before { content: ""; position: absolute; inset: -20%; pointer-events: none; opacity: 0; transform: scale(.05);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 214, 110, .24) 0%, rgba(255, 190, 70, .1) 40%, rgba(255, 190, 70, 0) 70%);
+  transition: transform 1.1s cubic-bezier(.2, .7, .2, 1), opacity .9s ease; }
+.toile { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1s ease .25s; touch-action: none; cursor: crosshair; pointer-events: none; }
+.indice { position: absolute; inset: auto 0 8%; margin: 0; text-align: center; font: 500 clamp(13px, 3.4vw, 17px)/1 var(--caps); letter-spacing: .04em; color: rgba(244, 239, 230, .7); opacity: 0; transition: opacity .8s ease .6s; }
+.socle { height: 12px; margin: 0 -3%; border-radius: 3px 3px 7px 7px; background: #2a2b45; transition: background .8s ease, box-shadow .8s ease; }
+.plaque.is-allumee { border-color: rgba(255, 240, 210, .55); box-shadow: inset 0 -2.4rem 3rem -2rem rgba(255, 210, 63, .38), 0 0 60px rgba(255, 200, 60, .12); }
+.plaque.is-allumee::before { opacity: 1; transform: scale(1); }
+.plaque.is-allumee .toile { opacity: 1; pointer-events: auto; }
+.plaque.is-allumee .indice { opacity: 1; }
+.plaque.is-allumee + .socle { background: linear-gradient(to bottom, #ffe9a6, var(--halo)); box-shadow: 0 0 40px 6px rgba(255, 210, 63, .45); }
+.outils { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; width: min(84vw, 760px); margin: 5svh auto 0; opacity: .35; transition: opacity .8s ease; }
+.dessin:has(.is-allumee) .outils { opacity: 1; }
+.feutres { display: flex; gap: 6px; }
+.feutre { width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; display: grid; place-items: center; }
+.feutre::before { content: ""; width: 24px; height: 24px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); transition: transform .2s ease; }
+.feutre[aria-checked="true"]::before { transform: scale(1.3); outline: 2px solid var(--ivoire); outline-offset: 3px; }
+.feutre:focus-visible, .effacer:focus-visible { outline: 2px solid var(--halo); outline-offset: 4px; }
+.effacer { padding: 10px 0; border: 0; border-bottom: 1px solid rgba(255, 210, 63, .7); background: none; color: var(--ivoire); font: 700 12px/1 var(--caps); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Sections après la tablette : même univers que le hero ----------
+   Titres : capitales Onest + mot écrit au feutre lumineux (--s, réglé au scroll par sections.js).
+   Chaque [data-station] est allumé (.is-allumee) quand la boule passe par son centre. */
+.usages, .formats, .boite, .questions, .fin { position: relative; z-index: 1; padding: 14svh var(--gutter) 6svh; }
+.bloc-titre { margin: 0 0 6svh; font-weight: 400; }
+.bloc-titre .caps { font-size: 11.5vw; }
+.bloc-titre .script { font-size: 15vw; }
+
+/* Une photo réelle : éteinte (très sombre) jusqu'au passage de la boule, puis la lumière part de son centre. */
+.photo { position: relative; margin: 0; border-radius: 8px; overflow: hidden; }
+.photo img { display: block; width: 100%; height: auto; filter: brightness(.14) saturate(.35); transition: filter 1.2s ease; }
+.photo::after { content: ""; position: absolute; inset: -30%; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 228, 140, .55) 0%, rgba(255, 190, 70, .18) 30%, rgba(255, 190, 70, 0) 60%); }
+.photo.is-allumee img { filter: none; }
+.photo.is-allumee::after { animation: eclat 1.4s ease-out forwards; }
+@keyframes eclat { from { opacity: 1; transform: scale(.05); } to { opacity: 0; transform: scale(1.2); } }
+
+/* Usages : une seule tablette qui reste à l'écran (la section est longue, sa scène colle en haut). Dans le cadre,
+   une photo par usage ; --noir éteint la pièce, --lum / --eclat rallument depuis le centre (réglés par sections.js). */
+.usages { height: calc(100lvh + 320svh); padding: 0; }
+.u-scene { position: sticky; top: 0; height: 100vh; height: 100lvh; display: flex; flex-direction: column; justify-content: center; gap: 3svh; padding: calc(var(--entete) + 2svh) var(--gutter) 10svh; }
+.u-titre { margin: 0; }
+.u-titre .caps { font-size: 9vw; }
+.u-titre .script { font-size: 12vw; }
+.u-cadre { position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 40svh; border: 1.5px solid rgba(244, 239, 230, .18); border-radius: 10px; overflow: hidden; background: #0d0e1d; }
+.u-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.u-photo.is-vue { opacity: 1; }
+.u-nuit { position: absolute; inset: 0; background: var(--nuit); opacity: var(--noir, .9); }
+.u-cadre::after { content: ""; position: absolute; inset: -25%; pointer-events: none; opacity: var(--eclat, 0); transform: scale(calc(.2 + var(--lum, 0)));
+  background: radial-gradient(circle at 50% 50%, rgba(255, 228, 140, .5) 0%, rgba(255, 190, 70, .16) 32%, rgba(255, 190, 70, 0) 62%); }
+.u-textes { position: relative; min-height: 15rem; }
+.u-texte { position: absolute; left: 0; right: 0; top: 0; opacity: var(--a, 0); transform: translateY(calc((1 - var(--a, 0)) * 12px)); }
+.usage-titre { margin: 0; font-weight: 400; }
+.usage-titre .script { font-size: 13vw; margin: 0 0 .05em -.04em; }
+.usage-titre .caps { font-size: 6.4vw; line-height: .95; margin-top: .25em; }
+.u-texte .sub { max-width: 34ch; margin-top: .8em; }
+
+/* Formats : les quatre plaques à l'échelle d'une feuille A4, tracées par la lumière ; la liste des prix. */
+.formats-intro { max-width: 34ch; margin: -2svh 0 6svh; }
+.formats-corps { display: grid; gap: 5svh; }
+.echelle { margin: 0; }
+.echelle svg { display: block; width: 100%; height: auto; overflow: visible; }
+.echelle rect { fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s ease, fill .5s ease, stroke-width .3s ease; }
+.echelle .a4 { stroke: rgba(244, 239, 230, .35); stroke-width: .08; }
+.echelle .a4-nom { font: 600 1.1px/1 var(--caps); fill: rgba(244, 239, 230, .5); text-anchor: end; letter-spacing: .06px; }
+.echelle .plaque-f { stroke: var(--halo); stroke-width: .12; }
+.echelle .plaque-f.is-choisi { stroke-width: .24; fill: rgba(255, 210, 63, .1); filter: drop-shadow(0 0 .35px rgba(255, 200, 60, .9)); }
+.echelle.is-allumee rect { stroke-dashoffset: 0; }
+.echelle.is-allumee .plaque-f:nth-of-type(3) { transition-delay: .2s, 0s, 0s; }
+.echelle.is-allumee .plaque-f:nth-of-type(4) { transition-delay: .4s, 0s, 0s; }
+.echelle.is-allumee .plaque-f:nth-of-type(5) { transition-delay: .6s, 0s, 0s; }
+.echelle figcaption { margin-top: 1.4em; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
+.formats-liste { margin: 0; padding: 0; border: 0; }
+.formats-liste label { position: relative; display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 14px; padding: 18px 0 18px 22px; border-bottom: 1px solid rgba(244, 239, 230, .14); font: 600 clamp(16px, 4.6vw, 22px)/1 var(--caps); cursor: pointer; color: rgba(244, 239, 230, .7); transition: color .3s ease; }
+.formats-liste input { position: absolute; opacity: 0; pointer-events: none; }
+.formats-liste label::before { content: ""; position: absolute; left: 2px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--halo); box-shadow: 0 0 10px 3px rgba(255, 200, 60, .75); opacity: 0; transform: scale(.3); transition: opacity .3s ease, transform .3s ease; }
+.formats-liste label:has(input:checked) { color: var(--ivoire); }
+.formats-liste label:has(input:checked)::before { opacity: 1; transform: none; }
+.formats-liste label:has(input:focus-visible) { outline: 2px solid var(--halo); outline-offset: 2px; }
+.f-forme { font: 400 13px/1 var(--caps); color: rgba(244, 239, 230, .5); }
+.f-prix { color: var(--halo); font-variant-numeric: tabular-nums; }
+.formats-cta { margin-top: 5svh; }
+.formats-note { margin: 2.2em 0 0; max-width: 46ch; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
+
+/* Dans la boîte : les lignes se soulignent au feutre doré, l'une après l'autre (--i). */
+.lignes { margin: 0; }
+.lignes div { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 18px; padding: 15px 0; }
+.lignes div::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: var(--halo); box-shadow: 0 0 8px rgba(255, 200, 60, .8); transform: scaleX(0); transform-origin: 0 50%; transition: transform .7s ease calc(var(--i, 0) * 90ms); }
+.lignes div::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: rgba(244, 239, 230, .12); }
+.boite-corps.is-allumee .lignes div::after { transform: scaleX(1); opacity: .55; }
+.lignes dt { font: 600 clamp(15px, 4.2vw, 19px)/1.25 var(--caps); color: var(--ivoire); }
+.lignes dd { margin: 0; text-align: right; font: 400 clamp(14px, 3.8vw, 17px)/1.3 var(--caps); color: var(--texte); }
+.lignes-titre { margin: 6svh 0 1svh; font: 800 clamp(22px, 6vw, 30px)/1 var(--caps); letter-spacing: -.02em; text-transform: uppercase; color: var(--ivoire); }
+.support { margin: 7svh 0 0; }
+.support ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.support li { display: flex; flex-direction: column; gap: 6px; font: 400 12px/1.2 var(--caps); color: rgba(244, 239, 230, .6); }
+.support img { width: 100%; height: auto; border-radius: 6px; opacity: .85; }
+.support figcaption { margin-top: 1.2em; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
+
+/* Questions : la réponse s'écrit mot à mot en néon, dans la couleur de feutre de la question (--pen). */
+.q-corps { display: grid; gap: 5svh; }
+.q-liste { display: flex; flex-direction: column; }
+.q-onglet { display: flex; align-items: baseline; gap: 12px; padding: 14px 0; border: 0; border-bottom: 1px solid rgba(244, 239, 230, .12); background: none; text-align: left; cursor: pointer; font: 500 clamp(15px, 4.2vw, 18px)/1.3 var(--caps); color: rgba(244, 239, 230, .62); transition: color .3s ease; }
+.q-onglet::before { content: ""; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--pen); box-shadow: 0 0 8px var(--pen); opacity: .35; transition: opacity .3s ease; }
+.q-onglet[aria-selected="true"] { color: var(--ivoire); }
+.q-onglet[aria-selected="true"]::before { opacity: 1; }
+.q-onglet:focus-visible { outline: 2px solid var(--halo); outline-offset: 2px; }
+.q-tablette { --pen: var(--halo); }
+.q-plaque { position: relative; min-height: 13rem; padding: 22px 20px; border: 1.5px solid rgba(244, 239, 230, .2); border-radius: 12px 12px 3px 3px; background: linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .01) 45%, rgba(255, 255, 255, .04)); transition: border-color .8s ease, box-shadow .8s ease; }
+.q-plaque.is-allumee { border-color: rgba(255, 240, 210, .5); box-shadow: inset 0 -2.4rem 3rem -2rem rgba(255, 210, 63, .3); }
+.q-plaque.is-allumee + .socle { background: linear-gradient(to bottom, #ffe9a6, var(--halo)); box-shadow: 0 0 40px 6px rgba(255, 210, 63, .4); }
+.q-reponse { font: 500 clamp(16px, 4.4vw, 21px)/1.45 var(--caps); color: var(--pen); text-shadow: 0 0 .3em var(--pen); opacity: .25; transition: opacity .8s ease; }
+.q-plaque.is-allumee .q-reponse { opacity: 1; }
+.q-reponse .mot { opacity: 0; animation: ecrit .35s ease forwards; animation-delay: calc(var(--k) * 55ms); }
+@keyframes ecrit { from { opacity: 0; filter: blur(3px); } to { opacity: 1; filter: none; } }
+
+/* Dernier écran. */
+.fin { display: flex; flex-direction: column; align-items: center; text-align: center; padding-bottom: 12svh; }
+.fin-titre .script { margin-left: auto; margin-right: auto; transform-origin: 50% 60%; }
+.fin-photo { width: min(92vw, 560px); }
+.fin-cta { margin-top: 6svh; --t: 0; }
+.fin-photo.is-allumee ~ .fin-cta { --t: 1; }
+.fin-cta .cta-trait path { transition: stroke-dashoffset 1s ease .6s; }
+.pied { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6svh var(--gutter) calc(6svh + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(244, 239, 230, .1); text-align: center; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
+.pied img { height: 26px; width: auto; }
+.pied-liens { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; max-width: 760px; }
+.pied a { color: rgba(244, 239, 230, .78); text-decoration: underline; text-decoration-color: rgba(255, 210, 63, .45); text-underline-offset: 3px; }
+.pied a:hover, .pied a:focus-visible { color: var(--halo); }
+.formats-cta[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+
+/* ---------- Paysage (16:9) : textes sur le côté libre ---------- */
+@media (orientation: landscape) {
+  :root { --gutter: max(24px, 6.5vw); --entete: calc(env(safe-area-inset-top, 0px) + 88px); }
+  .top-logo img { height: 38px; }
+  .top { padding-top: calc(env(safe-area-inset-top, 0px) + 20px); padding-bottom: 20px; }
+  .loader { top: calc(50svh + .16 * max(100svh, 56.25vw)); }
+  .loader-track { width: min(22vw, 320px); }
+  .caps { font-size: min(8.4vw, 15svh); }
+  .chapter .caps { font-size: min(6.4vw, 12svh); max-width: 40vw; }
+  .script { font-size: min(10.2vw, 18svh); }
+  .sub { max-width: 30vw; font-size: clamp(16px, 1.45vw, 22px); }
+  /* Titre sur deux lignes : « en pleine » et « lumière » se suivent. */
+  .titre { font-size: min(7.6vw, 15svh); }
+  .titre .l2, .titre .l3 { display: inline-block; margin: 0; }
+  .titre .l2 { margin-right: .26em; }
+  .fin-sub { max-width: 52ch; }
+  .dessin { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: center; column-gap: 6vw; padding-top: 18svh; }
+  .dessin-titre { margin: 0; font-size: min(5vw, 11svh); }
+  .tablette, .outils { width: 100%; }
+  .outils { grid-column: 2; }
+  /* Sections : deux colonnes, la photo alterne à gauche et à droite. */
+  .usages, .formats, .boite, .questions, .fin { padding-top: 16svh; }
+  .bloc-titre .caps { font-size: min(6.4vw, 13svh); }
+  .bloc-titre .script { font-size: min(8.4vw, 17svh); }
+  .usage-titre .script { font-size: min(5.6vw, 12svh); }
+  .usage-titre .caps { font-size: min(2.8vw, 6svh); }
+  .formats-corps { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; column-gap: 6vw; }
+  .boite-corps { max-width: 860px; }
+  .support ul { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 900px; }
+  .q-corps { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; column-gap: 6vw; }
+  .fin-photo { width: min(46vw, 72svh); }
+  /* Usages : le cadre à gauche, le titre et les textes à droite. */
+  .u-scene { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); grid-template-rows: auto auto; align-content: center; column-gap: 5vw; row-gap: 4svh; padding: calc(var(--entete) + 4svh) var(--gutter) 8svh; }
+  .u-cadre { grid-column: 1; grid-row: 1 / span 2; max-height: 72svh; align-self: center; }
+  .u-titre { grid-column: 2; align-self: end; }
+  .u-titre .caps { font-size: min(4.6vw, 10svh); }
+  .u-titre .script { font-size: min(6vw, 13svh); }
+  .u-textes { grid-column: 2; min-height: 34svh; }
+  .pos-1 { left: auto; right: var(--gutter); top: calc(var(--entete) + 3svh); text-align: right; }
+  .pos-1 .script { margin-left: auto; margin-right: .1em; transform-origin: 100% 60%; }
+  .pos-1 .sub { margin-left: auto; }
+  .pos-2 { right: auto; left: calc(var(--gutter) + 2vw); top: calc(var(--entete) + 3svh); text-align: left; }
+  .pos-2 .script { margin-left: .46em; margin-right: 0; transform-origin: 0 60%; }
+  .pos-2 .sub { margin-left: 0; }
+  .pos-3 { left: auto; right: var(--gutter); top: calc(var(--entete) + 3svh); }
+  .pos-4 { left: auto; right: var(--gutter); top: calc(var(--entete) + 2svh); }
+  .pos-4 .sub { left: auto; right: 0; top: 68svh; width: 30vw; text-align: right; }
+  .formats { padding-top: 16svh; }
+}
+
+/* ---------- Mouvement réduit : images fixes, textes visibles ---------- */
+.reduced .intro { display: none; }
+.reduced .top { opacity: 1; }
+.reduced .hero { height: auto; }
+.reduced .stage { position: relative; height: auto; min-height: 100svh; padding: 18svh var(--gutter) 10svh; display: flex; flex-direction: column; gap: 10svh; }
+.reduced .hero-video { position: absolute; }
+.reduced .eteint { opacity: .82; background: var(--nuit); }
+.reduced .chapter { position: relative; inset: auto; opacity: 1; transform: none; text-align: left; }
+.reduced .script { clip-path: none; margin-left: .46em; transform-origin: 0 60%; }
+.reduced .sub .w, .reduced .pos-4 .sub { opacity: 1; }
+.reduced .pos-4 .sub { position: static; width: auto; }
+.reduced .fin-bloc { position: relative; left: auto; right: auto; top: auto; transform: none; margin-top: 4svh; }
+.reduced .titre .l { clip-path: none; }
+.reduced .photo img { filter: none; }
+.reduced .usages { height: auto; }
+.reduced .u-scene { position: relative; height: auto; display: block; padding: 14svh var(--gutter) 6svh; }
+.reduced .u-cadre { margin-top: 5svh; }
+.reduced .u-photo:first-child { opacity: 1; }
+.reduced .u-nuit { opacity: 0; }
+.reduced .u-textes { min-height: 0; }
+.reduced .u-texte { position: static; opacity: 1; transform: none; margin-top: 5svh; --s: 1; }
+.reduced .u-texte .w { opacity: 1; }
+.reduced .echelle rect { stroke-dashoffset: 0; }
+.reduced .lignes div::after { transform: scaleX(1); opacity: .55; }
+.reduced .q-reponse { opacity: 1; }
+.reduced .q-reponse .mot { animation: none; opacity: 1; }
+.reduced .fin-cta { --t: 1; }
+.reduced .fin-sub { opacity: 1; }
+.reduced .boule, .reduced .tete, .reduced .trace { display: none; }
+.reduced .fil path { stroke-dashoffset: 0; }

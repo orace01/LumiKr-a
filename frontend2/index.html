@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lumikréa · La nuit s'allume de leurs idées</title>
+<meta name="description" content="Lumikréa, le tableau lumineux à dessiner : une plaque d'acrylique sur une base LED. On écrit au feutre, la lumière le révèle.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Lumikréa">
+<meta property="og:title" content="Lumikréa · Le tableau lumineux à dessiner">
+<meta property="og:description" content="Une plaque d'acrylique sur une base LED : on écrit au feutre, la lumière le révèle.">
+<meta property="og:image" content="https://www.lumikrea.store/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#17182D">
+<link rel="preload" as="font" type="font/woff2" href="fonts/onest-latin-wght-normal.woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="preload" as="image" href="media/hero-9x16.webp" media="(orientation: portrait)">
+<link rel="preload" as="image" href="media/hero-16x9.webp" media="(orientation: landscape)">
+</head>
+<body class="is-intro">
+
+<!-- Intro : le logo s'écrit, puis boucle pendant le chargement, puis se ferme sur le site -->
+<div class="intro" id="intro" aria-hidden="true">
+  <video class="intro-video" id="introVideo" muted playsinline preload="auto"></video>
+  <div class="loader" id="loader">
+    <div class="loader-track"><div class="loader-fill" id="loaderFill"></div></div>
+    <span class="loader-pct" id="loaderPct">0 %</span>
+  </div>
+  <div class="veil" id="veil"></div>
+</div>
+
+<header class="top">
+  <a class="top-logo" href="#hero" aria-label="Lumikréa, retour en haut"><img src="media/logo.svg" alt="Lumikréa" width="140" height="40"></a>
+  <a class="top-cta" href="#formats">Choisir mon format</a>
+</header>
+
+<main>
+  <section class="hero" id="hero" aria-label="L'histoire d'un dessin qui s'allume">
+    <div class="stage">
+      <video class="hero-video" id="heroVideo" muted playsinline preload="none" aria-hidden="true"></video>
+      <div class="eteint" id="eteint" aria-hidden="true"></div>
+
+      <!-- Chapitres : data-in / data-script / data-sub / data-subend / data-out en secondes du récit (0 à 30,5) -->
+      <article class="chapter pos-1" data-in="0.3" data-script="0.7" data-sub="1.0" data-subend="2.7" data-out="3.0">
+        <h2 class="title"><span class="caps">Un premier</span><span class="script">trait.</span></h2>
+        <p class="sub">Puis l'envie de continuer. Un soleil, une lune, quelques lignes : pas de modèle à réussir.</p>
+      </article>
+
+      <article class="chapter pos-2" data-in="7.4" data-script="7.9" data-sub="8.4" data-subend="10.6" data-out="11.6">
+        <h2 class="title"><span class="caps">La lumière</span><span class="script">révèle.</span></h2>
+        <p class="sub">Le jaune souligne chaque trait et lui donne un éclat doré.</p>
+      </article>
+
+      <article class="chapter pos-3" data-in="14.6" data-script="15.0" data-sub="15.6" data-subend="17.6" data-out="19.1">
+        <h2 class="title"><span class="caps">À deux,</span><span class="script">autrement.</span></h2>
+        <p class="sub">Un enfant commence, un parent complète : les idées se répondent trait après trait.</p>
+      </article>
+
+      <article class="chapter pos-4" data-in="21.8" data-script="22.3" data-subshow="25.6" data-sub="25.9" data-subend="27.1" data-out="27.5">
+        <h2 class="title"><span class="caps">Quelques minutes</span><span class="script">ensemble.</span></h2>
+        <p class="sub">Le dessin devient une présence lumineuse, près du lit.</p>
+      </article>
+
+      <!-- Fin : la boule lumineuse écrit le titre (un .l = un tracé), devient le point final,
+           puis descend en laissant un fil derrière elle pendant que le sous-titre s'éclaire. -->
+      <svg class="trace" id="trace" aria-hidden="true"><path class="fil-halo"/><path class="fil-core"/></svg>
+      <div class="fin-bloc">
+        <h1 class="titre" id="titre">
+          <span class="l l1">Vos idées,</span>
+          <span class="l l2">en pleine</span>
+          <span class="l l3 lumiere">lumière</span><span class="visually-hidden">.</span>
+        </h1>
+        <p class="sub fin-sub" id="finSub">Une plaque d'acrylique sur une base LED : déco de fête, mot doux, menu du jour ou dessin d'enfant, on l'écrit au feutre, la lumière le révèle, on efface et on recommence.</p>
+      </div>
+      <div class="boule" id="boule" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="suite" id="suite">
+  <!-- Fil lumineux dessiné au scroll derrière les sections ; la boule du hero en devient la tête
+       et va allumer la tablette au centre de sa plaque. -->
+  <svg class="fil" id="fil" aria-hidden="true"><path class="fil-halo"/><path class="fil-core"/></svg>
+  <div class="tete" id="tete" aria-hidden="true"></div>
+
+  <section class="dessin" id="dessin" aria-labelledby="dessin-titre">
+    <h2 class="dessin-titre" id="dessin-titre">Dessinez, puis éteignez la pièce.</h2>
+    <div class="tablette" id="tablette">
+      <div class="plaque" data-station="tablette">
+        <canvas class="toile" id="toile" role="img" aria-label="Zone de dessin : tracez au doigt, à la souris ou au stylet."></canvas>
+        <p class="indice" id="indice" aria-hidden="true">Dessinez ici</p>
+      </div>
+      <div class="socle" aria-hidden="true"></div>
+    </div>
+    <div class="outils">
+      <div class="feutres" id="feutres" role="radiogroup" aria-label="Couleur du feutre"></div>
+      <button type="button" class="effacer" id="effacer">Tout effacer</button>
+    </div>
+  </section>
+
+  <!-- Usages : une seule tablette qui reste à l'écran. Au scroll, la pièce s'éteint, la photo suivante s'allume depuis
+       le centre et son verbe s'écrit au feutre (Fêter → Décorer → Écrire → Créer). Piloté par sections.js. -->
+  <section class="usages" id="usages" aria-labelledby="usages-titre">
+    <div class="u-scene">
+      <h2 class="bloc-titre u-titre" id="usages-titre"><span class="caps">Un tableau,</span><span class="script">mille usages.</span></h2>
+      <div class="u-cadre" data-station="epingle">
+        <img class="u-photo" src="media/usage-feter.webp" width="1400" height="782" decoding="async" alt="Le tableau allumé dans une pièce sombre, décoré pour Halloween : toiles d'araignée, citrouille, chauves-souris et « Spooky Evening ».">
+        <img class="u-photo" src="media/usage-decorer.webp" width="682" height="620" decoding="async" alt="Le tableau allumé sur une commode, décoré de « Merry Christmas », de sapins, de flocons et d'un bonhomme de neige.">
+        <img class="u-photo" src="media/usage-ecrire.webp" width="920" height="650" decoding="async" alt="Le tableau paysage allumé sur un bureau, avec une citation en couleurs, « Good Morning » écrit en jaune et une fleur rouge.">
+        <img class="u-photo" src="media/usage-creer.webp" width="880" height="880" decoding="async" alt="Le petit tableau carré allumé dans une pièce sombre, avec une fusée, des planètes et des étoiles dessinées en couleurs.">
+        <div class="u-nuit" aria-hidden="true"></div>
+      </div>
+      <div class="u-textes">
+        <div class="u-texte">
+          <h3 class="usage-titre"><span class="script">Fêter.</span><span class="caps">Une déco pour chaque fête</span></h3>
+          <p class="sub">Citrouille pour Halloween, sapin à Noël, guirlande au Nouvel An : on efface la plaque et on dessine la fête suivante.</p>
+        </div>
+        <div class="u-texte">
+          <h3 class="usage-titre"><span class="script">Décorer.</span><span class="caps">Une lumière douce dans la maison</span></h3>
+          <p class="sub">Sur une étagère, une commode ou une table de chevet, la plaque éclairée par sa base décore le jour et fait veilleuse le soir.</p>
+        </div>
+        <div class="u-texte">
+          <h3 class="usage-titre"><span class="script">Écrire.</span><span class="caps">Un message qui se voit dans le noir</span></h3>
+          <p class="sub">Mot du matin, citation, liste de la semaine, ou le menu du jour au comptoir d'un café : on l'écrit, il s'illumine, on le change quand on veut.</p>
+        </div>
+        <div class="u-texte">
+          <h3 class="usage-titre"><span class="script">Créer.</span><span class="caps">Une ardoise qui brille</span></h3>
+          <p class="sub">Sirène, fusée ou prénom en couleurs : la plaque se remplit, s'illumine, puis repart de zéro pour le dessin suivant.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Formats : la liste des prix, et les quatre plaques à l'échelle d'une feuille A4, tracées par la lumière. -->
+  <section class="formats" id="formats" aria-labelledby="formats-titre">
+    <h2 class="bloc-titre" id="formats-titre" data-ecrit><span class="caps">Votre</span><span class="script">format.</span></h2>
+    <p class="sub formats-intro" data-mots>Un tableau en acrylique transparent, effaçable et éclairé par LED, pour dessiner, laisser un mot ou décorer.</p>
+    <div class="formats-corps">
+      <figure class="echelle" data-station>
+        <svg viewBox="-0.6 -0.6 31.2 22.2" role="img" aria-labelledby="echelle-legende">
+          <rect class="a4" x="0" y="0" width="29.7" height="21" pathLength="1"/>
+          <text class="a4-nom" x="28.9" y="1.6">A4</text>
+          <rect class="plaque-f" data-f="30x20" x="0" y="1" width="30" height="20" pathLength="1"/>
+          <rect class="plaque-f" data-f="20x20" x="0" y="1" width="20" height="20" pathLength="1"/>
+          <rect class="plaque-f" data-f="15x15" x="0" y="6" width="15" height="15" pathLength="1"/>
+          <rect class="plaque-f" data-f="12x12" x="0" y="9" width="12" height="12" pathLength="1"/>
+        </svg>
+        <figcaption id="echelle-legende">Les quatre plaques à l'échelle, posées sur une feuille A4 couchée.</figcaption>
+      </figure>
+      <fieldset class="formats-liste">
+        <legend class="visually-hidden">Dimensions de la plaque</legend>
+        <label><input type="radio" name="format" value="12x12" data-prix="24,90 €"><span class="f-taille">12 × 12 cm</span><span class="f-forme">Carré</span><span class="f-prix">24,90 €</span></label>
+        <label><input type="radio" name="format" value="15x15" data-prix="27,90 €"><span class="f-taille">15 × 15 cm</span><span class="f-forme">Carré</span><span class="f-prix">27,90 €</span></label>
+        <label><input type="radio" name="format" value="20x20" data-prix="32,90 €" checked><span class="f-taille">20 × 20 cm</span><span class="f-forme">Carré</span><span class="f-prix">32,90 €</span></label>
+        <label><input type="radio" name="format" value="30x20" data-prix="36,90 €"><span class="f-taille">30 × 20 cm</span><span class="f-forme">Paysage</span><span class="f-prix">36,90 €</span></label>
+      </fieldset>
+    </div>
+    <a class="cta cta-static formats-cta" id="commander" href="/commande">
+      <span>Commander le <span id="formatChoisi">20 × 20 cm</span></span>
+      <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
+    </a>
+    <!-- Prix, livraison et état de la vente : remplis par boutique.js depuis le serveur. -->
+    <p class="formats-note" id="formatsNote">Prix TTC · livraison offerte en France métropolitaine, en 10 jours ouvrés.</p>
+  </section>
+
+  <!-- Dans la boîte : les lignes se soulignent au feutre quand la boule arrive. -->
+  <section class="boite" id="boite" aria-labelledby="boite-titre">
+    <h2 class="bloc-titre" id="boite-titre" data-ecrit><span class="caps">Dans la</span><span class="script">boîte.</span></h2>
+    <div class="boite-corps" data-station>
+      <dl class="lignes">
+        <div><dt>Plaque en acrylique transparent</dt><dd>Au format choisi</dd></div>
+        <div><dt>Base lumineuse LED</dt><dd>Branchement USB direct</dd></div>
+        <div><dt>Support</dt><dd>Réglable</dd></div>
+        <div><dt>Feutre</dt><dd>1 fourni</dd></div>
+      </dl>
+      <h3 class="lignes-titre">Caractéristiques</h3>
+      <dl class="lignes">
+        <div><dt>Matériau</dt><dd>Acrylique transparent</dd></div>
+        <div><dt>Éclairage</dt><dd>LED, par la base</dd></div>
+        <div><dt>Alimentation</dt><dd>USB ; adaptateur secteur non fourni</dd></div>
+        <div><dt>Surface</dt><dd>Effaçable à sec, réutilisable</dd></div>
+        <div><dt>Usages</dt><dd>Dessin, messages, décoration, veilleuse</dd></div>
+      </dl>
+    </div>
+    <figure class="support">
+      <ul>
+        <li><img src="media/support-face.webp" width="274" height="146" loading="lazy" decoding="async" alt=""><span>De face</span></li>
+        <li><img src="media/support-dos.webp" width="274" height="150" loading="lazy" decoding="async" alt=""><span>De dos</span></li>
+        <li><img src="media/support-profil.webp" width="274" height="152" loading="lazy" decoding="async" alt=""><span>De profil</span></li>
+        <li><img src="media/support-tablette.webp" width="310" height="215" loading="lazy" decoding="async" alt="Une tablette tenue à l'horizontale par le support."><span>Porte-tablette</span></li>
+        <li><img src="media/support-telephone.webp" width="310" height="215" loading="lazy" decoding="async" alt="Un téléphone tenu à l'horizontale par le support."><span>Porte-téléphone</span></li>
+      </ul>
+      <figcaption>Le support, vu de face, de dos et de profil ; il tient aussi une tablette ou un téléphone (photos du fournisseur).</figcaption>
+    </figure>
+  </section>
+
+  <!-- Questions : la réponse s'écrit en néon sur une petite plaque, dans la couleur de feutre de la question. -->
+  <section class="questions" id="questions" aria-labelledby="questions-titre">
+    <h2 class="bloc-titre" id="questions-titre" data-ecrit><span class="caps">Avant de vous</span><span class="script">lancer.</span></h2>
+    <div class="q-corps">
+      <div class="q-liste" role="tablist" aria-labelledby="questions-titre" aria-orientation="vertical" id="qListe"></div>
+      <div class="q-tablette">
+        <div class="q-plaque" data-station="tablette"><div class="q-reponse" role="tabpanel" id="qReponse" aria-live="polite"></div></div>
+        <div class="socle" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dernier écran : la boule allume le produit, puis le bouton se souligne. -->
+  <section class="fin" id="fin" aria-labelledby="fin-titre">
+    <!-- « créer. » est écrit par la boule (station « ecriture » : --s suit sa position sur le mot). -->
+    <h2 class="bloc-titre fin-titre" id="fin-titre"><span class="caps">À vous de</span><span class="script" data-station="ecriture">créer.</span></h2>
+    <figure class="photo fin-photo" data-station><img src="media/fin-sirene.webp" width="748" height="760" loading="lazy" decoding="async" alt="Le tableau lumineux allumé dans le noir, avec une sirène dessinée aux feutres de couleur."></figure>
+    <a class="cta cta-static fin-cta" href="#formats">
+      <span>Choisir mon format</span>
+      <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
+    </a>
+  </section>
+
+  <footer class="pied">
+    <img src="media/logo.svg" alt="Lumikréa" width="120" height="34">
+    <p>Tableau lumineux à dessiner · livraison offerte en France métropolitaine</p>
+    <nav class="pied-liens" aria-label="Informations">
+      <a href="/suivi">Suivre ma commande</a>
+      <a href="/livraison-retours">Livraison et retours</a>
+      <a href="/cgv">Conditions générales de vente</a>
+      <a href="/mentions-legales">Mentions légales</a>
+      <a href="/confidentialite">Confidentialité</a>
+      <a href="mailto:contact@lumikrea.store">contact@lumikrea.store</a>
+    </nav>
+  </footer>
+  </div>
+</main>
+
+<script src="app.js"></script>
+<script src="dessin.js"></script>
+<script src="sections.js"></script>
+<script src="boutique.js"></script>
+</body>
+</html>

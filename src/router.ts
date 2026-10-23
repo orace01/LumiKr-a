@@ -2,7 +2,8 @@ import { useSyncExternalStore } from 'react'
 
 // Navigation entre les pages du site sans bibliothèque : l'adresse est lue dans
 // window.location et mise à jour avec l'API History. Le serveur renvoie
-// index.html pour toutes les adresses (voir server/main.ts).
+// app.html pour toutes les adresses, sauf l'accueil (/), qui est la page
+// statique de frontend2/ : on y va en rechargeant la page.
 
 const NAVIGATE_EVENT = 'lumikrea:navigate'
 
@@ -30,7 +31,7 @@ export function scrollToHash(hash: string) {
 
 export function navigate(to: string, options: { replace?: boolean } = {}) {
   const url = new URL(to, window.location.href)
-  if (url.origin !== window.location.origin) {
+  if (url.origin !== window.location.origin || url.pathname === '/') {
     window.location.assign(url)
     return
   }

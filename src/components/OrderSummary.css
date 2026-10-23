@@ -24,7 +24,7 @@
   width: 4.5rem;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 0.75rem;
 }
 
@@ -38,12 +38,13 @@
   min-width: 1.5rem;
   height: 1.5rem;
   padding: 0 0.3rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--glow);
   font-family: var(--font-display);
   font-size: 0.8125rem;
   font-weight: 700;
+  color: var(--on-primary);
 }
 
 .summary__name {
@@ -85,7 +86,7 @@
 .summary__total {
   align-items: baseline;
   padding-top: 0.75rem;
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--border);
   font-family: var(--font-display);
   font-size: var(--step-1);
   font-weight: 600;

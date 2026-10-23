@@ -20,27 +20,27 @@
 
 .checkout__banner {
   padding: 0.9rem 1.1rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 1.25rem;
   background: var(--glow-soft);
 }
 
 .checkout__banner--alert {
-  background: #ffe3e8;
+  background: var(--danger-soft);
 }
 
 .checkout__errors {
   display: grid;
   gap: 0.5rem;
   padding: 1rem 1.25rem;
-  border: 2px solid #b3123c;
+  border: 2px solid var(--danger);
   border-radius: 1.25rem;
-  background: #fff1f3;
-  color: #7d0a28;
+  background: var(--danger-soft);
+  color: var(--danger-text);
 }
 
 .checkout__errors:focus-visible {
-  outline-color: #b3123c;
+  outline-color: var(--danger);
 }
 
 .checkout__errors-title {
@@ -68,10 +68,10 @@
   gap: 1rem;
   margin: 0;
   padding: clamp(1.25rem, 3vw, 1.75rem);
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--paper);
-  box-shadow: 0 0.35rem 0 var(--ink);
+  box-shadow: var(--card-shadow);
 }
 
 .checkout__step {
@@ -102,11 +102,12 @@ legend.checkout__step + * {
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--glow);
   font-size: 1rem;
   font-weight: 700;
+  color: var(--on-primary);
 }
 
 .checkout__row {
@@ -129,7 +130,7 @@ legend.checkout__step + * {
   align-items: center;
   gap: 0.9rem;
   padding: 0.9rem 1.1rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 1.25rem;
   background: var(--paper);
   cursor: pointer;
@@ -137,14 +138,14 @@ legend.checkout__step + * {
 
 .checkout__choice:has(input:checked) {
   background: var(--glow-soft);
-  box-shadow: var(--sticker);
+  box-shadow: var(--card-shadow);
 }
 
 .checkout__choice input {
   flex: none;
   width: 1.3rem;
   height: 1.3rem;
-  accent-color: var(--ink);
+  accent-color: var(--glow);
 }
 
 .checkout__choice-text {
@@ -191,7 +192,7 @@ legend.checkout__step + * {
   width: 1.4rem;
   height: 1.4rem;
   margin: 0.1rem 0 0;
-  accent-color: var(--ink);
+  accent-color: var(--glow);
 }
 
 .checkout__terms .field__error {
@@ -214,7 +215,7 @@ legend.checkout__step + * {
 
 .checkout__aside {
   order: -1;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--paper);
 }
@@ -285,7 +286,7 @@ legend.checkout__step + * {
     position: sticky;
     top: calc(var(--header-height) + 1.5rem);
     order: 0;
-    box-shadow: 0 0.5rem 0 var(--ink);
+    box-shadow: var(--card-shadow);
   }
 
   .checkout__summary-toggle {

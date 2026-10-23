@@ -1,17 +1,11 @@
-import { useEffect, useState } from 'react'
 import { site } from '../config/site'
-import { useIsMobile } from '../hooks/useIsMobile'
-import { useMediaQuery } from '../hooks/useMediaQuery'
 import { Link } from './Link'
 import { useCart } from '../shop/useCart'
 import './Header.css'
 
-function BrandMark() {
-  return (
-    <svg className="header__mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-      <path d="M32 4c1.9 16.5 7.6 22.2 24 24-16.4 1.8-22.1 7.5-24 24-1.9-16.5-7.6-22.2-24-24 16.4-1.8 22.1-7.5 24-24z" />
-    </svg>
-  )
+/** Logo de l'accueil (frontend2/media/logo.svg, servi à /media/logo.svg). */
+function Logo() {
+  return <img className="header__logo" src="/media/logo.svg" alt={site.brand} width={140} height={40} />
 }
 
 function CartButton() {
@@ -37,31 +31,13 @@ function CartButton() {
   )
 }
 
-/**
- * En-tête du site. Sur l'accueil (`overHero`), il est transparent tant qu'il
- * est posé sur la photo plein écran, puis reprend son fond clair dès qu'on
- * défile. Il n'y a pas de photo plein écran sur téléphone, et avec les
- * animations réduites elle s'affiche déjà resserrée.
- */
-export function Header({ overHero = false }: { overHero?: boolean }) {
-  const [scrolled, setScrolled] = useState(false)
-  const mobile = useIsMobile()
-  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
-  const transparent = overHero && !scrolled && !mobile && !reducedMotion
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
+/** En-tête des pages de la boutique ; l'accueil (frontend2/) a le sien. */
+export function Header() {
   return (
-    <header className={`header${transparent ? ' header--over' : ''}`}>
+    <header className="header">
       <div className="container header__inner">
         <Link className="header__brand" to="/" aria-label={`${site.brand}, accueil`}>
-          <BrandMark />
-          {site.brand}
+          <Logo />
         </Link>
 
         <nav className="header__nav" aria-label="Sections de la page d’accueil">
@@ -91,8 +67,7 @@ export function CheckoutHeader() {
     <header className="header">
       <div className="container header__inner">
         <Link className="header__brand" to="/" aria-label={`${site.brand}, retour à l’accueil`}>
-          <BrandMark />
-          {site.brand}
+          <Logo />
         </Link>
         <p className="header__secure">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">

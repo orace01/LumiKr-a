@@ -16,9 +16,23 @@ npm run build     # vérification TypeScript, site (dist/) et serveur (dist-serv
 npm start         # serveur de production : site + API, en mode réel par défaut
 ```
 
+Le site a deux parties, servies sous le même domaine :
+
+- **l'accueil** (`/`) : page statique de `frontend2/` (HTML, CSS et JavaScript sans
+  framework), avec l'intro du logo, la vidéo du hero pilotée par le défilement, les usages,
+  les formats, le contenu de la boîte et la FAQ. `frontend2/boutique.js` y lit les prix,
+  la livraison et l'état de la vente sur l'API, et « Commander » met le format choisi dans
+  le panier puis ouvre `/commande` ;
+- **la boutique** (toutes les autres adresses) : application React (`app.html`, `src/`) pour
+  le panier, la commande, la confirmation, le suivi et les pages légales, dans le même
+  style que l'accueil (bleu nuit, halo doré, polices Onest et Sacramento).
+
 Stack : Vite, React 19, TypeScript, CSS natif (un fichier par composant, jetons dans
-`src/styles/global.css`). Polices auto-hébergées via `@fontsource-variable` (Fredoka, Figtree).
-Serveur : [Hono](https://hono.dev) sur Node.js 20 ou plus.
+`src/styles/global.css`). Polices auto-hébergées (`@fontsource`, copiées dans
+`frontend2/fonts/` pour l'accueil). Serveur : [Hono](https://hono.dev) sur Node.js 20 ou plus.
+En développement, `vite.config.ts` sert l'accueil à `/` et l'application ailleurs ; au build,
+`frontend2/` est copié à la racine de `dist/` (sauf `serve.mjs`, l'aperçu autonome du
+prototype : `node frontend2/serve.mjs`).
 
 ## Parcours d'achat
 
@@ -182,21 +196,24 @@ maximum de l'offre gratuite de Vercel) et à chaque consultation d'une commande 
 
 | Besoin | Fichier |
 | --- | --- |
-| Nom de marque, slogan, navigation, contact, identité légale du vendeur (`seller`) | `src/config/site.ts` |
+| Page d'accueil : textes, sections, animations, FAQ, médias | `frontend2/index.html`, `styles.css`, `app.js`, `sections.js`, `media/` |
+| Lien entre l'accueil et la boutique (prix, vente ouverte, « Commander ») | `frontend2/boutique.js` |
+| Nom de marque, slogan, navigation des pages boutique, contact, identité légale du vendeur (`seller`) | `src/config/site.ts` |
 | Texte des pages légales (mentions, CGV, confidentialité, livraison et retours) | `src/content/legal/*.md` |
 | Formats, prix, identifiants CJ, contenu de la boîte, caractéristiques | `src/config/product.ts` |
 | Devise, pays livrés, modes de livraison, nom du prestataire de paiement | `src/config/shop.ts` |
-| Questions fréquentes | `src/config/faq.ts` |
-| Couleurs, typographie, espacements | `src/styles/global.css` |
+| Couleurs, typographie, espacements des pages boutique | `src/styles/global.css` |
 
-Le nom de marque et la description sont injectés dans `index.html` par `vite.config.ts` :
-ils ne sont définis qu'une fois.
+Le nom de marque et la description sont injectés dans `app.html` par `vite.config.ts`.
+Les textes de l'accueil (FAQ, contenu de la boîte, caractéristiques) sont écrits dans
+`frontend2/` : les garder d'accord avec `src/config/product.ts` et `shop.ts`, qui font foi
+pour le serveur. Seuls les prix et le délai de livraison de l'accueil sont lus sur l'API.
 
 ### Informations « À confirmer »
 
-Dans `product.ts`, chaque information porte un champ `verified`. Tant qu'il vaut `false`,
-la page affiche une pastille « À confirmer » au lieu de présenter l'information comme
-acquise. Il suffit de renseigner `value` et de passer `verified` à `true`.
+Dans `product.ts`, chaque information porte un champ `verified` : seule une information
+vérifiée peut être affichée, sur l'accueil comme dans la boutique. Les pages légales
+signalent ce qui manque par une pastille « à compléter ».
 
 Même règle pour les prix et frais de livraison : `null` tant qu'ils ne sont pas fixés.
 
@@ -210,41 +227,14 @@ est retirée ; un jeton indispensable vide (e-mail, délai) s'affiche « à comp
 
 ## Médias
 
-Les originaux fournisseur restent intacts à la racine (`d05cda3e….mp4`, la vidéo, qui n'est
-plus utilisée par le site) et dans `CJYD2333071/`. Les images du site sont générées dans
-`src/assets/media/` :
+Les originaux fournisseur restent intacts dans `CJYD2333071/`. Médias de l'accueil (vidéos
+du hero et de l'intro, photos des usages) : `frontend2/media/`, voir
+`scripts/build-hero-frontend2.sh`. Images de la boutique (une vignette par format pour le
+panier et le récapitulatif, image de partage) :
 
 ```bash
-npm run media     # nécessite ffmpeg (libwebp)
+npm run media     # scripts/build-media.sh, nécessite ffmpeg (libwebp)
 ```
-
-Le script `scripts/build-media.sh` :
-
-- prépare la photo du hero (`media-sources/hero-good-morning.png`, fournie à part, agrandie ×2) ;
-- recadre les autres photos fournisseur sur le produit seul : photos des formats pour le début
-  de page, une vignette par format, les feutres, les trois vues du support, le packshot et
-  l'image de partage. Restent hors cadre les bandeaux et cotes en anglais, les personnes de
-  banque d'images, les textes religieux et les décors de fêtes (Noël, Nouvel An).
-
-### Animations au défilement
-
-Le rythme des sections reprend celui du site de référence numa.uprock.pro. Tout repose sur
-`position: sticky` et sur une variable CSS `--p` (avancement de 0 à 1) écrite par le hook
-`useScrollProgress` ; la chorégraphie elle-même est en CSS, dans le fichier de chaque composant.
-
-| Section | Effet | Fichiers |
-| --- | --- | --- |
-| Hero | La photo plein écran reste épinglée, se resserre au centre, puis les photos des formats surgissent autour | `Hero.tsx`, `Hero.css` |
-| Début de page sur téléphone | Pas de hero (sa photo n'est pas téléchargée) : sous le titre, les photos des quatre formats défilent du doigt, puis les boutons | `FormatCarousel.tsx`, `Intro.css`, `useIsMobile.ts` |
-| Titre et étapes | Le titre principal et ses boutons restent épinglés, les trois étapes montent par-dessus à des vitesses différentes | `Intro.tsx`, `Intro.css` |
-| Transition | Des mots géants traversent l'écran à l'horizontale pendant que le fond change de couleur | `GiantWords.tsx`, `GiantWords.css` |
-| Usages | Le titre et le sommaire restent fixes à gauche, les cartes s'empilent à droite | `Usages.tsx`, `Usages.css` |
-| Questions | Les questions sont des onglets ; la réponse s'écrit mot à mot en néon sur un tableau lumineux, dans la couleur de feutre de la question | `Faq.tsx`, `Faq.css` |
-| Final | Un titre géant monte, le produit flotte dessous sur un halo de couleur | `Finale.tsx`, `Finale.css` |
-
-Les autres blocs apparaissent en fondu avec un léger flou (`.reveal` dans `global.css`).
-Avec « animations réduites », rien n'est épinglé ni animé : chaque section s'affiche dans son
-état final, en mise en page ordinaire.
 
 ## Reste à faire avant mise en ligne
 

@@ -18,7 +18,7 @@
   width: 100%;
   min-height: 3.25rem;
   padding: 0 1rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 1rem;
   background: var(--paper);
   color: var(--ink);
@@ -44,8 +44,8 @@ select.field__input {
 }
 
 .field--error .field__input {
-  border-color: #b3123c;
-  box-shadow: 0 0 0 1px #b3123c;
+  border-color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger);
 }
 
 .field__error {
@@ -53,7 +53,7 @@ select.field__input {
   gap: 0.35rem;
   font-size: var(--step--1);
   font-weight: 600;
-  color: #b3123c;
+  color: var(--danger);
 }
 
 .field__error::before {
@@ -65,7 +65,7 @@ select.field__input {
   height: 1.15rem;
   margin-top: 0.1rem;
   border-radius: 50%;
-  background: #b3123c;
-  color: #fff;
+  background: var(--danger);
+  color: var(--on-primary);
   font-size: 0.75rem;
 }

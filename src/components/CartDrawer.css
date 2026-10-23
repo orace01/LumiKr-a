@@ -9,7 +9,7 @@
   margin: 0;
   padding: 0;
   border: 0;
-  border-left: 2px solid var(--ink);
+  border-left: 1px solid var(--border);
   background: var(--ivory);
   color: var(--ink);
 }
@@ -45,7 +45,7 @@ html:has(.cart[open]) {
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--border);
 }
 
 .cart__title {
@@ -62,7 +62,7 @@ html:has(.cart[open]) {
   place-items: center;
   width: 2.75rem;
   height: 2.75rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--paper);
   cursor: pointer;
@@ -98,7 +98,7 @@ html:has(.cart[open]) {
   gap: 0.9rem;
   align-items: start;
   padding: 0.9rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 1.25rem;
   background: var(--paper);
 }
@@ -107,7 +107,7 @@ html:has(.cart[open]) {
   width: 5rem;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 0.75rem;
 }
 
@@ -163,7 +163,7 @@ html:has(.cart[open]) {
   display: grid;
   gap: 0.6rem;
   padding: 1.25rem;
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--border);
   background: var(--paper);
 }
 
@@ -186,7 +186,7 @@ html:has(.cart[open]) {
 
 .cart__alert {
   padding: 0.6rem 0.9rem;
-  border: 2px dashed var(--ink-soft);
+  border: 1px dashed var(--border);
   border-radius: 1rem;
   font-size: var(--step--1);
 }
