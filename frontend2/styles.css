@@ -292,13 +292,36 @@ a { color: inherit; }
 .q-reponse .mot { opacity: 0; animation: ecrit .35s ease forwards; animation-delay: calc(var(--k) * 55ms); }
 @keyframes ecrit { from { opacity: 0; filter: blur(3px); } to { opacity: 1; filter: none; } }
 
-/* Dernier écran. */
-.fin { display: flex; flex-direction: column; align-items: center; text-align: center; padding-bottom: 12svh; }
-.fin-titre .script { margin-left: auto; margin-right: auto; transform-origin: 50% 60%; }
-.fin-photo { width: min(92vw, 560px); }
-.fin-cta { margin-top: 6svh; --t: 0; }
-.fin-photo.is-allumee ~ .fin-cta { --t: 1; }
-.fin-cta .cta-trait path { transition: stroke-dashoffset 1s ease .6s; }
+/* Dernier écran : une carte photo qui s'agrandit jusqu'au plein écran (--z de 0 à 1) pendant que la lumière part de son
+   centre (--lum, --eclat). La carte est un calque plein écran découpé (clip-path) et légèrement réduit (scale) :
+   seules des propriétés composées bougent, rien n'est remis en page pendant le scroll. */
+.fin { height: calc(100lvh + 200svh); padding: 0; background: #07070d; }
+.fin-scene { position: sticky; top: 0; height: 100vh; height: 100lvh; overflow: hidden; }
+.fin-carte { --ix: 7vw; --iy: 17lvh; position: absolute; inset: 0; overflow: hidden; background: #0d0e1d;
+  clip-path: inset(calc((1 - var(--z, 0)) * var(--iy)) calc((1 - var(--z, 0)) * var(--ix)) round calc((1 - var(--z, 0)) * 28px));
+  transform: scale(calc(.9 + .1 * var(--z, 0))); }
+.fin-carte img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; transform: scale(calc(1.12 - .12 * var(--z, 0))); }
+/* La pièce éteinte, puis l'éclat qui part du centre quand la boule y entre ; un dégradé en bas pour lire le texte. */
+.fin-nuit { position: absolute; inset: 0; background: #06060c; opacity: calc((1 - var(--lum, 0)) * .9); }
+.fin-carte::before { content: ""; position: absolute; inset: -25%; z-index: 1; pointer-events: none; opacity: var(--eclat, 0); transform: scale(calc(.15 + var(--lum, 0)));
+  background: radial-gradient(circle at 50% 50%, rgba(255, 228, 140, .5) 0%, rgba(255, 190, 70, .16) 32%, rgba(255, 190, 70, 0) 62%); }
+.fin-carte::after { content: ""; position: absolute; inset: 45% 0 0; pointer-events: none; background: linear-gradient(to bottom, rgba(6, 6, 12, 0), rgba(6, 6, 12, .86)); }
+/* Le texte reste dans la carte : son bas suit le bord de la carte. */
+.fin-texte { position: absolute; z-index: 2; left: 0; right: 0; bottom: calc((1 - var(--z, 0)) * var(--iy) + 3.5svh + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; gap: 1.1svh; padding: 0 calc(var(--gutter) + (1 - var(--z, 0)) * var(--ix)); text-align: center; }
+.fin-titre { margin: 0; }
+.fin-titre .caps { font-size: 11vw; }
+.fin-titre .script { font-size: 17vw; margin-left: auto; margin-right: auto; transform-origin: 50% 60%; }
+.fin-soustitre, .fin-prix, .fin-actions { opacity: var(--a, 0); transform: translateY(calc((1 - var(--a, 0)) * 14px)); }
+.fin-soustitre { max-width: 30ch; margin: 0; font: 400 clamp(14px, 3.9vw, 19px)/1.4 var(--caps); color: var(--ivoire); text-shadow: var(--ombre); }
+.fin-prix { margin: 0; font: 600 14px/1.4 var(--caps); letter-spacing: .03em; color: var(--halo); text-shadow: var(--ombre); }
+.fin-actions { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: .6svh; }
+.fin-actions .o-decouvrir { opacity: 1; transition: color .2s ease; }
+.fin:not(.is-lisible) .fin-actions { pointer-events: none; visibility: hidden; }
+/* Le seul bouton plein du site : l'action finale, assez grand pour le pouce. */
+.btn-or { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 34px; border-radius: 999px; background: var(--halo); color: #17182D;
+  font: 700 15px/1 var(--caps); letter-spacing: .02em; text-decoration: none; box-shadow: 0 0 34px rgba(255, 200, 60, .32); transition: transform .2s ease, box-shadow .2s ease; }
+.btn-or:hover { transform: translateY(-1px); box-shadow: 0 0 44px rgba(255, 200, 60, .5); }
+.btn-or:focus-visible { outline: 2px solid var(--ivoire); outline-offset: 4px; }
 .pied { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6svh var(--gutter) calc(6svh + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(244, 239, 230, .1); text-align: center; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
 .pied img { height: 26px; width: auto; }
 .pied-liens { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; max-width: 760px; }
@@ -338,7 +361,7 @@ a { color: inherit; }
   .tablette, .outils { width: 100%; }
   .outils { grid-column: 2; }
   /* Sections : deux colonnes, la photo alterne à gauche et à droite. */
-  .usages, .formats, .boite, .questions, .fin { padding-top: 16svh; }
+  .usages, .formats, .boite, .questions { padding-top: 16svh; }
   .bloc-titre .caps { font-size: min(6.4vw, 13svh); }
   .bloc-titre .script { font-size: min(8.4vw, 17svh); }
   .usage-titre .script { font-size: min(5.6vw, 12svh); }
@@ -347,7 +370,15 @@ a { color: inherit; }
   .boite-corps { max-width: 860px; }
   .support ul { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 900px; }
   .q-corps { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; column-gap: 6vw; }
-  .fin-photo { width: min(46vw, 72svh); }
+  .fin-carte { --ix: 17vw; --iy: 14lvh; }
+  /* Paysage : le texte en bas à gauche, sur l'étagère sombre, pour laisser voir le tableau au centre. */
+  .fin-texte { right: auto; width: min(44vw, 640px); bottom: calc((1 - var(--z, 0)) * var(--iy) + 9svh); align-items: flex-start; text-align: left;
+    padding: 0 0 0 calc(var(--gutter) + (1 - var(--z, 0)) * var(--ix)); }
+  .fin-carte::after { inset: 0 auto 0 0; width: 60%; background: linear-gradient(to right, rgba(6, 6, 12, .82), rgba(6, 6, 12, 0)); }
+  .fin-titre .caps { font-size: min(5.2vw, 11svh); }
+  .fin-titre .script { font-size: min(7.4vw, 15svh); margin-left: .3em; margin-right: 0; transform-origin: 0 60%; }
+  .fin-soustitre { font-size: min(1.5vw, 19px); }
+  .fin-actions { flex-direction: row; align-items: center; gap: 32px; }
   /* Usages : le cadre à gauche, le titre et les textes à droite. */
   .u-scene { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); grid-template-rows: auto auto; align-content: center; column-gap: 5vw; row-gap: 4svh; padding: calc(var(--entete) + 4svh) var(--gutter) 8svh; }
   .u-cadre { grid-column: 1; grid-row: 1 / span 2; max-height: 72svh; align-self: center; }
@@ -398,7 +429,7 @@ a { color: inherit; }
 .reduced .lignes div::after { transform: scaleX(1); opacity: .55; }
 .reduced .q-reponse { opacity: 1; }
 .reduced .q-reponse .mot { animation: none; opacity: 1; }
-.reduced .fin-cta { --t: 1; }
+
 .reduced .fin-sub { opacity: 1; }
 .reduced .boule, .reduced .tete, .reduced .trace { display: none; }
 .reduced .fil path { stroke-dashoffset: 0; }

@@ -53,6 +53,28 @@
       mots.forEach((s, m) => setv(s, "--w", 0.26 + 0.74 * clamp(k - m)));
     });
   }
+  // ---------- Dernier écran : la carte qui s'agrandit et s'allume ----------
+  // Même principe que les usages : la scène colle à l'écran, sa progression q (0 → 1) règle tout. La boule entre au
+  // centre de la carte (station « epingle », app.js) ; tant qu'elle n'y est pas, la pièce reste éteinte. Ensuite, la
+  // carte s'agrandit jusqu'au plein écran (--z) pendant que la lumière part du centre (--lum, --eclat), « créer. »
+  // s'écrit, puis le sous-titre, le prix et les boutons arrivent (--a).
+  const fin = document.getElementById("fin"), fScene = fin.querySelector(".fin-scene");
+  const fCarte = fin.querySelector(".fin-carte"), fTitre = fin.querySelector(".fin-titre");
+  let fTop = 0, fCourse = 1;
+  function rendreFin() {
+    const qb = (scrollY - fTop) / fCourse, q = clamp(qb);
+    // La boule plonge dans la carte un peu avant que la scène ne colle (q ≈ −0,1) : la lumière part de là.
+    const arrivee = fCarte.classList.contains("is-allumee");
+    const lum = arrivee ? plage(qb, -0.1, 0.45) : 0;
+    setv(fCarte, "--z", plage(q, 0, 0.55));
+    setv(fCarte, "--lum", lum);
+    setv(fCarte, "--eclat", 4 * lum * (1 - lum));
+    setv(fTitre, "--s", plage(q, 0.4, 0.66));
+    const a = plage(q, 0.6, 0.8);
+    setv(fCarte, "--a", a);
+    fin.classList.toggle("is-lisible", a > 0.4);
+  }
+
   // Lignes de « Dans la boîte » : soulignées l'une après l'autre.
   document.querySelectorAll(".lignes div").forEach((d, i) => d.style.setProperty("--i", i));
 
@@ -65,6 +87,8 @@
     for (const q of paragraphes) q.p._top = q.p.getBoundingClientRect().top + scrollY;
     uTop = usages.getBoundingClientRect().top + scrollY;
     uCourse = Math.max(1, usages.offsetHeight - uScene.offsetHeight);
+    fTop = fin.getBoundingClientRect().top + scrollY;
+    fCourse = Math.max(1, fin.offsetHeight - fScene.offsetHeight);
     sale = true;
   };
   // Progression d'un élément : 0 quand son haut est à 92 % de la hauteur de l'écran, 1 quand il est à 52 %.
@@ -89,11 +113,15 @@
       }
       rendreUsages();
     }
+    rendreFin();                                           // dépend aussi de l'arrivée de la boule, pas seulement du scroll
     requestAnimationFrame(rendre);
   }
   if (reduced) {
     ecrits.forEach((el) => el.style.setProperty("--s", 1));
     paragraphes.forEach(({ spans }) => spans.forEach((s) => s.style.setProperty("--w", 1)));
+    ["--z", "--lum", "--a"].forEach((v) => fCarte.style.setProperty(v, 1));
+    fTitre.style.setProperty("--s", 1);
+    fin.classList.add("is-lisible");
   } else {
     addEventListener("scroll", () => { sale = true; }, { passive: true });
     let largeur = innerWidth;
@@ -105,12 +133,12 @@
   }
 
   // ---------- Ouverture : « dès … » suit le prix le plus bas lu sur la boutique (mis à jour par boutique.js) ----------
-  const prixMin = document.getElementById("prixMin");
+  const prixMin = document.querySelectorAll(".prix-min");   // ouverture et dernier écran
   const listeFormats = document.querySelector(".formats-liste");
   const majPrix = () => {
     const prix = [...listeFormats.querySelectorAll(".f-prix")].map((el) => ({ txt: el.textContent.trim(), n: parseFloat(el.textContent.replace(/[^\d,.]/g, "").replace(",", ".")) }))
       .filter((p) => !isNaN(p.n));
-    if (prix.length) prixMin.textContent = prix.reduce((a, b) => (b.n < a.n ? b : a)).txt;
+    if (prix.length) { const min = prix.reduce((a, b) => (b.n < a.n ? b : a)).txt; prixMin.forEach((el) => { el.textContent = min; }); }
   };
   new MutationObserver(majPrix).observe(listeFormats, { subtree: true, childList: true, characterData: true });
   majPrix();

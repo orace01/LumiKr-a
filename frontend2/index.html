@@ -49,7 +49,7 @@
       <div class="ouverture" id="ouverture">
         <h2 class="o-titre"><span class="caps">Dessinez</span><span class="script">dans la lumière.</span></h2>
         <p class="o-sous">Le tableau lumineux à dessiner : une plaque transparente, une base LED, un feutre.</p>
-        <p class="o-prix">À partir de <span id="prixMin">24,90 €</span> · livraison offerte</p>
+        <p class="o-prix">À partir de <span class="prix-min" id="prixMin">24,90 €</span> · livraison offerte</p>
         <div class="o-actions">
           <a class="cta o-cta" href="#formats">
             <span>Choisir mon format</span>
@@ -224,15 +224,29 @@
     </div>
   </section>
 
-  <!-- Dernier écran : la boule allume le produit, puis le bouton se souligne. -->
+  <!-- Dernier écran : la section est longue et sa scène reste collée à l'écran. Une carte photo aux coins arrondis
+       (dernière image du hero, « Bonne nuit ») ; la boule y entre par le centre (station « epingle »), puis la carte
+       s'agrandit jusqu'au plein écran pendant que la lumière part du centre ; le texte est posé sur la photo
+       (--z, --lum, --eclat, --s, --a réglés par sections.js). -->
   <section class="fin" id="fin" aria-labelledby="fin-titre">
-    <!-- « créer. » est écrit par la boule (station « ecriture » : --s suit sa position sur le mot). -->
-    <h2 class="bloc-titre fin-titre" id="fin-titre"><span class="caps">À vous de</span><span class="script" data-station="ecriture">créer.</span></h2>
-    <figure class="photo fin-photo" data-station><img src="media/fin-sirene.webp" width="748" height="760" loading="lazy" decoding="async" alt="Le tableau lumineux allumé dans le noir, avec une sirène dessinée aux feutres de couleur."></figure>
-    <a class="cta cta-static fin-cta" href="#formats">
-      <span>Choisir mon format</span>
-      <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
-    </a>
+    <div class="fin-scene">
+      <div class="fin-carte" data-station="epingle">
+        <picture>
+          <source media="(orientation: landscape)" srcset="media/hero-16x9-fin.webp">
+          <img src="media/hero-9x16-fin.webp" decoding="async" alt="Le tableau lumineux allumé sur la table de chevet, « Bonne nuit » écrit au feutre, près de la lampe.">
+        </picture>
+        <div class="fin-nuit" aria-hidden="true"></div>
+        <div class="fin-texte">
+          <h2 class="bloc-titre fin-titre" id="fin-titre"><span class="caps">À vous de</span><span class="script">créer.</span></h2>
+          <p class="fin-soustitre">Un feutre, un peu de lumière : le reste, c'est vous.</p>
+          <p class="fin-prix">À partir de <span class="prix-min">24,90 €</span> · livraison offerte</p>
+          <div class="fin-actions">
+            <a class="btn-or" href="#formats">Choisir mon format</a>
+            <a class="o-decouvrir" href="#formats">Voir les formats <span aria-hidden="true">›</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <footer class="pied">
