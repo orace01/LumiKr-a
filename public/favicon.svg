@@ -1,11 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Favicon Lumikréa : la lampe du logo (goutte + 5 rayons, tracés de frontend2/media/logo.svg), sur une tuile
+       bleu nuit pour rester lisible sur un onglet clair comme sombre. -->
   <defs>
-    <radialGradient id="g" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#ffd45c" stop-opacity=".55"/>
-      <stop offset="1" stop-color="#ffd45c" stop-opacity="0"/>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffdc85" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#ffdc85" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="goutte" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#ffffff"/><stop offset="1" stop-color="#ffe2a0"/>
+    </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#100e0b"/>
-  <circle cx="32" cy="32" r="26" fill="url(#g)"/>
-  <circle cx="32" cy="32" r="11" fill="#ffd45c"/>
+  <rect width="64" height="64" rx="14" fill="#17182D"/>
+  <!-- Le centre de la goutte (600,5 ; −86 dans le logo) est ramené vers (29 ; 35), à l'échelle 0,62 : lampe centrée. -->
+  <g transform="translate(29.2 35.1) scale(.62) translate(-600.5 86)">
+    <circle cx="600.5" cy="-86" r="32" fill="url(#halo)"/>
+    <g fill="#ffdc85">
+      <rect x="-9" y="-3.6" width="18" height="7.2" rx="3.6" transform="translate(575.75 -110.75) rotate(-135)"/>
+      <rect x="-9" y="-3.6" width="18" height="7.2" rx="3.6" transform="translate(600.5 -121) rotate(-90)"/>
+      <rect x="-9" y="-3.6" width="18" height="7.2" rx="3.6" transform="translate(625.25 -110.75) rotate(-45)"/>
+      <rect x="-9" y="-3.6" width="18" height="7.2" rx="3.6" transform="translate(635.5 -86) rotate(0)"/>
+      <rect x="-9" y="-3.6" width="18" height="7.2" rx="3.6" transform="translate(625.25 -61.25) rotate(45)"/>
+    </g>
+    <path fill="url(#goutte)" d="M 612.30 -78.46 C 606.79 -70.71 602.06 -63.32 600.50 -60.00 C 598.94 -63.32 594.21 -70.71 588.70 -78.46 A 14.00 14.00 0 1 1 612.30 -78.46 Z"/>
+  </g>
 </svg>
