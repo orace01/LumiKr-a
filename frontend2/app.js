@@ -34,10 +34,13 @@
   const mix = (a, b, k) => a + (b - a) * k;
 
   const params = new URLSearchParams(location.search);
-  // Chaque arrivée rejoue l'intro : on repart du haut de la page, et une page restaurée par « retour » est rechargée.
+  // L'intro du logo se joue à chaque arrivée sur le site (première visite, ou retour après être parti), mais pas quand
+  // on actualise la page. La page repart du haut ; une page restaurée par « retour » depuis un autre site est
+  // rechargée comme une arrivée (replace : le navigateur la compte comme une navigation, pas une actualisation).
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   window.scrollTo(0, 0);
-  addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
+  addEventListener("pageshow", (e) => { if (e.persisted) location.replace(location.href); });
+  const actualisation = performance.getEntriesByType("navigation")[0]?.type === "reload";
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const portraitQuery = matchMedia("(orientation: portrait)");
   const fmt = portraitQuery.matches ? "9x16" : "16x9";
@@ -444,7 +447,7 @@
     setTimeout(() => { intro.remove(); body.classList.remove("is-revealing-site"); }, 1300);
   }
 
-  if (params.has("sans-intro")) {
+  if (params.has("sans-intro") || actualisation) {
     intro.remove();
     body.classList.remove("is-intro");
   } else {
