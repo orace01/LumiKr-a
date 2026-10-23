@@ -169,21 +169,37 @@
   // ---------- Trajet de la boule derrière les sections, jusqu'au centre de la tablette ----------
   // Il part là où la boule a fini sa descente : au centre, à la hauteur de suivi de l'écran, quand le hero se termine
   // (le bas de la scène touche alors le haut de .suite, d'où y0 négatif).
-  // Stations : la tablette, puis chaque photo et section ([data-station], dans l'ordre de la page). La boule passe
-  // par le centre de chacune ; une station s'allume quand la boule l'atteint (et s'éteint si l'on remonte).
+  // Stations ([data-station], dans l'ordre de la page) : la boule passe par chacune et l'allume (.is-allumee, retirée
+  // si l'on remonte).
+  //  - « tablette » (dessin, questions) : elle entre dans la plaque et y reste tant que la section est à l'écran ;
+  //  - « epingle » (usages) : la scène reste collée à l'écran ; la boule entre dans le cadre à son arrivée, y reste
+  //    cachée pendant que les usages défilent, et en ressort quand la scène se libère ;
+  //  - « ecriture » (« créer. ») : elle écrit le mot de gauche à droite au fil du scroll ;
+  //  - sans valeur (échelle, boîte, photo de fin) : elle passe par le centre.
   const stations = [...document.querySelectorAll("[data-station]")];
-  let filLen = 0, filTable = [], suiteTop = 0, lastFil = -1, y0 = 0, sy = 0, stationLens = [], sceneH = 1, pauses = [];
+  let filLen = 0, filTable = [], suiteTop = 0, lastFil = -1, y0 = 0, sy = 0, stationLens = [], sceneH = 1;
+  let pauses = [], caches = [], ecritures = [];
 
-  // Hauteur atteinte sur le trajet pour une hauteur de scroll : identique, sauf aux tablettes. Là, la boule reste au
-  // centre de la plaque (elle monte avec la page, dans la tablette) tant que la section n'est pas passée, puis
-  // ressort et rattrape sa hauteur habituelle sur R pixels de scroll.
-  function hauteurTrajet(yT) {
-    for (const t of pauses) {
-      if (yT < t.y) break;
-      if (yT < t.y + t.D) return t.y;
-      if (yT < t.y + t.D + t.R) { const u = ease((yT - t.y - t.D) / t.R); return mix(yT - t.D, yT, u); }
+  // Longueur du trajet atteinte à la hauteur y, sans revenir en arrière de minL (après un mot écrit à l'horizontale).
+  function chercher(y, minL) {
+    let i = 1;
+    while (i < filTable.length && (filTable[i][0] < minL || filTable[i][1] < y)) i++;
+    if (i >= filTable.length) return filLen;
+    const [l0, ya] = filTable[i - 1], [l1, yb] = filTable[i];
+    return Math.max(minL, l0 + (l1 - l0) * clamp((y - ya) / ((yb - ya) || 1)));
+  }
+  // Longueur parcourue pour une hauteur de scroll yT (repère de .suite). Pendant une pause (tablette, écriture), le
+  // scroll fait avancer la boule de l0 à l1 : immobile dans la plaque, ou le long du mot. Après, elle rattrape sa
+  // hauteur habituelle sur R pixels de scroll.
+  function longueurTrajet(yT) {
+    let minL = 0, yE = yT;
+    for (const p of pauses) {                            // une pause plus loin l'emporte sur le rattrapage d'avant
+      if (yT < p.y) break;
+      if (yT < p.y + p.D) return mix(p.l0, p.l1, (yT - p.y) / p.D);
+      minL = p.l1;
+      yE = yT < p.y + p.D + p.R ? mix(yT - p.D, yT, ease((yT - p.y - p.D) / p.R)) : yT;
     }
-    return yT;
+    return chercher(yE, minL);
   }
   const lit = stations.map(() => false);
   function buildFil() {
@@ -195,23 +211,52 @@
     y0 = sceneH * suivi - sceneH;
     let x = w / 2, y = y0, d = `M ${x} ${y0}`, right = true;
     const ends = [];                                      // longueur du tracé jusqu'à chaque station
-    pauses = [];
-    for (const st of stations) {
-      const p = st.getBoundingClientRect();
-      const bx = p.left - r.left + p.width / 2, by = p.top - r.top + p.height / 2;
-      if (st.dataset.station === "tablette") {             // la boule reste dans la plaque jusqu'au bas de la section
-        const bas = st.closest("section").getBoundingClientRect().bottom - r.top;
-        pauses.push({ y: by, D: Math.max(0, bas - by), R: sceneH * 0.5 });
-      }
+    pauses = []; caches = []; ecritures = [];
+    // Courbes alternées droite-gauche jusqu'au point (bx, by), la dernière finit dessus.
+    const vers = (bx, by) => {
       const n = Math.max(1, Math.round((by - y) / step)), ys = y;
-      for (let i = 1; i <= n; i++) {                     // courbes alternées droite-gauche, la dernière finit au centre
+      for (let i = 1; i <= n; i++) {
         const ny = ys + (by - ys) * i / n, nx = i === n ? bx : (right ? xr : xl), c = (ny - y) * 0.55;
         d += ` C ${x} ${y + c}, ${nx} ${ny - c}, ${nx} ${ny}`;
         x = nx; y = ny;
         if (i < n) right = !right;
       }
-      filPaths[1].setAttribute("d", d);                  // tracé provisoire, pour mesurer la longueur jusqu'ici
-      ends.push(filPaths[1].getTotalLength());
+    };
+    const mesure = () => { filPaths[1].setAttribute("d", d); return filPaths[1].getTotalLength(); };   // tracé provisoire
+    for (const st of stations) {
+      const kind = st.dataset.station, p = st.getBoundingClientRect();
+      const bx = p.left - r.left + p.width / 2, by = p.top - r.top + p.height / 2;
+      if (kind === "epingle") {
+        // Le cadre colle à l'écran : on calcule son centre au début et à la fin du collage (positions dans la page),
+        // la boule y entre au premier, descend cachée en ligne droite, ressort au second.
+        const sec = st.closest("section"), scene = st.offsetParent;
+        const top = sec.getBoundingClientRect().top - r.top, fc = st.offsetTop + st.offsetHeight / 2;
+        vers(bx, top + fc);
+        const a = mesure();
+        y = top + sec.offsetHeight - scene.offsetHeight + fc;
+        d += ` L ${bx} ${y}`;
+        caches.push([a, mesure()]); ends.push(a);
+        continue;
+      }
+      if (kind === "ecriture") {
+        // Le mot : la boule arrive à sa gauche, puis le parcourt en ligne droite pendant D pixels de scroll.
+        vers(p.left - r.left, by);
+        const l0 = mesure();
+        x = p.right - r.left; d += ` L ${x} ${by}`;
+        const l1 = mesure();
+        pauses.push({ y: by, D: sceneH * 0.45, R: sceneH * 0.5, l0, l1 });
+        ecritures.push({ el: st.closest("h2") || st, l0, l1 });
+        ends.push(l1);
+        continue;
+      }
+      vers(bx, by);
+      const l = mesure();
+      ends.push(l);
+      if (kind === "tablette") {                         // la boule reste dans la plaque jusqu'au bas de la section
+        const bas = st.closest("section").getBoundingClientRect().bottom - r.top;
+        pauses.push({ y: by, D: Math.max(0, bas - by), R: sceneH * 0.5, l0: l, l1: l });
+        caches.push([l, l]);
+      }
     }
     stationLens = ends;
     fil.setAttribute("viewBox", `0 0 ${w} ${h}`);
@@ -219,7 +264,7 @@
     filLen = filPaths[0].getTotalLength();
     fil.style.setProperty("--len", filLen.toFixed(1));
     filTable = [];                                       // longueur → hauteur, pour retrouver la tête depuis le scroll
-    for (let i = 0; i <= 240; i++) { const l = filLen * i / 240; filTable.push([l, filPaths[0].getPointAtLength(l).y]); }
+    for (let i = 0; i <= 600; i++) { const l = filLen * i / 600; filTable.push([l, filPaths[0].getPointAtLength(l).y]); }
     suiteTop = r.top + scrollY;
     lastFil = -1;
   }
@@ -230,26 +275,22 @@
     const yTarget = sy + sceneH * suivi - suiteTop;
     const cachee = yTarget < y0 - 1;
     if (tete._c !== cachee) { tete._c = cachee; tete.classList.toggle("is-cachee", cachee); }
-    let len = 0;
-    const yT = hauteurTrajet(yTarget);
-    if (yT > y0) {
-      let i = 1;
-      while (i < filTable.length && filTable[i][1] < yT) i++;
-      if (i >= filTable.length) len = filLen;
-      else { const [l0, y0] = filTable[i - 1], [l1, y1] = filTable[i]; len = l0 + (l1 - l0) * clamp((yT - y0) / ((y1 - y0) || 1)); }
-    }
+    let len = yTarget > y0 ? longueurTrajet(yTarget) : 0;
     len = Math.round(len * 10) / 10;
     if (len === lastFil) return;
     lastFil = len;
     fil.style.setProperty("--off", (filLen - len).toFixed(1));
     const p = filPaths[0].getPointAtLength(len);
-    // Tablettes (dessin, questions) : la boule y entre en rétrécissant jusqu'à disparaître au centre de la plaque
-    // qui s'allume, y reste tant que la section est à l'écran, puis en ressort.
+    // Tablettes et cadre des usages : la boule y entre en rétrécissant jusqu'à disparaître, y reste cachée, puis en
+    // ressort en grandissant.
     let k = 1;
-    stations.forEach((st, i) => {
-      if (st.dataset.station === "tablette") k = Math.min(k, clamp(Math.abs(len - stationLens[i]) / (sceneH * 0.12)));
-    });
+    for (const [a, b] of caches) k = Math.min(k, clamp((len < a ? a - len : len > b ? len - b : 0) / (sceneH * 0.12)));
     tete.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) scale(${ease(k).toFixed(3)})`;
+    // « créer. » : le mot se révèle derrière la boule.
+    for (const e of ecritures) {
+      const s = Math.round(clamp((len - e.l0) / ((e.l1 - e.l0) || 1)) * 1000) / 1000;
+      if (e.el._s !== s) { e.el._s = s; e.el.style.setProperty("--s", s); }
+    }
     stations.forEach((st, i) => {
       const on = filLen > 0 && len >= stationLens[i] - 1;
       if (on !== lit[i]) { lit[i] = on; st.classList.toggle("is-allumee", on); }
@@ -483,8 +524,9 @@
   const goto = params.get("t");
   if (goto) document.fonts.ready.then(() => requestAnimationFrame(() => {
     measure();
-    const st = isNaN(+goto) && document.querySelector(`#${CSS.escape(goto)} [data-station]`);
-    if (st) { const p = st.getBoundingClientRect(); scrollTo(0, scrollY + p.top + p.height / 2 - sceneH * suivi + 4); }
+    const [nom, ecrans = 0] = goto.split("+");          // « usages+1.5 » : 1,5 écran plus bas que la section
+    const st = isNaN(+nom) && document.querySelector(`#${CSS.escape(nom)} [data-station]`);
+    if (st) { const p = st.getBoundingClientRect(); scrollTo(0, scrollY + p.top + p.height / 2 - sceneH * suivi + 4 + (+ecrans) * sceneH); }
     else scrollTo(0, heroTop + clamp(+goto / STORY_END) * run);
     readScroll(); current = target; sy = scrollY;
     // ?debug : positions à l'écran des éléments de la fin, écrites dans la page (lisibles sans capture).

@@ -37,24 +37,24 @@
       <div class="eteint" id="eteint" aria-hidden="true"></div>
 
       <!-- Chapitres : data-in / data-script / data-sub / data-subend / data-out en secondes du récit (0 à 30,5) -->
-      <article class="chapter pos-1" data-in="0.3" data-script="0.7" data-sub="1.1" data-subend="2.5" data-out="3.0">
-        <h2 class="title"><span class="caps">Un</span><span class="script">dessin.</span></h2>
-        <p class="sub">Un premier trait. Puis l'envie de continuer.</p>
+      <article class="chapter pos-1" data-in="0.3" data-script="0.7" data-sub="1.0" data-subend="2.7" data-out="3.0">
+        <h2 class="title"><span class="caps">Un premier</span><span class="script">trait.</span></h2>
+        <p class="sub">Puis l'envie de continuer. Un soleil, une lune, quelques lignes : pas de modèle à réussir.</p>
       </article>
 
       <article class="chapter pos-2" data-in="7.4" data-script="7.9" data-sub="8.4" data-subend="10.6" data-out="11.6">
-        <h2 class="title"><span class="caps">Un</span><span class="script">halo.</span></h2>
-        <p class="sub">La lumière révèle le trait.</p>
+        <h2 class="title"><span class="caps">La lumière</span><span class="script">révèle.</span></h2>
+        <p class="sub">Le jaune souligne chaque trait et lui donne un éclat doré.</p>
       </article>
 
       <article class="chapter pos-3" data-in="14.6" data-script="15.0" data-sub="15.6" data-subend="17.6" data-out="19.1">
-        <h2 class="title"><span class="caps">Un</span><span class="script">lien.</span></h2>
-        <p class="sub">De sa chambre à la vôtre, un fil de lumière.</p>
+        <h2 class="title"><span class="caps">À deux,</span><span class="script">autrement.</span></h2>
+        <p class="sub">Un enfant commence, un parent complète : les idées se répondent trait après trait.</p>
       </article>
 
       <article class="chapter pos-4" data-in="21.8" data-script="22.3" data-subshow="25.6" data-sub="25.9" data-subend="27.1" data-out="27.5">
-        <h2 class="title"><span class="caps">Un</span><span class="script">souvenir.</span></h2>
-        <p class="sub">Un mot laissé près du lit, qui veille jusqu'au matin.</p>
+        <h2 class="title"><span class="caps">Quelques minutes</span><span class="script">ensemble.</span></h2>
+        <p class="sub">Le dessin devient une présence lumineuse, près du lit.</p>
       </article>
 
       <!-- Fin : la boule lumineuse écrit le titre (un .l = un tracé), devient le point final,
@@ -93,41 +93,37 @@
     </div>
   </section>
 
-  <!-- Usages : une photo réelle par usage, éteinte, que la boule allume en passant. -->
+  <!-- Usages : une seule tablette qui reste à l'écran. Au scroll, la pièce s'éteint, la photo suivante s'allume depuis
+       le centre et son verbe s'écrit au feutre (Fêter → Décorer → Écrire → Créer). Piloté par sections.js. -->
   <section class="usages" id="usages" aria-labelledby="usages-titre">
-    <h2 class="bloc-titre" id="usages-titre" data-ecrit><span class="caps">Un tableau,</span><span class="script">mille usages.</span></h2>
-
-    <article class="usage">
-      <figure class="photo" data-station><img src="media/usage-feter.webp" width="1400" height="782" loading="lazy" decoding="async" alt="Le tableau allumé dans une pièce sombre, décoré pour Halloween : toiles d'araignée, citrouille, chauves-souris et « Spooky Evening »."></figure>
-      <div class="usage-texte">
-        <h3 class="usage-titre" data-ecrit><span class="script">Fêter.</span><span class="caps">Une déco pour chaque fête</span></h3>
-        <p class="sub" data-mots>Citrouille pour Halloween, sapin à Noël, guirlande au Nouvel An : on efface la plaque et on dessine la fête suivante.</p>
+    <div class="u-scene">
+      <h2 class="bloc-titre u-titre" id="usages-titre"><span class="caps">Un tableau,</span><span class="script">mille usages.</span></h2>
+      <div class="u-cadre" data-station="epingle">
+        <img class="u-photo" src="media/usage-feter.webp" width="1400" height="782" decoding="async" alt="Le tableau allumé dans une pièce sombre, décoré pour Halloween : toiles d'araignée, citrouille, chauves-souris et « Spooky Evening ».">
+        <img class="u-photo" src="media/usage-decorer.webp" width="682" height="620" decoding="async" alt="Le tableau allumé sur une commode, décoré de « Merry Christmas », de sapins, de flocons et d'un bonhomme de neige.">
+        <img class="u-photo" src="media/usage-ecrire.webp" width="920" height="650" decoding="async" alt="Le tableau paysage allumé sur un bureau, avec une citation en couleurs, « Good Morning » écrit en jaune et une fleur rouge.">
+        <img class="u-photo" src="media/usage-creer.webp" width="880" height="880" decoding="async" alt="Le petit tableau carré allumé dans une pièce sombre, avec une fusée, des planètes et des étoiles dessinées en couleurs.">
+        <div class="u-nuit" aria-hidden="true"></div>
       </div>
-    </article>
-
-    <article class="usage">
-      <figure class="photo" data-station><img src="media/usage-decorer.webp" width="682" height="620" loading="lazy" decoding="async" alt="Le tableau allumé sur une commode, décoré de « Merry Christmas », de sapins, de flocons et d'un bonhomme de neige."></figure>
-      <div class="usage-texte">
-        <h3 class="usage-titre" data-ecrit><span class="script">Décorer.</span><span class="caps">Une lumière douce dans la maison</span></h3>
-        <p class="sub" data-mots>Sur une étagère, une commode ou une table de chevet, la plaque éclairée par sa base décore le jour et fait veilleuse le soir.</p>
+      <div class="u-textes">
+        <div class="u-texte">
+          <h3 class="usage-titre"><span class="script">Fêter.</span><span class="caps">Une déco pour chaque fête</span></h3>
+          <p class="sub">Citrouille pour Halloween, sapin à Noël, guirlande au Nouvel An : on efface la plaque et on dessine la fête suivante.</p>
+        </div>
+        <div class="u-texte">
+          <h3 class="usage-titre"><span class="script">Décorer.</span><span class="caps">Une lumière douce dans la maison</span></h3>
+          <p class="sub">Sur une étagère, une commode ou une table de chevet, la plaque éclairée par sa base décore le jour et fait veilleuse le soir.</p>
+        </div>
+        <div class="u-texte">
+          <h3 class="usage-titre"><span class="script">Écrire.</span><span class="caps">Un message qui se voit dans le noir</span></h3>
+          <p class="sub">Mot du matin, citation, liste de la semaine, ou le menu du jour au comptoir d'un café : on l'écrit, il s'illumine, on le change quand on veut.</p>
+        </div>
+        <div class="u-texte">
+          <h3 class="usage-titre"><span class="script">Créer.</span><span class="caps">Une ardoise qui brille</span></h3>
+          <p class="sub">Sirène, fusée ou prénom en couleurs : la plaque se remplit, s'illumine, puis repart de zéro pour le dessin suivant.</p>
+        </div>
       </div>
-    </article>
-
-    <article class="usage">
-      <figure class="photo" data-station><img src="media/usage-ecrire.webp" width="920" height="650" loading="lazy" decoding="async" alt="Le tableau paysage allumé sur un bureau, avec une citation en couleurs, « Good Morning » écrit en jaune et une fleur rouge."></figure>
-      <div class="usage-texte">
-        <h3 class="usage-titre" data-ecrit><span class="script">Écrire.</span><span class="caps">Un message qui se voit dans le noir</span></h3>
-        <p class="sub" data-mots>Mot du matin, citation, liste de la semaine, ou le menu du jour au comptoir d'un café : on l'écrit, il s'illumine, on le change quand on veut.</p>
-      </div>
-    </article>
-
-    <article class="usage">
-      <figure class="photo" data-station><img src="media/usage-creer.webp" width="880" height="880" loading="lazy" decoding="async" alt="Le petit tableau carré allumé dans une pièce sombre, avec une fusée, des planètes et des étoiles dessinées en couleurs."></figure>
-      <div class="usage-texte">
-        <h3 class="usage-titre" data-ecrit><span class="script">Créer.</span><span class="caps">Une ardoise qui brille</span></h3>
-        <p class="sub" data-mots>Sirène, fusée ou prénom en couleurs : la plaque se remplit, s'illumine, puis repart de zéro pour le dessin suivant.</p>
-      </div>
-    </article>
+    </div>
   </section>
 
   <!-- Formats : la liste des prix, et les quatre plaques à l'échelle d'une feuille A4, tracées par la lumière. -->
@@ -206,7 +202,8 @@
 
   <!-- Dernier écran : la boule allume le produit, puis le bouton se souligne. -->
   <section class="fin" id="fin" aria-labelledby="fin-titre">
-    <h2 class="bloc-titre fin-titre" id="fin-titre" data-ecrit><span class="caps">À vous de</span><span class="script">créer.</span></h2>
+    <!-- « créer. » est écrit par la boule (station « ecriture » : --s suit sa position sur le mot). -->
+    <h2 class="bloc-titre fin-titre" id="fin-titre"><span class="caps">À vous de</span><span class="script" data-station="ecriture">créer.</span></h2>
     <figure class="photo fin-photo" data-station><img src="media/fin-sirene.webp" width="748" height="760" loading="lazy" decoding="async" alt="Le tableau lumineux allumé dans le noir, avec une sirène dessinée aux feutres de couleur."></figure>
     <a class="cta cta-static fin-cta" href="#formats">
       <span>Choisir mon format</span>

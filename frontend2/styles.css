@@ -11,6 +11,8 @@
   --caps: "Onest", "Arial Narrow", system-ui, sans-serif;
   --script: "Sacramento", "Brush Script MT", cursive;
   --gutter: max(16px, 7.8vw);
+  /* Hauteur réservée au header : les textes du hero et des scènes collées commencent en dessous. */
+  --entete: calc(env(safe-area-inset-top, 0px) + 76px);
   --ombre: 0 2px 24px rgba(8, 8, 20, .62), 0 1px 3px rgba(8, 8, 20, .5);
   color-scheme: dark;
 }
@@ -47,7 +49,7 @@ a { color: inherit; }
   pointer-events: none; transition: opacity .6s ease; }
 .top > * { pointer-events: auto; }
 .is-intro .top { opacity: 0; }
-.top-logo img { height: 22px; width: auto; }
+.top-logo img { height: 32px; width: auto; }
 .top-cta { font: 700 11px/1 var(--caps); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; padding: 12px 0; border-bottom: 1px solid rgba(255, 210, 63, .7); text-shadow: var(--ombre); }
 
 /* ---------- Hero piloté par le scroll ---------- */
@@ -69,18 +71,20 @@ a { color: inherit; }
 .chapter { position: absolute; opacity: var(--a, 0); transform: translateY(calc(var(--y, 0) * 1px)); will-change: opacity, transform; }
 .title { margin: 0; font-weight: 400; }
 .caps { display: block; font: 800 15.6vw/.84 var(--caps); letter-spacing: -.03em; text-transform: uppercase; color: var(--ivoire); text-shadow: var(--ombre); }
+/* Chapitres du hero : capitales de plusieurs mots (« Quelques minutes ») sur deux lignes au plus. */
+.chapter .caps { font-size: 12.4vw; max-width: 86vw; }
 .script { display: block; width: max-content; font: 400 19vw/.82 var(--script); color: var(--halo); margin: -.06em 0 0 .46em; transform: rotate(-4deg); transform-origin: 0 60%;
   text-shadow: 0 0 .05em rgba(255, 210, 63, .9), 0 0 .22em rgba(255, 160, 40, .55);
   clip-path: inset(-30% calc((1 - var(--s, 0)) * 100%) -40% -6%); }
 .sub { margin: .9em 0 0; max-width: 64vw; font: 400 clamp(15px, 4.3vw, 19px)/1.3 var(--caps); color: var(--ivoire); text-shadow: var(--ombre); }
 .sub .w { opacity: var(--w, .26); }
 
-.pos-1 { left: var(--gutter); top: 11svh; }
-.pos-2 { right: var(--gutter); top: 10.4svh; text-align: right; }
+.pos-1 { left: var(--gutter); top: calc(var(--entete) + 3svh); }
+.pos-2 { right: var(--gutter); top: calc(var(--entete) + 3svh); text-align: right; }
 .pos-2 .script { margin-left: auto; margin-right: .1em; transform-origin: 100% 60%; }
 .pos-2 .sub { margin-left: auto; }
-.pos-3 { left: var(--gutter); top: 10.4svh; }
-.pos-4 { left: var(--gutter); top: 10.4svh; }
+.pos-3 { left: var(--gutter); top: calc(var(--entete) + 3svh); }
+.pos-4 { left: var(--gutter); top: calc(var(--entete) + 3svh); }
 .pos-4 .sub { position: absolute; left: 0; top: 70svh; width: 86vw; max-width: none; opacity: var(--sa, 0); }
 
 /* Fin du hero : titre écrit par la boule (chaque .l révélée de gauche à droite par --r, la boule au bord),
@@ -171,12 +175,25 @@ a { color: inherit; }
 .photo.is-allumee::after { animation: eclat 1.4s ease-out forwards; }
 @keyframes eclat { from { opacity: 1; transform: scale(.05); } to { opacity: 0; transform: scale(1.2); } }
 
-/* Usages : une par écran, la photo puis le verbe écrit, le titre, le texte mot à mot. */
-.usage { display: grid; gap: 4svh; margin: 0 0 16svh; }
+/* Usages : une seule tablette qui reste à l'écran (la section est longue, sa scène colle en haut). Dans le cadre,
+   une photo par usage ; --noir éteint la pièce, --lum / --eclat rallument depuis le centre (réglés par sections.js). */
+.usages { height: calc(100lvh + 320svh); padding: 0; }
+.u-scene { position: sticky; top: 0; height: 100vh; height: 100lvh; display: flex; flex-direction: column; justify-content: center; gap: 3svh; padding: calc(var(--entete) + 2svh) var(--gutter) 10svh; }
+.u-titre { margin: 0; }
+.u-titre .caps { font-size: 9vw; }
+.u-titre .script { font-size: 12vw; }
+.u-cadre { position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 40svh; border: 1.5px solid rgba(244, 239, 230, .18); border-radius: 10px; overflow: hidden; background: #0d0e1d; }
+.u-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.u-photo.is-vue { opacity: 1; }
+.u-nuit { position: absolute; inset: 0; background: var(--nuit); opacity: var(--noir, .9); }
+.u-cadre::after { content: ""; position: absolute; inset: -25%; pointer-events: none; opacity: var(--eclat, 0); transform: scale(calc(.2 + var(--lum, 0)));
+  background: radial-gradient(circle at 50% 50%, rgba(255, 228, 140, .5) 0%, rgba(255, 190, 70, .16) 32%, rgba(255, 190, 70, 0) 62%); }
+.u-textes { position: relative; min-height: 15rem; }
+.u-texte { position: absolute; left: 0; right: 0; top: 0; opacity: var(--a, 0); transform: translateY(calc((1 - var(--a, 0)) * 12px)); }
 .usage-titre { margin: 0; font-weight: 400; }
-.usage-titre .script { font-size: 16vw; margin: 0 0 .05em -.04em; }
-.usage-titre .caps { font-size: 7.4vw; line-height: .95; margin-top: .25em; }
-.usage-texte .sub { max-width: 34ch; }
+.usage-titre .script { font-size: 13vw; margin: 0 0 .05em -.04em; }
+.usage-titre .caps { font-size: 6.4vw; line-height: .95; margin-top: .25em; }
+.u-texte .sub { max-width: 34ch; margin-top: .8em; }
 
 /* Formats : les quatre plaques à l'échelle d'une feuille A4, tracées par la lumière ; la liste des prix. */
 .formats-intro { max-width: 34ch; margin: -2svh 0 6svh; }
@@ -240,7 +257,7 @@ a { color: inherit; }
 /* Dernier écran. */
 .fin { display: flex; flex-direction: column; align-items: center; text-align: center; padding-bottom: 12svh; }
 .fin-titre .script { margin-left: auto; margin-right: auto; transform-origin: 50% 60%; }
-.fin-photo { width: min(74vw, 440px); }
+.fin-photo { width: min(92vw, 560px); }
 .fin-cta { margin-top: 6svh; --t: 0; }
 .fin-photo.is-allumee ~ .fin-cta { --t: 1; }
 .fin-cta .cta-trait path { transition: stroke-dashoffset 1s ease .6s; }
@@ -249,10 +266,13 @@ a { color: inherit; }
 
 /* ---------- Paysage (16:9) : textes sur le côté libre ---------- */
 @media (orientation: landscape) {
-  :root { --gutter: max(24px, 6.5vw); }
+  :root { --gutter: max(24px, 6.5vw); --entete: calc(env(safe-area-inset-top, 0px) + 88px); }
+  .top-logo img { height: 38px; }
+  .top { padding-top: calc(env(safe-area-inset-top, 0px) + 20px); padding-bottom: 20px; }
   .loader { top: calc(50svh + .16 * max(100svh, 56.25vw)); }
   .loader-track { width: min(22vw, 320px); }
   .caps { font-size: min(8.4vw, 15svh); }
+  .chapter .caps { font-size: min(6.4vw, 12svh); max-width: 40vw; }
   .script { font-size: min(10.2vw, 18svh); }
   .sub { max-width: 30vw; font-size: clamp(16px, 1.45vw, 22px); }
   /* Titre sur deux lignes : « en pleine » et « lumière » se suivent. */
@@ -268,23 +288,28 @@ a { color: inherit; }
   .usages, .formats, .boite, .questions, .fin { padding-top: 16svh; }
   .bloc-titre .caps { font-size: min(6.4vw, 13svh); }
   .bloc-titre .script { font-size: min(8.4vw, 17svh); }
-  .usage { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); align-items: center; column-gap: 6vw; margin-bottom: 20svh; }
-  .usage:nth-of-type(even) .photo { order: 2; }
-  .usage-titre .script { font-size: min(7.4vw, 15svh); }
-  .usage-titre .caps { font-size: min(3.4vw, 7svh); }
+  .usage-titre .script { font-size: min(5.6vw, 12svh); }
+  .usage-titre .caps { font-size: min(2.8vw, 6svh); }
   .formats-corps { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; column-gap: 6vw; }
   .boite-corps { max-width: 860px; }
   .support ul { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 900px; }
   .q-corps { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; column-gap: 6vw; }
-  .fin-photo { width: min(34vw, 62svh); }
-  .pos-1 { left: auto; right: var(--gutter); top: 12svh; text-align: right; }
+  .fin-photo { width: min(46vw, 72svh); }
+  /* Usages : le cadre à gauche, le titre et les textes à droite. */
+  .u-scene { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); grid-template-rows: auto auto; align-content: center; column-gap: 5vw; row-gap: 4svh; padding: calc(var(--entete) + 4svh) var(--gutter) 8svh; }
+  .u-cadre { grid-column: 1; grid-row: 1 / span 2; max-height: 72svh; align-self: center; }
+  .u-titre { grid-column: 2; align-self: end; }
+  .u-titre .caps { font-size: min(4.6vw, 10svh); }
+  .u-titre .script { font-size: min(6vw, 13svh); }
+  .u-textes { grid-column: 2; min-height: 34svh; }
+  .pos-1 { left: auto; right: var(--gutter); top: calc(var(--entete) + 3svh); text-align: right; }
   .pos-1 .script { margin-left: auto; margin-right: .1em; transform-origin: 100% 60%; }
   .pos-1 .sub { margin-left: auto; }
-  .pos-2 { right: auto; left: calc(var(--gutter) + 2vw); top: 12svh; text-align: left; }
+  .pos-2 { right: auto; left: calc(var(--gutter) + 2vw); top: calc(var(--entete) + 3svh); text-align: left; }
   .pos-2 .script { margin-left: .46em; margin-right: 0; transform-origin: 0 60%; }
   .pos-2 .sub { margin-left: 0; }
-  .pos-3 { left: auto; right: var(--gutter); top: 10svh; }
-  .pos-4 { left: auto; right: var(--gutter); top: 8svh; }
+  .pos-3 { left: auto; right: var(--gutter); top: calc(var(--entete) + 3svh); }
+  .pos-4 { left: auto; right: var(--gutter); top: calc(var(--entete) + 2svh); }
   .pos-4 .sub { left: auto; right: 0; top: 68svh; width: 30vw; text-align: right; }
   .formats { padding-top: 16svh; }
 }
@@ -303,6 +328,14 @@ a { color: inherit; }
 .reduced .fin-bloc { position: relative; left: auto; right: auto; top: auto; transform: none; margin-top: 4svh; }
 .reduced .titre .l { clip-path: none; }
 .reduced .photo img { filter: none; }
+.reduced .usages { height: auto; }
+.reduced .u-scene { position: relative; height: auto; display: block; padding: 14svh var(--gutter) 6svh; }
+.reduced .u-cadre { margin-top: 5svh; }
+.reduced .u-photo:first-child { opacity: 1; }
+.reduced .u-nuit { opacity: 0; }
+.reduced .u-textes { min-height: 0; }
+.reduced .u-texte { position: static; opacity: 1; transform: none; margin-top: 5svh; --s: 1; }
+.reduced .u-texte .w { opacity: 1; }
 .reduced .echelle rect { stroke-dashoffset: 0; }
 .reduced .lignes div::after { transform: scaleX(1); opacity: .55; }
 .reduced .q-reponse { opacity: 1; }

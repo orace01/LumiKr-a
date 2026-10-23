@@ -11,16 +11,48 @@
   // Un titre [data-ecrit] voit son mot au feutre s'écrire (--s) en entrant dans l'écran ; un paragraphe [data-mots]
   // s'éclaire mot à mot (--w de 26 % à 100 %), comme les sous-titres du hero.
   const ecrits = [...document.querySelectorAll("[data-ecrit]")];
-  const paragraphes = [...document.querySelectorAll("[data-mots]")].map((p) => {
+  // Découpe un paragraphe en mots (.w) qui s'éclairent un par un.
+  const decouper = (p) => {
     const mots = p.textContent.trim().split(/\s+/);
     p.textContent = "";
-    return { p, spans: mots.map((m, i) => {
+    return mots.map((m, i) => {
       const s = document.createElement("span");
       s.className = "w"; s.textContent = m;
       p.append(s, i < mots.length - 1 ? " " : "");
       return s;
-    }) };
-  });
+    });
+  };
+  const paragraphes = [...document.querySelectorAll("[data-mots]")].map((p) => ({ p, spans: decouper(p) }));
+  const setv = (el, nom, v) => { v = Math.round(v * 1000) / 1000; if (el["_" + nom] !== v) { el["_" + nom] = v; el.style.setProperty(nom, v); } };
+  const lisse = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+  const plage = (u, a, b) => lisse((u - a) / (b - a));
+
+  // ---------- Usages : une seule tablette, quatre usages ----------
+  // La section est longue et sa scène reste collée à l'écran ; sa progression q (0 → 1) se découpe en quatre.
+  // Dans chaque quart : la photo s'allume depuis le centre, le verbe s'écrit, le texte s'éclaire mot à mot, puis la
+  // pièce s'éteint avant l'usage suivant (le dernier reste allumé). Le titre s'écrit quand la section arrive.
+  const usages = document.getElementById("usages"), uScene = usages.querySelector(".u-scene");
+  const uCadre = usages.querySelector(".u-cadre"), uTitre = usages.querySelector(".u-titre");
+  const uPhotos = [...usages.querySelectorAll(".u-photo")];
+  const uTextes = [...usages.querySelectorAll(".u-texte")].map((el) => ({ el, mots: decouper(el.querySelector(".sub")) }));
+  let uTop = 0, uCourse = 1, uVue = -1;
+  function rendreUsages() {
+    setv(uTitre, "--s", clamp((scrollY - (uTop - vh * 0.75)) / (vh * 0.55)));
+    const n = uPhotos.length, q = clamp((scrollY - uTop) / uCourse);
+    const i = Math.min(n - 1, Math.floor(q * n)), u = q * n - i, dernier = i === n - 1;
+    if (i !== uVue) { uVue = i; uPhotos.forEach((p, j) => p.classList.toggle("is-vue", j === i)); }
+    const lum = u < 0.16 ? lisse(u / 0.16) : (!dernier && u > 0.84 ? 1 - lisse((u - 0.84) / 0.16) : 1);
+    setv(uCadre, "--lum", lum);
+    setv(uCadre, "--noir", (1 - lum) * 0.9);
+    setv(uCadre, "--eclat", u < 0.5 ? 4 * lum * (1 - lum) : 0);   // l'éclat ne part du centre qu'en s'allumant
+    uTextes.forEach(({ el, mots }, j) => {
+      setv(el, "--a", j === i ? plage(u, 0.06, 0.18) * (dernier ? 1 : 1 - plage(u, 0.8, 0.9)) : 0);
+      if (j !== i) return;
+      setv(el, "--s", plage(u, 0.1, 0.32));
+      const k = clamp((u - 0.2) / 0.45) * (mots.length + 3);
+      mots.forEach((s, m) => setv(s, "--w", 0.26 + 0.74 * clamp(k - m)));
+    });
+  }
   // Lignes de « Dans la boîte » : soulignées l'une après l'autre.
   document.querySelectorAll(".lignes div").forEach((d, i) => d.style.setProperty("--i", i));
 
@@ -31,6 +63,8 @@
     vh = innerHeight;
     for (const el of ecrits) el._top = el.getBoundingClientRect().top + scrollY;
     for (const q of paragraphes) q.p._top = q.p.getBoundingClientRect().top + scrollY;
+    uTop = usages.getBoundingClientRect().top + scrollY;
+    uCourse = Math.max(1, usages.offsetHeight - uScene.offsetHeight);
     sale = true;
   };
   // Progression d'un élément : 0 quand son haut est à 92 % de la hauteur de l'écran, 1 quand il est à 52 %.
@@ -53,6 +87,7 @@
           if (s._w !== w) { s._w = w; s.style.setProperty("--w", w); }
         });
       }
+      rendreUsages();
     }
     requestAnimationFrame(rendre);
   }
