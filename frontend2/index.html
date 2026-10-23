@@ -80,16 +80,14 @@
         <p class="sub">Le dessin devient une présence lumineuse, près du lit.</p>
       </article>
 
-      <!-- Fin : la boule lumineuse écrit le titre (un .l = un tracé), devient le point final,
-           puis descend en laissant un fil derrière elle pendant que le sous-titre s'éclaire. -->
+      <!-- Fin : la boule lumineuse écrit le titre (un .l = un tracé), disposé comme « Dessinez dans la lumière. » :
+           capitales, puis mot au feutre ; elle devient le point final, puis descend vers la galerie. -->
       <svg class="trace" id="trace" aria-hidden="true"><path class="fil-halo"/><path class="fil-core"/></svg>
       <div class="fin-bloc">
         <h1 class="titre" id="titre">
-          <span class="l l1">Vos idées,</span>
-          <span class="l l2">en pleine</span>
-          <span class="l l3 lumiere">lumière</span><span class="visually-hidden">.</span>
+          <span class="l l1 caps">Vos idées,</span>
+          <span class="l l2 script">en pleine lumière</span><span class="visually-hidden">.</span>
         </h1>
-        <p class="sub fin-sub" id="finSub">Une plaque d'acrylique sur une base LED : déco de fête, mot doux, menu du jour ou dessin d'enfant, on l'écrit au feutre, la lumière le révèle, on efface et on recommence.</p>
       </div>
       <div class="boule" id="boule" aria-hidden="true"></div>
     </div>
@@ -100,6 +98,21 @@
        et va allumer la tablette au centre de sa plaque. -->
   <svg class="fil" id="fil" aria-hidden="true"><path class="fil-halo"/><path class="fil-core"/></svg>
   <div class="tete" id="tete" aria-hidden="true"></div>
+
+  <!-- Galerie : mosaïque de deux colonnes ; le texte de la fin du hero est coupé en deux cases (en haut et en bas à
+       gauche), les mots s'éclairent au scroll ([data-mots], sections.js). Photos provisoires (maquette). -->
+  <section class="galerie" id="galerie" aria-label="Galerie">
+    <div class="g-grille">
+      <p class="g-texte" data-mots>Une plaque d'acrylique sur une base LED : déco de fête, mot doux, menu du jour ou dessin d'enfant.</p>
+      <img class="g-photo" src="media/usage-feter.webp" loading="lazy" decoding="async" alt="Le tableau décoré pour Halloween.">
+      <img class="g-photo" src="media/usage-decorer.webp" loading="lazy" decoding="async" alt="Le tableau décoré pour Noël sur une commode.">
+      <img class="g-photo" src="media/usage-creer.webp" loading="lazy" decoding="async" alt="Le petit tableau carré avec une fusée et des planètes.">
+      <img class="g-photo" src="media/fin-sirene.webp" loading="lazy" decoding="async" alt="Le tableau avec une sirène dessinée en couleurs.">
+      <img class="g-photo" src="media/usage-ecrire.webp" loading="lazy" decoding="async" alt="Le tableau sur un bureau avec une citation et « Good Morning ».">
+      <p class="g-texte" data-mots>On l'écrit au feutre, la lumière le révèle, on efface et on recommence.</p>
+      <img class="g-photo" src="media/support-tablette.webp" loading="lazy" decoding="async" alt="Le support du tableau utilisé comme porte-tablette.">
+    </div>
+  </section>
 
   <section class="dessin" id="dessin" aria-labelledby="dessin-titre">
     <h2 class="dessin-titre" id="dessin-titre">Dessinez, puis éteignez la pièce.</h2>
@@ -238,8 +251,8 @@
         <div class="fin-nuit" aria-hidden="true"></div>
         <div class="fin-texte">
           <h2 class="bloc-titre fin-titre" id="fin-titre"><span class="caps">À vous de</span><span class="script">créer.</span></h2>
-          <p class="fin-soustitre">Un feutre, un peu de lumière : le reste, c'est vous.</p>
-          <p class="fin-prix">À partir de <span class="prix-min">24,90 €</span> · livraison offerte</p>
+          <p class="fin-soustitre">Un feutre, un peu de lumière :<br> le reste, c'est vous.</p>
+          <p class="fin-prix">À partir de <span class="prix-min">24,90 €</span><span class="fin-livraison"><span class="fin-point" aria-hidden="true"> · </span>livraison offerte</span></p>
           <div class="fin-actions">
             <a class="btn-or" href="#formats">Choisir mon format</a>
             <a class="o-decouvrir" href="#formats">Voir les formats <span aria-hidden="true">›</span></a>

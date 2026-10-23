@@ -24,7 +24,7 @@
   const intro = $("#intro"), introVideo = $("#introVideo"), loader = $("#loader"), loaderFill = $("#loaderFill"), loaderPct = $("#loaderPct");
   const hero = $("#hero"), heroVideo = $("#heroVideo"), eteint = $("#eteint");
   const stage = $(".stage"), titre = $("#titre"), lignes = [...titre.querySelectorAll(".l")], boule = $("#boule");
-  const finSub = $("#finSub"), trace = $("#trace"), tracePaths = [...trace.querySelectorAll("path")];
+  const trace = $("#trace"), tracePaths = [...trace.querySelectorAll("path")];
   const suite = $("#suite"), fil = $("#fil"), filPaths = [...fil.querySelectorAll("path")], tete = $("#tete");
   const plaque = $(".plaque");
   const ouverture = $("#ouverture");
@@ -72,7 +72,6 @@
       if (s._w !== w) { s._w = w; s.style.setProperty("--w", w); }
     });
   };
-  const finWords = splitWords(finSub);
 
   const chapters = [...document.querySelectorAll(".chapter")].map((el) => {
     const d = el.dataset;
@@ -112,7 +111,7 @@
   let geo = null, lastBall = "", traceLen = 0, suivi = 0.62;
   function measureFin() {
     const s = stage.getBoundingClientRect();
-    const fs = parseFloat(getComputedStyle(titre).fontSize);
+    const fs = parseFloat(getComputedStyle(lignes[lignes.length - 1]).fontSize);   // police de la ligne au feutre
     const lines = lignes.map((l) => { const r = l.getBoundingClientRect(); return { x: r.left - s.left, y: r.top - s.top + r.height * 0.5, w: r.width }; });
     const gap = 0.14;                                   // temps pour revenir au début de la ligne suivante
     const total = lines.reduce((n, l) => n + l.w, 0), write = FIN.write[1] - FIN.write[0] - gap * (lines.length - 1);
@@ -121,15 +120,15 @@
     const end = lines[lines.length - 1];
     // Le point final : juste après « lumière », posé sur la ligne de base, de la taille d'un point de la police.
     const point = { x: end.x + end.w + fs * 0.1, y: end.y + fs * 0.27, s: (fs * 0.19) / 22 };
-    const sub = finSub.getBoundingClientRect(), subBottom = sub.bottom - s.top;
+    const titreBas = titre.getBoundingClientRect().bottom - s.top;
     const W = s.width, H = s.height;
-    // Hauteur de suivi : la boule finit sa descente juste sous le sous-titre, puis reste à cette hauteur de l'écran
-    // pendant tout le scroll des sections (même rapport dans drawFil) : elle suit le scroll sans saut.
+    // Hauteur de suivi : la boule finit sa descente sous le titre, puis reste à cette hauteur de l'écran pendant tout
+    // le scroll des sections (même rapport dans drawFil) : elle suit le scroll sans saut.
     // Hauteurs prises sur la scène (100lvh, fixe) et non sur la zone visible, qui change quand les barres du
     // navigateur mobile se replient : la géométrie reste la même pendant tout le scroll.
-    suivi = clamp(subBottom / H + 0.06, 0.62, 0.85);
+    suivi = clamp(titreBas / H + 0.14, 0.62, 0.85);
     const endY = H * suivi;
-    // Descente : du point, vers le bas derrière la fin du sous-titre, puis vers le centre, à la hauteur de suivi.
+    // Descente : du point, vers le bas, puis vers le centre, à la hauteur de suivi.
     const d = `M ${point.x} ${point.y} C ${point.x} ${endY}, ${W / 2} ${endY - (endY - point.y) * 0.25}, ${W / 2} ${endY}`;
     trace.setAttribute("viewBox", `0 0 ${W} ${H}`);
     tracePaths.forEach((p) => p.setAttribute("d", d));
@@ -146,9 +145,6 @@
       const r = Math.round(clamp((t - L[i].t0) / (L[i].t1 - L[i].t0)) * 1000) / 1000;
       if (el._r !== r) { el._r = r; el.style.setProperty("--r", r); }
     });
-    const show = clamp((t - FIN.sub[0]) / (FIN.sub[1] - FIN.sub[0]));
-    if (finSub._sa !== show) { finSub._sa = show; finSub.style.setProperty("--sa", show); }
-    lightWords(finWords, t, show, FIN.words);
 
     let x = geo.cx, y = geo.cy, s = span(t, ...FIN.ball), drawn = 0;
     if (t >= FIN.toLine[0] && t < FIN.write[0]) {           // du centre au début de la première ligne
@@ -548,7 +544,7 @@
     // ?debug : positions à l'écran des éléments de la fin, écrites dans la page (lisibles sans capture).
     if (params.has("debug")) setTimeout(() => {
       const box = (el) => { const r = el.getBoundingClientRect(); return [r.left, r.top, r.width, r.height].map(Math.round); };
-      body.dataset.geo = JSON.stringify({ vue: [innerWidth, innerHeight], largeur: document.documentElement.scrollWidth, titre: lignes.map(box), sous: box(finSub), boule: box(boule),
+      body.dataset.geo = JSON.stringify({ vue: [innerWidth, innerHeight], largeur: document.documentElement.scrollWidth, titre: lignes.map(box), boule: box(boule),
         bouleOp: boule.style.opacity, plaque: box(plaque), tete: box(tete), allumees: lit.filter(Boolean).length, h: eteint.style.getPropertyValue("--h") });
     }, 1500);
   }));
