@@ -64,19 +64,9 @@ a { color: inherit; }
   background: radial-gradient(circle farthest-corner at 50% 50%, rgba(23, 24, 45, 0) max(0%, calc(var(--h, 1.25) * 100% - 30%)), rgba(23, 24, 45, .72) max(0%, calc(var(--h, 1.25) * 100% - 12%)), var(--nuit) max(0%, calc(var(--h, 1.25) * 100%))); }
 .eteint::after { content: ""; position: absolute; inset: 0; background: var(--nuit); opacity: var(--plein, 0); }
 
-/* Fil doré de progression */
-.rail { position: absolute; left: 4.6vw; top: 20svh; height: 60svh; width: 2px; opacity: var(--ra, 0); }
-.rail-track { position: absolute; inset: 0; background: rgba(244, 239, 230, .16); }
-/* Le fil et sa tête bougent en transform (sans recalcul de mise en page à chaque image). */
-.rail-fill { position: absolute; left: -.5px; top: 0; width: 3px; height: 100%; transform: scaleY(var(--p, 0)); transform-origin: 50% 0; background: var(--halo); box-shadow: 0 0 10px rgba(255, 200, 60, .9); will-change: transform; }
-.rail-head { position: absolute; left: -3px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--halo); box-shadow: 0 0 12px rgba(255, 200, 60, 1); transform: translateY(calc(var(--p, 0) * 60svh)); will-change: transform; }
-.rail-nums { list-style: none; margin: 0; padding: 0; }
-.rail-nums li { position: absolute; right: 8px; top: calc(var(--at) * 100%); transform: translateY(-50%); font: 600 9px/1 var(--caps); letter-spacing: .06em; color: var(--ivoire); opacity: .4; transition: opacity .3s; }
-.rail-nums li.is-on { opacity: 1; }
 
 /* Chapitres */
 .chapter { position: absolute; opacity: var(--a, 0); transform: translateY(calc(var(--y, 0) * 1px)); will-change: opacity, transform; }
-.label { margin: 0 0 1.2em; font: 600 clamp(10px, 2.4vw, 13px)/1 var(--caps); letter-spacing: .16em; text-transform: uppercase; color: rgba(244, 239, 230, .86); text-shadow: var(--ombre); }
 .title { margin: 0; font-weight: 400; }
 .caps { display: block; font: 800 15.6vw/.84 var(--caps); letter-spacing: -.03em; text-transform: uppercase; color: var(--ivoire); text-shadow: var(--ombre); }
 .script { display: block; width: max-content; font: 400 19vw/.82 var(--script); color: var(--halo); margin: -.06em 0 0 .46em; transform: rotate(-4deg); transform-origin: 0 60%;
@@ -262,11 +252,9 @@ a { color: inherit; }
   :root { --gutter: max(24px, 6.5vw); }
   .loader { top: calc(50svh + .16 * max(100svh, 56.25vw)); }
   .loader-track { width: min(22vw, 320px); }
-  .rail { left: 2.6vw; }
   .caps { font-size: min(8.4vw, 15svh); }
   .script { font-size: min(10.2vw, 18svh); }
   .sub { max-width: 30vw; font-size: clamp(16px, 1.45vw, 22px); }
-  .label { font-size: 12px; }
   /* Titre sur deux lignes : « en pleine » et « lumière » se suivent. */
   .titre { font-size: min(7.6vw, 15svh); }
   .titre .l2, .titre .l3 { display: inline-block; margin: 0; }
@@ -323,4 +311,3 @@ a { color: inherit; }
 .reduced .fin-sub { opacity: 1; }
 .reduced .boule, .reduced .tete, .reduced .trace { display: none; }
 .reduced .fil path { stroke-dashoffset: 0; }
-.reduced .rail { display: none; }

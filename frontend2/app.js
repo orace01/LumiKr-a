@@ -22,7 +22,7 @@
   const $ = (s) => document.querySelector(s);
   const body = document.body;
   const intro = $("#intro"), introVideo = $("#introVideo"), loader = $("#loader"), loaderFill = $("#loaderFill"), loaderPct = $("#loaderPct");
-  const hero = $("#hero"), heroVideo = $("#heroVideo"), eteint = $("#eteint"), rail = $("#rail"), railNums = $("#railNums");
+  const hero = $("#hero"), heroVideo = $("#heroVideo"), eteint = $("#eteint");
   const stage = $(".stage"), titre = $("#titre"), lignes = [...titre.querySelectorAll(".l")], boule = $("#boule");
   const finSub = $("#finSub"), trace = $("#trace"), tracePaths = [...trace.querySelectorAll("path")];
   const suite = $("#suite"), fil = $("#fil"), filPaths = [...fil.querySelectorAll("path")], tete = $("#tete");
@@ -75,14 +75,6 @@
     const spans = splitWords(el.querySelector(".sub"));
     return { el, spans, tIn: +d.in, tScript: +d.script, tSubShow: d.subshow ? +d.subshow : +d.in + 0.3, tSub: +d.sub, tSubEnd: +d.subend, tOut: +d.out, cache: {} };
   });
-  chapters.forEach((c, i) => {
-    const li = document.createElement("li");
-    li.textContent = String(i + 1).padStart(2, "0");
-    li.style.setProperty("--at", (c.tIn / VIDEO_END).toFixed(4));
-    railNums.append(li);
-    c.num = li;
-  });
-
   const setVar = (el, cache, name, value) => {
     const v = Math.round(value * 1000) / 1000;
     if (cache[name] !== v) { cache[name] = v; el.style.setProperty(name, v); }
@@ -103,14 +95,6 @@
     setVar(eteint, ec, "--h", 1.25 * (1 - span(t, ...FIN.dark)));
     setVar(eteint, ec, "--plein", span(t, FIN.dark[1] - 0.5, FIN.dark[1]));   // aplat plein : derrière tout le titre
     renderFin(t);
-
-    const rc = rail._c || (rail._c = {});
-    setVar(rail, rc, "--ra", span(t, 0.2, 0.8) * (1 - span(t, 25.6, 26.4)));
-    setVar(rail, rc, "--p", clamp(t / VIDEO_END));
-    chapters.forEach((c, i) => {
-      const on = t >= c.tIn && (i === chapters.length - 1 || t < chapters[i + 1].tIn);
-      c.num.classList.toggle("is-on", on);
-    });
   }
 
   // ---------- Fin : la boule écrit le titre, devient le point final, puis descend ----------
