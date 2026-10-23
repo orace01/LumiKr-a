@@ -118,7 +118,8 @@ a { color: inherit; }
   padding: var(--entete) var(--gutter) calc(var(--barres, 0px) + 12svh); text-align: center; pointer-events: none;
   opacity: var(--o, 1); transform: translateY(calc((1 - var(--o, 1)) * -48px)); }
 .ouverture::before { content: ""; position: absolute; inset: 0; z-index: -1;
-  background: radial-gradient(ellipse 90% 56% at 50% 50%, rgba(23, 24, 45, .84) 0%, rgba(23, 24, 45, .52) 48%, rgba(23, 24, 45, 0) 78%); }
+  /* Voile neutre (pas bleu) resserré derrière le texte : la vidéo garde ses couleurs chaudes, le bas reste net. */
+  background: radial-gradient(ellipse 78% 30% at 50% 42%, rgba(8, 7, 14, .62) 0%, rgba(8, 7, 14, .34) 52%, rgba(8, 7, 14, 0) 100%); }
 .ouverture a { pointer-events: auto; }
 /* Titre : les capitales sortent du flou, puis « dans la lumière. » s'écrit au feutre. */
 .o-titre { margin: 0; font-weight: 400; }
@@ -311,7 +312,7 @@ a { color: inherit; }
   .top-logo img { height: 38px; }
   /* Ouverture : même composition, centrée, à l'échelle de l'écran large. */
   .ouverture { gap: 2.6svh; padding-bottom: calc(var(--barres, 0px) + 14svh); }
-  .ouverture::before { background: radial-gradient(ellipse 46% 56% at 50% 46%, rgba(23, 24, 45, .8) 0%, rgba(23, 24, 45, .46) 48%, rgba(23, 24, 45, 0) 78%); }
+  .ouverture::before { background: radial-gradient(ellipse 42% 38% at 50% 44%, rgba(8, 7, 14, .6) 0%, rgba(8, 7, 14, .32) 52%, rgba(8, 7, 14, 0) 100%); }
   /* Ordinateur : composition de page produit, titre géant centré, sous-titre court, prix, deux actions côte à côte. */
   .ouverture { gap: 2svh; }
   .o-titre .caps { font-size: min(13vw, 24svh); letter-spacing: -.04em; line-height: .84; }
