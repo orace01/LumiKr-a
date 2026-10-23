@@ -27,6 +27,7 @@
   const finSub = $("#finSub"), trace = $("#trace"), tracePaths = [...trace.querySelectorAll("path")];
   const suite = $("#suite"), fil = $("#fil"), filPaths = [...fil.querySelectorAll("path")], tete = $("#tete");
   const plaque = $(".plaque");
+  const ouverture = $("#ouverture");
 
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const ease = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
@@ -98,6 +99,11 @@
     setVar(eteint, ec, "--h", 1.25 * (1 - span(t, ...FIN.dark)));
     setVar(eteint, ec, "--plein", span(t, FIN.dark[1] - 0.5, FIN.dark[1]));   // aplat plein : derrière tout le titre
     renderFin(t);
+    // Ouverture : s'efface en montant dès le premier scroll.
+    const oc = ouverture._c || (ouverture._c = {}), o = 1 - span(t, 0.02, 0.42);
+    setVar(ouverture, oc, "--o", o);
+    const cachee = o < 0.01;                              // invisible : ne doit plus capter les clics
+    if (ouverture._h !== cachee) { ouverture._h = cachee; ouverture.style.visibility = cachee ? "hidden" : ""; }
   }
 
   // ---------- Fin : la boule écrit le titre, devient le point final, puis descend ----------
@@ -306,7 +312,7 @@
   // ---------- Mouvement réduit : pas de vidéo pilotée ----------
   if (reduced) {
     body.classList.remove("is-intro");
-    body.classList.add("reduced");
+    body.classList.add("reduced", "is-ouvert");
     intro.remove();
     heroVideo.poster = `media/hero-${fmt}-fin.webp`;
     stations.forEach((st) => st.classList.add("is-allumee"));   // tout est allumé, sans boule
@@ -442,7 +448,7 @@
   function revealSite() {
     intro.classList.add("is-revealing");
     body.classList.remove("is-intro");
-    body.classList.add("is-revealing-site");
+    body.classList.add("is-revealing-site", "is-ouvert");   // l'ouverture se joue pendant que le site apparaît
     window.scrollTo(0, 0);
     setTimeout(() => { intro.remove(); body.classList.remove("is-revealing-site"); }, 1300);
   }
@@ -450,6 +456,7 @@
   if (params.has("sans-intro") || actualisation) {
     intro.remove();
     body.classList.remove("is-intro");
+    setTimeout(() => body.classList.add("is-ouvert"), 80);   // l'ouverture se joue dès l'affichage
   } else {
     introVideo.src = cfg.src;
     introVideo.addEventListener("ended", revealSite, { once: true });
@@ -521,6 +528,12 @@
   measure();
   render(0);
   requestAnimationFrame(frame);
+
+  // « Découvrir › » : descend en douceur jusqu'au premier chapitre du hero.
+  $("#decouvrir").addEventListener("click", (e) => {
+    e.preventDefault();
+    scrollTo({ top: heroTop + (1.6 / STORY_END) * run, behavior: "smooth" });
+  });
 
   // ?t=33.5 ouvre la page directement à ce moment du récit ; ?t=dessin, usages, formats, boite, questions ou fin :
   // la boule posée sur la première station de cette section (vérifications, captures).

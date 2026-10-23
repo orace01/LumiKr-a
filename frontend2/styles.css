@@ -111,6 +111,43 @@ a { color: inherit; }
 /* Bouton : texte souligné d'un trait de feutre doré */
 .cta { position: relative; display: inline-block; padding: 10px 0 18px; font: 700 clamp(13px, 3.3vw, 16px)/1 var(--caps); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--ivoire); text-shadow: var(--ombre); }
 .cta-trait { position: absolute; left: -2%; bottom: 2px; width: 104%; height: 14px; overflow: visible; }
+/* ---------- Ouverture du hero ----------
+   À l'apparition du site (body.is-ouvert) : le logo sort du flou, la phrase s'écrit au feutre, puis le bouton se
+   souligne et l'invitation à défiler apparaît. Au premier scroll, tout s'efface en montant (--o, réglé par app.js). */
+.ouverture { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.2svh;
+  padding: var(--entete) var(--gutter) calc(var(--barres, 0px) + 12svh); text-align: center; pointer-events: none;
+  opacity: var(--o, 1); transform: translateY(calc((1 - var(--o, 1)) * -48px)); }
+.ouverture::before { content: ""; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(ellipse 90% 56% at 50% 50%, rgba(23, 24, 45, .84) 0%, rgba(23, 24, 45, .52) 48%, rgba(23, 24, 45, 0) 78%); }
+.ouverture a { pointer-events: auto; }
+/* Titre : les capitales sortent du flou, puis « dans la lumière. » s'écrit au feutre. */
+.o-titre { margin: 0; font-weight: 400; }
+.o-titre .caps { font-size: 15vw; line-height: .86; opacity: 0; transform: translateY(14px) scale(.97); filter: blur(10px);
+  transition: opacity 1s ease .15s, transform 1.3s cubic-bezier(.2, .7, .2, 1) .15s, filter 1s ease .15s; }
+.o-titre .script { width: auto; max-width: 90vw; margin: .02em auto 0; font-size: 13vw; line-height: 1; transform: rotate(-4deg); transform-origin: 50% 60%;
+  clip-path: inset(-30% 100% -40% -6%); transition: clip-path 1.5s cubic-bezier(.45, .05, .25, 1) .95s; }
+.o-sous { max-width: 30ch; margin: 1.2svh auto 0; font: 400 clamp(15px, 4.3vw, 19px)/1.4 var(--caps); color: var(--ivoire); text-shadow: var(--ombre);
+  opacity: 0; transform: translateY(8px); transition: opacity .8s ease 2.1s, transform .8s ease 2.1s; }
+.o-prix { margin: 0; font: 600 13px/1.4 var(--caps); letter-spacing: .04em; color: var(--halo); text-shadow: var(--ombre); opacity: 0; transition: opacity .7s ease 2.4s; }
+.o-actions { display: flex; flex-direction: column; align-items: center; gap: 1.2svh; margin-top: .6svh; }
+.o-cta { opacity: 0; transition: opacity .7s ease 2.6s; }
+.o-cta .cta-trait path { stroke-dashoffset: 1; transition: stroke-dashoffset .9s ease 2.9s; }
+.o-decouvrir { padding: 8px 0; font: 500 clamp(14px, 3.8vw, 16px)/1 var(--caps); color: rgba(244, 239, 230, .82); text-decoration: none; text-shadow: var(--ombre); opacity: 0; transition: opacity .7s ease 2.8s, color .2s ease; }
+.o-decouvrir:hover, .o-decouvrir:focus-visible { color: var(--halo); }
+.o-decouvrir:focus-visible { outline: 2px solid var(--halo); outline-offset: 4px; }
+.o-defiler { position: absolute; left: 50%; bottom: calc(var(--barres, 0px) + env(safe-area-inset-bottom, 0px) + 4svh); transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 12px; font: 600 11px/1 var(--caps); letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(244, 239, 230, .78); text-shadow: var(--ombre); opacity: 0; transition: opacity .8s ease 3.2s; }
+.o-defiler i { position: relative; width: 1px; height: 44px; background: linear-gradient(to bottom, rgba(255, 210, 63, .7), rgba(255, 210, 63, 0)); }
+.o-defiler i::after { content: ""; position: absolute; left: -3.5px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--halo);
+  box-shadow: 0 0 10px 3px rgba(255, 200, 60, .75); animation: defile 1.9s ease-in-out infinite; }
+@keyframes defile { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(40px); opacity: 0; } }
+.is-ouvert .o-titre .caps { opacity: 1; transform: none; filter: none; }
+.is-ouvert .o-titre .script { clip-path: inset(-30% -6% -40% -6%); }
+.is-ouvert .o-sous { opacity: 1; transform: none; }
+.is-ouvert .o-cta, .is-ouvert .o-prix, .is-ouvert .o-decouvrir, .is-ouvert .o-defiler { opacity: 1; }
+.is-ouvert .o-cta .cta-trait path { stroke-dashoffset: 0; }
+
 .cta-trait path { fill: none; stroke: var(--halo); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--t, 0)); filter: drop-shadow(0 0 4px rgba(255, 200, 60, .9)); vector-effect: non-scaling-stroke; }
 .cta-static { --t: 1; }
 .cta:hover .cta-trait path, .cta:focus-visible .cta-trait path { animation: trait .7s ease forwards; }
@@ -272,6 +309,17 @@ a { color: inherit; }
 @media (orientation: landscape) {
   :root { --gutter: max(24px, 6.5vw); --entete: calc(env(safe-area-inset-top, 0px) + 88px); }
   .top-logo img { height: 38px; }
+  /* Ouverture : même composition, centrée, à l'échelle de l'écran large. */
+  .ouverture { gap: 2.6svh; padding-bottom: calc(var(--barres, 0px) + 14svh); }
+  .ouverture::before { background: radial-gradient(ellipse 46% 56% at 50% 46%, rgba(23, 24, 45, .8) 0%, rgba(23, 24, 45, .46) 48%, rgba(23, 24, 45, 0) 78%); }
+  /* Ordinateur : composition de page produit, titre géant centré, sous-titre court, prix, deux actions côte à côte. */
+  .ouverture { gap: 2svh; }
+  .o-titre .caps { font-size: min(13vw, 24svh); letter-spacing: -.04em; line-height: .84; }
+  .o-titre .script { font-size: min(7.6vw, 14svh); max-width: 70vw; margin-top: -.12em; }
+  .o-sous { max-width: 44ch; font-size: clamp(17px, 1.5vw, 22px); }
+  .o-prix { font-size: 15px; }
+  .o-actions { flex-direction: row; gap: 40px; margin-top: 1.4svh; }
+  .o-decouvrir { font-size: 16px; }
   .top { padding-top: calc(env(safe-area-inset-top, 0px) + 20px); padding-bottom: 20px; }
   .loader { top: calc(50svh + .16 * max(100svh, 56.25vw)); }
   .loader-track { width: min(22vw, 320px); }
@@ -340,6 +388,11 @@ a { color: inherit; }
 .reduced .u-textes { min-height: 0; }
 .reduced .u-texte { position: static; opacity: 1; transform: none; margin-top: 5svh; --s: 1; }
 .reduced .u-texte .w { opacity: 1; }
+.reduced .ouverture { position: relative; inset: auto; padding: 0 0 6svh; opacity: 1; transform: none; }
+.reduced .ouverture::before, .reduced .o-defiler { display: none; }
+.reduced .o-titre .caps, .reduced .o-sous, .reduced .o-cta, .reduced .o-prix, .reduced .o-decouvrir { opacity: 1; transform: none; filter: none; transition: none; }
+.reduced .o-titre .script { clip-path: none; transition: none; }
+.reduced .o-cta .cta-trait path { stroke-dashoffset: 0; transition: none; }
 .reduced .echelle rect { stroke-dashoffset: 0; }
 .reduced .lignes div::after { transform: scaleX(1); opacity: .55; }
 .reduced .q-reponse { opacity: 1; }

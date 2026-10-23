@@ -44,7 +44,23 @@
       <div class="eteint" id="eteint" aria-hidden="true"></div>
 
       <!-- Chapitres : data-in / data-script / data-sub / data-subend / data-out en secondes du récit (0 à 30,5) -->
-      <article class="chapter pos-1" data-in="0.3" data-script="0.7" data-sub="1.0" data-subend="2.7" data-out="3.0">
+      <!-- Ouverture : logo au centre, phrase écrite au feutre, bouton d'achat, invitation à faire défiler.
+           Elle s'ouvre quand le site apparaît (classe is-ouvert) et s'efface au premier scroll (--o). -->
+      <div class="ouverture" id="ouverture">
+        <h2 class="o-titre"><span class="caps">Dessinez</span><span class="script">dans la lumière.</span></h2>
+        <p class="o-sous">Le tableau lumineux à dessiner : une plaque transparente, une base LED, un feutre.</p>
+        <p class="o-prix">À partir de <span id="prixMin">24,90 €</span> · livraison offerte</p>
+        <div class="o-actions">
+          <a class="cta o-cta" href="#formats">
+            <span>Choisir mon format</span>
+            <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
+          </a>
+          <a class="o-decouvrir" href="#hero" id="decouvrir">Découvrir <span aria-hidden="true">›</span></a>
+        </div>
+        <div class="o-defiler" aria-hidden="true"><span>Faites défiler</span><i></i></div>
+      </div>
+
+      <article class="chapter pos-1" data-in="0.6" data-script="0.95" data-sub="1.25" data-subend="2.8" data-out="3.1">
         <h2 class="title"><span class="caps">Un premier</span><span class="script">trait.</span></h2>
         <p class="sub">Puis l'envie de continuer. Un soleil, une lune, quelques lignes : pas de modèle à réussir.</p>
       </article>

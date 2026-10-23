@@ -104,6 +104,17 @@
     requestAnimationFrame(rendre);
   }
 
+  // ---------- Ouverture : « dès … » suit le prix le plus bas lu sur la boutique (mis à jour par boutique.js) ----------
+  const prixMin = document.getElementById("prixMin");
+  const listeFormats = document.querySelector(".formats-liste");
+  const majPrix = () => {
+    const prix = [...listeFormats.querySelectorAll(".f-prix")].map((el) => ({ txt: el.textContent.trim(), n: parseFloat(el.textContent.replace(/[^\d,.]/g, "").replace(",", ".")) }))
+      .filter((p) => !isNaN(p.n));
+    if (prix.length) prixMin.textContent = prix.reduce((a, b) => (b.n < a.n ? b : a)).txt;
+  };
+  new MutationObserver(majPrix).observe(listeFormats, { subtree: true, childList: true, characterData: true });
+  majPrix();
+
   // ---------- Formats : le format choisi s'allume sur l'échelle ----------
   const choisi = document.getElementById("formatChoisi");
   const plaques = [...document.querySelectorAll(".plaque-f")];
