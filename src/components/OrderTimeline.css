@@ -30,7 +30,7 @@
   place-items: center;
   width: 2.5rem;
   height: 2.5rem;
-  border: 2px solid var(--ink-soft);
+  border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--paper);
   color: var(--ink-soft);
@@ -47,7 +47,7 @@
 .timeline__step--current .timeline__dot {
   border-color: var(--ink);
   background: var(--glow);
-  color: var(--ink);
+  color: var(--on-primary);
   box-shadow: 0 0 0 5px var(--glow-soft);
 }
 

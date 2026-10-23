@@ -263,6 +263,10 @@ a { color: inherit; }
 .fin-cta .cta-trait path { transition: stroke-dashoffset 1s ease .6s; }
 .pied { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6svh var(--gutter) calc(6svh + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(244, 239, 230, .1); text-align: center; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
 .pied img { height: 26px; width: auto; }
+.pied-liens { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; max-width: 760px; }
+.pied a { color: rgba(244, 239, 230, .78); text-decoration: underline; text-decoration-color: rgba(255, 210, 63, .45); text-underline-offset: 3px; }
+.pied a:hover, .pied a:focus-visible { color: var(--halo); }
+.formats-cta[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
 
 /* ---------- Paysage (16:9) : textes sur le côté libre ---------- */
 @media (orientation: landscape) {

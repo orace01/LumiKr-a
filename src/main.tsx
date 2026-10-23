@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@fontsource-variable/figtree/index.css'
-import '@fontsource-variable/fredoka/index.css'
+import '@fontsource-variable/onest/index.css'
+import '@fontsource/sacramento/400.css'
 import './styles/global.css'
 import App from './App.tsx'
 

@@ -24,9 +24,10 @@ site.use('/assets/*', async (c, next) => {
   await next()
   c.header('Cache-Control', 'public, max-age=31536000, immutable')
 })
+// L'accueil (dist/index.html, copié de frontend2/) et tous les fichiers du site.
 site.use('*', serveStatic({ root: './dist' }))
-// Application d'une seule page : toutes les autres adresses renvoient index.html.
-site.get('*', serveStatic({ path: './dist/index.html' }))
+// Application React : toutes les autres adresses renvoient app.html.
+site.get('*', serveStatic({ path: './dist/app.html' }))
 
 const port = Number(process.env.PORT ?? 3000)
 serve({ fetch: site.fetch, port }, (info) => {

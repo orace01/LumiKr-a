@@ -4,11 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lumikréa · La nuit s'allume de leurs idées</title>
-<meta name="description" content="Lumikréa, le tableau lumineux à dessiner : une plaque d'acrylique sur une base LED en bois clair. On écrit au feutre, la lumière le révèle.">
+<meta name="description" content="Lumikréa, le tableau lumineux à dessiner : une plaque d'acrylique sur une base LED. On écrit au feutre, la lumière le révèle.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Lumikréa">
+<meta property="og:title" content="Lumikréa · Le tableau lumineux à dessiner">
+<meta property="og:description" content="Une plaque d'acrylique sur une base LED : on écrit au feutre, la lumière le révèle.">
+<meta property="og:image" content="https://www.lumikrea.store/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#17182D">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600;700;800&family=Sacramento&display=swap">
+<link rel="preload" as="font" type="font/woff2" href="fonts/onest-latin-wght-normal.woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="styles.css">
 <link rel="preload" as="image" href="media/hero-9x16.webp" media="(orientation: portrait)">
 <link rel="preload" as="image" href="media/hero-16x9.webp" media="(orientation: landscape)">
@@ -150,11 +157,12 @@
         <label><input type="radio" name="format" value="30x20" data-prix="36,90 €"><span class="f-taille">30 × 20 cm</span><span class="f-forme">Paysage</span><span class="f-prix">36,90 €</span></label>
       </fieldset>
     </div>
-    <a class="cta cta-static formats-cta" id="commander" href="https://www.lumikrea.store/#formats">
+    <a class="cta cta-static formats-cta" id="commander" href="/commande">
       <span>Commander le <span id="formatChoisi">20 × 20 cm</span></span>
       <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
     </a>
-    <p class="formats-note">Prix TTC · livraison offerte en France métropolitaine, en 10 jours ouvrés. Prototype : la commande se fait sur la boutique actuelle.</p>
+    <!-- Prix, livraison et état de la vente : remplis par boutique.js depuis le serveur. -->
+    <p class="formats-note" id="formatsNote">Prix TTC · livraison offerte en France métropolitaine, en 10 jours ouvrés.</p>
   </section>
 
   <!-- Dans la boîte : les lignes se soulignent au feutre quand la boule arrive. -->
@@ -213,7 +221,15 @@
 
   <footer class="pied">
     <img src="media/logo.svg" alt="Lumikréa" width="120" height="34">
-    <p>Tableau lumineux à dessiner · livraison offerte en France métropolitaine · <a href="https://www.lumikrea.store">lumikrea.store</a></p>
+    <p>Tableau lumineux à dessiner · livraison offerte en France métropolitaine</p>
+    <nav class="pied-liens" aria-label="Informations">
+      <a href="/suivi">Suivre ma commande</a>
+      <a href="/livraison-retours">Livraison et retours</a>
+      <a href="/cgv">Conditions générales de vente</a>
+      <a href="/mentions-legales">Mentions légales</a>
+      <a href="/confidentialite">Confidentialité</a>
+      <a href="mailto:contact@lumikrea.store">contact@lumikrea.store</a>
+    </nav>
   </footer>
   </div>
 </main>
@@ -221,5 +237,6 @@
 <script src="app.js"></script>
 <script src="dessin.js"></script>
 <script src="sections.js"></script>
+<script src="boutique.js"></script>
 </body>
 </html>

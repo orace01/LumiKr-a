@@ -7,7 +7,6 @@ import { site } from './config/site'
 import { CheckoutPage } from './pages/CheckoutPage'
 import { ConfirmationPage } from './pages/ConfirmationPage'
 import { DemoPaymentPage } from './pages/DemoPaymentPage'
-import { LandingPage } from './pages/LandingPage'
 import { LegalPage, NotFoundPage } from './pages/LegalPage'
 import { TrackingPage } from './pages/TrackingPage'
 import { useLocation } from './router'
@@ -16,15 +15,14 @@ import { ShopProvider } from './shop/ShopProvider'
 
 interface Route {
   page: ReactNode
-  /** `landing` : en-tête transparent sur la photo ; `checkout` : en-tête réduit, sans pied de page. */
-  chrome: 'landing' | 'page' | 'checkout'
+  /** `checkout` : en-tête réduit, sans pied de page. */
+  chrome: 'page' | 'checkout'
 }
 
 function resolve(pathname: string): Route {
   const path = pathname.replace(/\/+$/, '') || '/'
+  // L'accueil (/) n'est pas ici : c'est la page statique de frontend2/.
   switch (path) {
-    case '/':
-      return { page: <LandingPage />, chrome: 'landing' }
     case '/commande':
       return { page: <CheckoutPage />, chrome: 'checkout' }
     case '/commande/confirmation':
@@ -60,7 +58,7 @@ function Shell() {
       <a className="skip-link" href="#contenu">
         Aller au contenu
       </a>
-      {route.chrome === 'checkout' ? <CheckoutHeader /> : <Header overHero={route.chrome === 'landing'} />}
+      {route.chrome === 'checkout' ? <CheckoutHeader /> : <Header />}
       <main id="contenu" ref={mainRef} tabIndex={-1}>
         {route.page}
       </main>

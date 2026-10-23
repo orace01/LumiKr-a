@@ -67,9 +67,9 @@ export const site = {
   // Ancres de la page d'accueil, préfixées par « / » pour fonctionner depuis
   // toutes les pages du site.
   nav: [
-    { label: 'Démonstration', href: '/#demonstration' },
     { label: 'Usages', href: '/#usages' },
     { label: 'Formats', href: '/#formats' },
+    { label: 'Dans la boîte', href: '/#boite' },
     { label: 'Questions', href: '/#questions' },
   ],
   primaryCta: { label: 'Choisir mon format', href: '/#formats' },

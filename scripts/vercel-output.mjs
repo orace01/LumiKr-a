@@ -36,10 +36,17 @@ await json(`${OUT}/config.json`, {
       continue: true,
     },
     { src: '^/api(?:/.*)?$', dest: '/api' },
+    // Vidéos et images de l'accueil, polices : en cache une journée.
+    {
+      src: '^/(media|fonts)/(.*)$',
+      headers: { 'Cache-Control': 'public, max-age=86400' },
+      continue: true,
+    },
+    // « / » sert index.html, l'accueil copié de frontend2/.
     { handle: 'filesystem' },
-    { src: '^/assets/.*$', status: 404 },
-    // Application d'une seule page : toutes les autres adresses renvoient index.html.
-    { src: '^/.*$', dest: '/index.html' },
+    { src: '^/(assets|media|fonts)/.*$', status: 404 },
+    // Application React : toutes les autres adresses renvoient app.html.
+    { src: '^/.*$', dest: '/app.html' },
   ],
   // Suivi des colis une fois par jour (maximum de l'offre gratuite de Vercel) ;
   // le suivi est aussi mis à jour quand un client consulte sa commande.

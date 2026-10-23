@@ -9,12 +9,12 @@ export function Footer() {
     <footer className="footer on-night">
       <div className="container footer__inner">
         <div className="footer__brand">
-          <p className="footer__name">{site.brand}</p>
+          <img className="footer__logo" src="/media/logo.svg" alt={site.brand} width={180} height={52} />
           <p className="footer__tagline">{site.tagline}</p>
         </div>
 
         <nav aria-label="Pied de page">
-          <h2 className="footer__title">La page</h2>
+          <h2 className="footer__title">L’accueil</h2>
           <ul className="footer__links">
             {site.nav.map((item) => (
               <li key={item.href}>

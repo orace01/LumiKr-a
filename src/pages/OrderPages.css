@@ -44,10 +44,10 @@
   place-items: center;
   width: 4.5rem;
   height: 4.5rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--green);
-  box-shadow: var(--sticker);
+  box-shadow: var(--card-shadow);
   rotate: -6deg;
 }
 
@@ -77,10 +77,10 @@
   display: grid;
   gap: 1.25rem;
   padding: clamp(1.25rem, 3vw, 2rem);
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--paper);
-  box-shadow: 0 0.5rem 0 var(--ink);
+  box-shadow: var(--card-shadow);
 }
 
 .order-page__card:focus-visible {
@@ -147,7 +147,7 @@
 
 .demo-pay__badge {
   padding: 0.35rem 1rem;
-  border: 2px dashed var(--ink);
+  border: 1px dashed var(--border);
   border-radius: 999px;
   background: var(--glow-soft);
   font-weight: 700;
@@ -213,7 +213,7 @@ h3.legal__heading {
   display: grid;
   gap: 0.75rem;
   padding: clamp(1rem, 3vw, 1.5rem);
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border);
   border-radius: calc(var(--radius) * 0.6);
   background: var(--paper);
   font-size: var(--step--1);
