@@ -99,18 +99,38 @@
   <svg class="fil" id="fil" aria-hidden="true"><path class="fil-halo"/><path class="fil-core"/></svg>
   <div class="tete" id="tete" aria-hidden="true"></div>
 
-  <!-- Galerie : mosaïque de deux colonnes ; le texte de la fin du hero est coupé en deux cases (en haut et en bas à
-       gauche), les mots s'éclairent au scroll ([data-mots], sections.js). Photos provisoires (maquette). -->
-  <section class="galerie" id="galerie" aria-label="Galerie">
-    <div class="g-grille">
-      <p class="g-texte" data-mots>Une plaque d'acrylique sur une base LED : déco de fête, mot doux, menu du jour ou dessin d'enfant.</p>
-      <img class="g-photo" src="media/usage-feter.webp" loading="lazy" decoding="async" alt="Le tableau décoré pour Halloween.">
-      <img class="g-photo" src="media/usage-decorer.webp" loading="lazy" decoding="async" alt="Le tableau décoré pour Noël sur une commode.">
-      <img class="g-photo" src="media/usage-creer.webp" loading="lazy" decoding="async" alt="Le petit tableau carré avec une fusée et des planètes.">
-      <img class="g-photo" src="media/fin-sirene.webp" loading="lazy" decoding="async" alt="Le tableau avec une sirène dessinée en couleurs.">
-      <img class="g-photo" src="media/usage-ecrire.webp" loading="lazy" decoding="async" alt="Le tableau sur un bureau avec une citation et « Good Morning ».">
-      <p class="g-texte" data-mots>On l'écrit au feutre, la lumière le révèle, on efface et on recommence.</p>
-      <img class="g-photo" src="media/support-tablette.webp" loading="lazy" decoding="async" alt="Le support du tableau utilisé comme porte-tablette.">
+  <!-- Galerie. Téléphone : titre, sous-titre et bouton, puis un carrousel horizontal (une photo par défilement, la carte
+       du centre droite et pleine, les voisines plus petites et inclinées), flèches dessous. Ordinateur : mosaïque (titre
+       en haut à gauche, grande carte portrait dessous, paysage au centre, carte large sous elle, portrait haute à droite,
+       bouton en bas à droite). À l'arrivée, les cadres s'ouvrent comme des rideaux qui descendent, l'un après l'autre
+       (.is-ouverte, --i) ; carrousel et ouverture pilotés par sections.js. -->
+  <section class="galerie" id="galerie" aria-labelledby="galerie-titre">
+    <div class="g-tete">
+      <h2 class="bloc-titre g-titre" id="galerie-titre" data-ecrit><span class="caps">Vos dessins,</span><span class="script">en vrai.</span></h2>
+      <p class="g-sous">Une plaque d'acrylique sur une base LED : déco de fête, mot doux, menu du jour ou dessin d'enfant. On l'écrit au feutre, la lumière le révèle, on efface et on recommence.</p>
+    </div>
+    <a class="btn-or g-cta" href="#formats">Choisir votre format</a>
+    <div class="g-piste" id="gPiste">
+      <figure class="g-carte g-bas" style="--i: 0">
+        <img src="media/galerie-bonne-nuit.webp" width="1200" height="1500" loading="lazy" decoding="async" alt="Le tableau allumé sur une table de chevet d'une chambre d'enfant, « Bonne nuit » écrit en jaune.">
+        <figcaption><span class="g-tag">Chambre</span>Bonne nuit</figcaption>
+      </figure>
+      <figure class="g-carte g-haut" style="--i: 1">
+        <img src="media/galerie-mandala.webp" width="1600" height="892" loading="lazy" decoding="async" alt="Une main dessine un mandala jaune lumineux au feutre sur la plaque, le soir.">
+        <figcaption><span class="g-tag">Dessin</span>Un mandala</figcaption>
+      </figure>
+      <figure class="g-carte g-gauche" style="--i: 2">
+        <img src="media/galerie-bravo.webp" width="1200" height="1500" loading="lazy" decoding="async" alt="Une main écrit « Bravo » en bleu lumineux sur la plaque posée sur un bureau.">
+        <figcaption><span class="g-tag">Mot doux</span>Bravo !</figcaption>
+      </figure>
+      <figure class="g-carte g-droite" style="--i: 3">
+        <img src="media/galerie-p3n15.webp" width="720" height="1280" loading="lazy" decoding="async" alt="Le tableau allumé sur un bureau, avec des notes en jaune et en bleu écrites au feutre.">
+        <figcaption><span class="g-tag">Bureau</span>La liste du jour</figcaption>
+      </figure>
+    </div>
+    <div class="g-fleches">
+      <button type="button" class="g-fleche" data-sens="-1" aria-label="Photo précédente" aria-controls="gPiste">←</button>
+      <button type="button" class="g-fleche" data-sens="1" aria-label="Photo suivante" aria-controls="gPiste">→</button>
     </div>
   </section>
 

@@ -132,6 +132,38 @@
     requestAnimationFrame(rendre);
   }
 
+  // ---------- Galerie : ouverture des cadres et carrousel du téléphone ----------
+  // Les cadres s'ouvrent (rideaux, CSS) quand la galerie arrive à l'écran, une seule fois. Sur téléphone, chaque carte
+  // reçoit sa distance au centre du carrousel (--d, en largeurs de carte) et --k = min(1, |d|) ; les flèches font
+  // défiler d'une carte et se grisent aux deux bouts.
+  const galerie = document.getElementById("galerie"), piste = document.getElementById("gPiste");
+  const cartes = [...piste.querySelectorAll(".g-carte")], fleches = [...galerie.querySelectorAll(".g-fleche")];
+  if (reduced || !("IntersectionObserver" in window)) galerie.classList.add("is-ouverte");
+  else new IntersectionObserver((entrees, obs) => {
+    if (entrees.some((e) => e.isIntersecting)) { galerie.classList.add("is-ouverte"); obs.disconnect(); }
+  }, { threshold: 0.18 }).observe(galerie);
+  let gAttente = false;
+  const majCarrousel = () => {
+    gAttente = false;
+    if (getComputedStyle(piste).display === "contents") return;   // ordinateur : mosaïque, pas de carrousel
+    const centre = piste.scrollLeft + piste.clientWidth / 2, pas = cartes[0].offsetWidth + 14;
+    cartes.forEach((c) => {
+      const d = clamp((c.offsetLeft + c.offsetWidth / 2 - centre) / pas, -1.5, 1.5);
+      setv(c, "--d", d);
+      setv(c, "--k", Math.min(1, Math.abs(d)));
+    });
+    const bout = piste.scrollWidth - piste.clientWidth - 2;
+    fleches[0].disabled = piste.scrollLeft <= 2;
+    fleches[1].disabled = piste.scrollLeft >= bout;
+  };
+  const demanderCarrousel = () => { if (!gAttente) { gAttente = true; requestAnimationFrame(majCarrousel); } };
+  piste.addEventListener("scroll", demanderCarrousel, { passive: true });
+  addEventListener("resize", demanderCarrousel);
+  fleches.forEach((b) => b.addEventListener("click", () => {
+    piste.scrollBy({ left: +b.dataset.sens * (cartes[0].offsetWidth + 14), behavior: reduced ? "auto" : "smooth" });
+  }));
+  majCarrousel();
+
   // ---------- Ouverture : « dès … » suit le prix le plus bas lu sur la boutique (mis à jour par boutique.js) ----------
   const prixMin = document.querySelectorAll(".prix-min");   // ouverture et dernier écran
   const listeFormats = document.querySelector(".formats-liste");
