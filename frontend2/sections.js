@@ -163,6 +163,13 @@
     piste.scrollBy({ left: +b.dataset.sens * (cartes[0].offsetWidth + 14), behavior: reduced ? "auto" : "smooth" });
   }));
   majCarrousel();
+  // Survol (ordinateur) : la tache de lumière de la carte suit la souris.
+  cartes.forEach((c) => c.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const r = c.getBoundingClientRect();
+    c.style.setProperty("--mx", `${Math.round(e.clientX - r.left)}px`);
+    c.style.setProperty("--my", `${Math.round(e.clientY - r.top)}px`);
+  }));
 
   // ---------- Ouverture : « dès … » suit le prix le plus bas lu sur la boutique (mis à jour par boutique.js) ----------
   const prixMin = document.querySelectorAll(".prix-min");   // ouverture et dernier écran
