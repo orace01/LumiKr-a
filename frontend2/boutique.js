@@ -176,7 +176,16 @@
       panneau.querySelector(".panier__panel").style.transform = "";
     }, reduit ? 0 : 280);
   }
-  document.getElementById("barrePanierBouton").addEventListener("click", ouvrirPanneau);
+  const barreBouton = document.getElementById("barrePanierBouton");
+  barreBouton.addEventListener("click", () => { if (!panneau.open) ouvrirPanneau(); });
+  // Tirer la barre vers le haut ouvre aussi le panneau (vidéo épicerie).
+  let tire = null;
+  barreBouton.addEventListener("pointerdown", (evenement) => { tire = evenement.clientY; });
+  barreBouton.addEventListener("pointermove", (evenement) => {
+    if (tire !== null && tire - evenement.clientY > 40) { tire = null; ouvrirPanneau(); }
+  });
+  barreBouton.addEventListener("pointerup", () => { tire = null; });
+  barreBouton.addEventListener("pointercancel", () => { tire = null; });
   document.getElementById("panierFermer").addEventListener("click", fermerPanneau);
   panneau.addEventListener("cancel", (evenement) => { evenement.preventDefault(); fermerPanneau(); });
   panneau.addEventListener("click", (evenement) => { if (evenement.target === panneau) fermerPanneau(); });

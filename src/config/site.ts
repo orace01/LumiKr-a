@@ -68,8 +68,7 @@ export const site = {
   // toutes les pages du site.
   nav: [
     { label: 'Usages', href: '/#usages' },
-    { label: 'Formats', href: '/#formats' },
-    { label: 'Dans la boîte', href: '/#boite' },
+    { label: 'Votre format', href: '/#formats' },
     { label: 'Questions', href: '/#questions' },
   ],
   // La boutique : grille des formats, puis fiche de chacun (docs/plan-page-produit.md).

@@ -59,6 +59,3 @@ export function navigate(to: string, options: { replace?: boolean; transition?: 
   if (options.transition) withTransition(update)
   else update()
 }
-
-/** Vrai pour les adresses de la boutique, où les changements de page sont animés. */
-export const isShopPath = (pathname: string) => pathname === '/boutique' || pathname.startsWith('/boutique/')

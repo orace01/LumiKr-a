@@ -13,3 +13,13 @@
   font-weight: 700;
   pointer-events: none;
 }
+
+/* Téléphone : posée en bas de page, sous le pied de page, pour ne jamais couvrir le contenu ni la barre panier. */
+@media (max-width: 899px) {
+  .demo-banner {
+    position: static;
+    display: block;
+    width: fit-content;
+    margin: 0 auto 1rem;
+  }
+}

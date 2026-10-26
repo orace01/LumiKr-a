@@ -13,7 +13,7 @@ import { LegalPage, NotFoundPage } from './pages/LegalPage'
 import { ProductPage } from './pages/ProductPage'
 import { ShopPage } from './pages/ShopPage'
 import { TrackingPage } from './pages/TrackingPage'
-import { isShopPath, useLocation } from './router'
+import { useLocation } from './router'
 import { CartProvider } from './shop/CartProvider'
 import { ShopProvider } from './shop/ShopProvider'
 
@@ -71,7 +71,7 @@ function Shell() {
         {route.page}
       </main>
       {route.chrome !== 'checkout' && <Footer />}
-      {route.chrome !== 'checkout' && <CartBar always={isShopPath(pathname)} />}
+      {route.chrome !== 'checkout' && <CartBar />}
       <CartDrawer />
       <Toast />
       <DemoBanner />

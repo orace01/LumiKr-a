@@ -235,21 +235,27 @@ a { color: inherit; }
 /* ---------- Votre format : collage des quatre formats (inspiration « Gallery ») ----------
    Un grand cadre arrondi ; au centre le 20 × 20 (station de la boule), autour le 12 × 12, le 15 × 15 et le 30 × 20,
    un peu de travers (--r) ; chaque photo mène à sa fiche. Téléphone : collage empilé sur deux colonnes. */
-.formats-cadre { position: relative; overflow: hidden; padding: 9svh 18px 7svh; border: 1px solid rgba(244, 239, 230, .1); border-radius: 28px; text-align: center;
+.formats-cadre { position: relative; overflow: clip; padding: 9svh 18px 7svh; border: 1px solid rgba(244, 239, 230, .1); border-radius: 28px;
   background: radial-gradient(70% 45% at 50% 38%, rgba(255, 210, 63, .1), rgba(255, 210, 63, 0) 70%), linear-gradient(180deg, #1d2042, #141530); }
 .formats-motif { position: absolute; width: 120px; fill: none; stroke: rgba(255, 210, 63, .14); stroke-width: 1; pointer-events: none; }
 .formats-motif--haut { top: -30px; right: -30px; }
 .formats-motif--bas { bottom: -30px; left: -30px; }
-.formats-titre { margin-bottom: 3.5svh; }
-.formats-titre .script { margin-left: auto; margin-right: auto; }
-.boite-pilule { display: inline-flex; flex-direction: column; align-items: center; gap: 10px; max-width: 100%; padding: 12px 16px; border: 1px solid rgba(244, 239, 230, .18); border-radius: 22px;
+/* Téléphone : tout en colonne ; la galerie s'intercale entre « Dans la boîte » et le bouton. */
+.formats-cadre { display: flex; flex-direction: column; align-items: flex-start; }
+.formats-texte { display: contents; }
+.formats-titre { order: 1; } .formats-lede { order: 2; } .boite-pilule { order: 3; } .collage { order: 4; align-self: stretch; }
+.formats-pastilles { order: 5; } .formats-actions { order: 6; }
+.formats-titre { margin-bottom: 3svh; }
+.formats-lede { max-width: 42ch; margin: 0 0 3.5svh; font: 400 clamp(16px, 4.3vw, 19px)/1.5 var(--caps); color: var(--texte); }
+.boite-pilule { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 10px; max-width: 100%; padding: 12px 16px; border: 1px solid rgba(244, 239, 230, .18); border-radius: 22px;
   background: rgba(15, 16, 36, .55); scroll-margin-top: 96px; }
 .boite-pilule__titre { font: 700 11px/1 var(--caps); letter-spacing: .16em; text-transform: uppercase; color: var(--halo); }
-.boite-pilule ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin: 0; padding: 0; list-style: none; }
+.boite-pilule ul { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px 16px; margin: 0; padding: 0; list-style: none; }
 .boite-pilule li { display: inline-flex; align-items: center; gap: 6px; font: 500 14px/1.2 var(--caps); color: var(--ivoire); }
 .boite-pilule svg { flex: none; color: var(--halo); }
 
-.collage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 5svh 0 4svh; text-align: left; }
+/* Téléphone : galerie verticale, une photo sous l’autre, légèrement décalées et inclinées. */
+.collage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; margin: 5svh 0 4svh; }
 .collage__carte { --r: 0deg; position: relative; display: block; color: var(--ivoire); text-decoration: none;
   opacity: 0; transform: translateY(28px) rotate(var(--r)) scale(.96);
   transition: opacity .7s ease calc(var(--i, 0) * 120ms), transform .8s cubic-bezier(.22, 1, .36, 1) calc(var(--i, 0) * 120ms), box-shadow .3s ease; }
@@ -258,11 +264,11 @@ a { color: inherit; }
   background: rgba(15, 16, 36, .82); font: 400 12px/1 var(--caps); white-space: nowrap; backdrop-filter: blur(6px); }
 .collage__legende b { font-weight: 700; }
 .collage__legende span { color: var(--halo); font-variant-numeric: tabular-nums; }
-.collage__carte--centre { grid-column: 1 / -1; --r: -1deg; }
-.collage__carte--petit { --r: -4deg; margin-top: -18px; z-index: 1; }
-.collage__carte--moyen { --r: 3deg; margin-top: 18px; z-index: 1; }
-.collage__carte--large { grid-column: 1 / -1; --r: 1.5deg; }
-.collage__support { grid-column: 1 / -1; justify-self: center; width: 72%; margin: 6px 0 0; text-align: center;
+.collage__carte--centre { --r: -1deg; }
+.collage__carte--petit { --r: -3deg; width: 84%; justify-self: start; }
+.collage__carte--moyen { --r: 3deg; width: 84%; justify-self: end; }
+.collage__carte--large { --r: 1.5deg; }
+.collage__support { justify-self: center; width: 72%; margin: 6px 0 0; text-align: center;
   opacity: 0; transform: translateY(28px) rotate(-2deg); transition: opacity .7s ease .5s, transform .8s cubic-bezier(.22, 1, .36, 1) .5s; }
 .collage__support img { width: 100%; height: auto; border-radius: 14px; }
 .collage__support figcaption { margin-top: 8px; font: 400 13px/1.4 var(--caps); color: rgba(244, 239, 230, .65); }
@@ -274,9 +280,9 @@ a { color: inherit; }
 /* La boule allume la photo centrale à son passage. */
 .collage__carte--centre.is-allumee img { box-shadow: 0 0 0 2px rgba(255, 210, 63, .55), 0 0 60px rgba(255, 200, 60, .35), 0 18px 40px rgba(5, 5, 15, .45); }
 
-.formats-pastilles { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 4svh; padding: 0; list-style: none; }
+.formats-pastilles { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 8px; margin: 3svh 0 4svh; padding: 0; list-style: none; }
 .formats-pastilles li { padding: 7px 14px; border: 1px solid rgba(244, 239, 230, .16); border-radius: 999px; font: 500 13px/1 var(--caps); color: var(--texte); }
-.formats-note { margin: 1.6em auto 0; max-width: 46ch; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
+.formats-note { margin: 1.6em 0 0; max-width: 46ch; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
 
 /* Questions : la réponse s'écrit mot à mot en néon, dans la couleur de feutre de la question (--pen). */
 .q-corps { display: grid; gap: 5svh; }
@@ -402,18 +408,20 @@ a { color: inherit; }
   .pos-4 .sub { left: auto; right: 0; top: 68svh; width: 30vw; text-align: right; }
   .formats { padding-top: 16svh; }
   /* Votre format, ordinateur : collage libre comme « Gallery » ; le 20 × 20 au centre, les autres le chevauchent. */
-  .formats-cadre { padding: 9svh 4vw 7svh; border-radius: 40px; }
+  /* Votre format, ordinateur : texte à gauche, collé sous le titre pendant que la galerie défile à droite. */
+  .formats-cadre { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); column-gap: 5vw; align-items: start; padding: 10svh 5vw 8svh; border-radius: 40px; }
+  .formats-texte { display: block; position: sticky; top: calc(var(--entete) + 4svh); }
   .formats-motif { width: 200px; }
   .formats-titre .caps { font-size: min(6.4vw, 12svh); }
   .formats-titre .script { font-size: min(8.4vw, 15svh); }
-  .boite-pilule { flex-direction: row; gap: 18px; padding: 12px 22px; border-radius: 999px; }
-  .collage { position: relative; display: block; max-width: 1100px; aspect-ratio: 16 / 8.6; margin: 5svh auto 4svh; }
-  .collage__carte, .collage__support { position: absolute; margin: 0; }
-  .collage__carte--centre { left: 27%; top: 6%; width: 46%; z-index: 1; }
-  .collage__carte--petit { left: 3%; top: 3%; width: 27%; z-index: 2; }
-  .collage__carte--moyen { right: 1%; top: 0; width: 29%; z-index: 2; }
-  .collage__carte--large { right: 4%; bottom: 0; width: 36%; z-index: 2; }
-  .collage__support { left: 6%; bottom: 2%; width: 23%; z-index: 2; text-align: left; }
+  .formats-lede { font-size: clamp(17px, 1.35vw, 20px); }
+  .boite-pilule { padding: 14px 20px; }
+  /* Galerie en mosaïque : le 20 × 20 en grand, le 12 × 12 et le 15 × 15 côte à côte, le 30 × 20 en large, puis le support. */
+  .collage { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin: 0; }
+  .collage__carte--centre, .collage__carte--large { grid-column: 1 / -1; }
+  .collage__carte--petit, .collage__carte--moyen { width: auto; justify-self: stretch; }
+  .collage__carte--petit { margin-top: 28px; }
+  .collage__support { grid-column: 1 / -1; width: 60%; }
   .collage__legende { font-size: 14px; }
 }
 

@@ -72,8 +72,9 @@
   backdrop-filter: blur(14px) saturate(1.4);
   transition: background-color 0.3s, box-shadow 0.3s, backdrop-filter 0.3s;
 }
-/* Page défilée : l'en-tête s'efface, seuls le logo, le menu et les boutons restent. */
-.header--transparent { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* Page défilée : l'en-tête devient transparent, en verre dépoli : ce qui passe dessous est flouté,
+   pour que le texte de la page ne se mêle jamais au logo et au menu (même règle que src/components/Header.css). */
+.header--transparent { background: rgb(15 16 36 / 0.3); box-shadow: none; -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5); }
 .header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; height: var(--header-height); }
 .header__brand { display: inline-flex; align-items: center; text-decoration: none; }
 .header__logo { width: auto; height: 2.25rem; }

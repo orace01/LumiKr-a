@@ -31,8 +31,7 @@
     <nav class="header__nav" aria-label="Sections de la page d’accueil">
       <ul>
         <li><a href="#usages">Usages</a></li>
-        <li><a href="#formats">Formats</a></li>
-        <li><a href="#boite">Dans la boîte</a></li>
+        <li><a href="#formats">Votre format</a></li>
         <li><a href="#questions">Questions</a></li>
       </ul>
     </nav>
@@ -47,8 +46,7 @@
       <nav class="header__menu" id="menu-mobile" aria-label="Menu" hidden>
         <ul>
           <li><a href="#usages">Usages</a></li>
-          <li><a href="#formats">Formats</a></li>
-          <li><a href="#boite">Dans la boîte</a></li>
+          <li><a href="#formats">Votre format</a></li>
           <li><a href="#questions">Questions</a></li>
           <li><a href="/commande">Panier<span class="header__menu-count" id="menuNombre" hidden></span></a></li>
           <li><a href="/suivi">Suivre ma commande</a></li>
@@ -211,7 +209,10 @@
     <div class="formats-cadre">
       <svg class="formats-motif formats-motif--haut" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L96 50 L50 96 L4 50 Z M50 24 L76 50 L50 76 L24 50 Z"/></svg>
       <svg class="formats-motif formats-motif--bas" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L96 50 L50 96 L4 50 Z M50 24 L76 50 L50 76 L24 50 Z"/></svg>
+      <!-- Ordinateur : ce texte reste collé sous le titre pendant que la galerie défile à droite. -->
+      <div class="formats-texte">
       <h2 class="bloc-titre formats-titre" id="formats-titre" data-ecrit><span class="caps">Votre</span><span class="script">format.</span></h2>
+      <p class="formats-lede">Quatre tailles, une même lumière : une plaque en acrylique transparent posée sur sa base LED. Du 12 × 12 cm, discret sur un bureau ou une table de chevet, au 30 × 20 cm en paysage pour les grands dessins et les longs messages. Touchez une photo pour découvrir le format.</p>
       <div class="boite-pilule" id="boite">
         <span class="boite-pilule__titre">Dans la boîte</span>
         <ul>
@@ -220,6 +221,17 @@
           <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 20l6-14 6 14M9 14h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Support réglable</li>
           <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M15 4l5 5L9 20H4v-5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>1 feutre</li>
         </ul>
+      </div>
+      <ul class="formats-pastilles">
+        <li>Acrylique transparent</li>
+        <li>Éclairé par LED</li>
+        <li>Branchement USB</li>
+        <li>Effaçable à sec</li>
+      </ul>
+      <div class="formats-actions">
+        <a class="btn-or formats-cta" href="/boutique">Voir les 4 formats</a>
+        <p class="formats-note" id="formatsNote">Prix TTC · livraison offerte en France métropolitaine, en 10 jours ouvrés.</p>
+      </div>
       </div>
       <div class="collage">
         <a class="collage__carte collage__carte--centre" href="/boutique/20x20" style="--i: 0" data-station>
@@ -243,14 +255,6 @@
           <figcaption>Le support tient aussi une tablette ou un téléphone.</figcaption>
         </figure>
       </div>
-      <ul class="formats-pastilles">
-        <li>Acrylique transparent</li>
-        <li>Éclairé par LED</li>
-        <li>Branchement USB</li>
-        <li>Effaçable à sec</li>
-      </ul>
-      <a class="btn-or formats-cta" href="/boutique">Voir les 4 formats</a>
-      <p class="formats-note" id="formatsNote">Prix TTC · livraison offerte en France métropolitaine, en 10 jours ouvrés.</p>
     </div>
   </section>
 
@@ -302,8 +306,7 @@
         <h2 class="footer__title">L’accueil</h2>
         <ul class="footer__links">
           <li><a href="#usages">Usages</a></li>
-          <li><a href="#formats">Formats</a></li>
-          <li><a href="#boite">Dans la boîte</a></li>
+          <li><a href="#formats">Votre format</a></li>
           <li><a href="#questions">Questions</a></li>
           <li><a href="/suivi">Suivre ma commande</a></li>
         </ul>
@@ -330,6 +333,7 @@
      CartDrawer.tsx). Remplis par boutique.js. -->
 <div class="cart-bar" id="barrePanier" aria-hidden="true" inert>
   <button type="button" class="cart-bar__button" id="barrePanierBouton" aria-label="Panier, vide">
+    <span class="cart-bar__grip" aria-hidden="true"></span>
     <span class="cart-bar__label">Panier</span>
     <span class="cart-bar__thumbs" id="barreMiniatures"></span>
     <span class="cart-bar__count" id="barreNombre">0</span>
