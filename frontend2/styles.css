@@ -147,9 +147,10 @@ a { color: inherit; }
 .is-ouvert .o-cta, .is-ouvert .o-prix, .is-ouvert .o-decouvrir, .is-ouvert .o-defiler { opacity: 1; }
 .is-ouvert .o-cta .cta-trait path { stroke-dashoffset: 0; }
 /* Composition « Pear makes you appear » : texte aligné à gauche, la photo reste dégagée.
-   Téléphone : le bloc (titre → boutons) est centré verticalement dans l'espace visible sous l'en-tête
-   (padding-top = --entete, padding-bottom = barres du navigateur seulement), sur un voile qui monte depuis le bas. */
-.ouverture { align-items: flex-start; justify-content: center; text-align: left; padding-bottom: var(--barres, 0px); }
+   Téléphone : le bloc (titre → boutons) est centré verticalement entre l'en-tête et « Faites défiler »
+   (padding-top = --entete ; padding-bottom = barres du navigateur + hauteur de l'indicateur), sur un voile qui monte depuis le bas. */
+.ouverture { align-items: flex-start; justify-content: center; text-align: left;
+  padding-bottom: calc(var(--barres, 0px) + env(safe-area-inset-bottom, 0px) + 4svh + 72px); }
 .ouverture::before { background: linear-gradient(to top, rgba(8, 7, 14, .85) 0%, rgba(8, 7, 14, .6) 45%, rgba(8, 7, 14, 0) 85%); }
 /* Téléphone : titre imposant, « DESSINEZ » presque sur toute la largeur, « dans la lumière. » dessous. */
 .o-titre .caps { font-size: 17vw; letter-spacing: -.055em; line-height: .82; }
