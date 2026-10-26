@@ -249,16 +249,21 @@
   }
 }
 
+/* Bouton compact : il guide vers la boutique sans écraser l'en-tête. */
 .header__cta {
+  min-height: 2.4rem;
+  padding: 0.35rem 1rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.07em;
   white-space: nowrap;
 }
 
 @media (max-width: 520px) {
   .header__cta {
-    min-height: 2.5rem;
-    padding: 0.4rem 0.85rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.06em;
+    min-height: 2.15rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
   }
 }
 
