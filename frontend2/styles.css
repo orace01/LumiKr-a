@@ -147,11 +147,12 @@ a { color: inherit; }
 .is-ouvert .o-cta, .is-ouvert .o-prix, .is-ouvert .o-decouvrir, .is-ouvert .o-defiler { opacity: 1; }
 .is-ouvert .o-cta .cta-trait path { stroke-dashoffset: 0; }
 /* Composition « Pear makes you appear » : texte aligné à gauche, la photo reste dégagée.
-   Téléphone : le bloc se pose en bas de l'écran, sur un voile qui monte depuis le bas. */
-.ouverture { align-items: flex-start; justify-content: flex-end; text-align: left; padding-bottom: calc(var(--barres, 0px) + 17svh); }
-.ouverture::before { background: linear-gradient(to top, rgba(8, 7, 14, .85) 0%, rgba(8, 7, 14, .55) 42%, rgba(8, 7, 14, 0) 75%); }
-/* Téléphone : titre imposant, « DESSINEZ » sur toute la largeur, « dans la lumière. » dessous. */
-.o-titre .caps { font-size: 18.6vw; letter-spacing: -.055em; line-height: .82; }
+   Téléphone : le bloc (titre → boutons) est centré verticalement dans l'espace visible sous l'en-tête
+   (padding-top = --entete, padding-bottom = barres du navigateur seulement), sur un voile qui monte depuis le bas. */
+.ouverture { align-items: flex-start; justify-content: center; text-align: left; padding-bottom: var(--barres, 0px); }
+.ouverture::before { background: linear-gradient(to top, rgba(8, 7, 14, .85) 0%, rgba(8, 7, 14, .6) 45%, rgba(8, 7, 14, 0) 85%); }
+/* Téléphone : titre imposant, « DESSINEZ » presque sur toute la largeur, « dans la lumière. » dessous. */
+.o-titre .caps { font-size: 17vw; letter-spacing: -.055em; line-height: .82; }
 .o-titre .script { margin: .02em 0 0 .08em; font-size: 13.6vw; transform-origin: 0 60%; }
 .o-sous { margin: 1svh 0 0; max-width: 32ch; }
 .o-actions { flex-direction: row; align-items: center; gap: 24px; }
