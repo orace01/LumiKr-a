@@ -1,0 +1,191 @@
+/* Barre panier et panneau du panier sur l'accueil (téléphone) : copie de src/components/CartBar.css et de la
+   version téléphone de CartDrawer.css. À modifier en même temps que ces fichiers. */
+.cart-bar, .panier {
+  --ink: #f4efe6;
+  --ink-soft: #bcb7c6;
+  --border: rgba(244, 239, 230, 0.24);
+  --paper: #1f2140;
+  --glow: #ffd23f;
+  --on-primary: #17182d;
+  --font-display: "Onest", "Arial Narrow", system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cart-bar { display: none; }
+@keyframes thumb-in { from { transform: scale(0); } }
+@keyframes cart-bump { 40% { transform: scale(1.45); } }
+@keyframes sheet-in { from { transform: translateY(100%); } }
+@keyframes sheet-out { to { transform: translateY(100%); } }
+
+@media (max-width: 899px) {
+  .cart-bar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 45;
+    display: block;
+    padding: 0 0.75rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+    background: #05050c;
+    transform: translateY(110%);
+    transition: transform 0.5s var(--ease-out);
+  }
+  /* Coins arrondis du bas de la page, posés sur la barre noire : deux angles noirs découpés en quart de
+     cercle, transparents au centre, pour aller avec n'importe quel fond de page. */
+  .cart-bar::before {
+    content: "";
+    position: absolute;
+    inset: -1.5rem 0 auto;
+    height: 1.5rem;
+    background:
+      radial-gradient(circle at 100% 0, transparent 1.5rem, #05050c 1.5rem) left / 1.5rem 1.5rem no-repeat,
+      radial-gradient(circle at 0 0, transparent 1.5rem, #05050c 1.5rem) right / 1.5rem 1.5rem no-repeat;
+    pointer-events: none;
+  }
+  .cart-bar.is-visible { transform: none; }
+  body:has(.cart-bar.is-visible) { padding-bottom: 5.5rem; }
+  .cart-bar__button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 4rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border: 0;
+    background: none;
+    color: #fff;
+    font-family: var(--font-display);
+    cursor: pointer;
+  }
+  .cart-bar__label { font-size: 1.2rem; font-weight: 700; }
+  .cart-bar__thumbs { display: flex; flex: 1; align-items: center; min-height: 2.5rem; }
+  .cart-bar__thumb {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: -0.6rem;
+    border: 2px solid #05050c;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #fff;
+    animation: thumb-in 0.45s var(--ease-bounce) both;
+  }
+  .cart-bar__more { margin-left: 0.9rem; font-size: 0.875rem; color: var(--ink-soft); }
+  .cart-bar__count {
+    display: grid;
+    place-items: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.6rem;
+    border-radius: 999px;
+    background: var(--glow);
+    color: var(--on-primary);
+    font-weight: 700;
+  }
+  .cart-bar__count.is-bumping { animation: cart-bump 0.5s var(--ease-bounce); }
+}
+
+/* Panneau du panier : noir, monte depuis le bas. */
+.panier {
+  position: fixed;
+  inset: auto 0 0;
+  width: 100%;
+  max-width: none;
+  max-height: 85dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 1.75rem 1.75rem 0 0;
+  background: #05050c;
+  color: var(--ink);
+  font-family: var(--font-display);
+}
+.panier::backdrop { background: rgb(22 15 58 / 0.55); }
+.panier[open] { animation: sheet-in 0.5s var(--ease-out); }
+.panier.is-closing { animation: sheet-out 0.28s var(--ease-out) forwards; }
+html:has(.panier[open]) { overflow: hidden; }
+.panier__panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 85dvh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  transition: transform 0.25s var(--ease-out);
+}
+.panier__poignee {
+  align-self: center;
+  flex: none;
+  width: 3rem;
+  height: 0.35rem;
+  margin: 0.65rem 0 0.15rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.35);
+  touch-action: none;
+  cursor: grab;
+}
+.panier__poignee::before { content: ""; display: block; height: 2.75rem; margin: -1.2rem -2rem 0; }
+.panier__entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+}
+.panier__titre { margin: 0; font-size: 1.6rem; font-weight: 800; }
+.panier__compte { font-weight: 500; color: var(--ink-soft); }
+.panier__fermer {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+.panier__lignes { display: grid; gap: 0.9rem; margin: 0; padding: 1.25rem; overflow-y: auto; list-style: none; }
+.panier__vide { color: var(--ink-soft); text-align: center; }
+.panier__ligne {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: start;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+.panier__miniature { width: 4.5rem; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 0.75rem; }
+.panier__nom { margin: 0; font-weight: 600; line-height: 1.25; }
+.panier__actions { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
+.panier__quantite { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 999px; }
+.panier__quantite button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.panier__quantite button:disabled { opacity: 0.3; cursor: not-allowed; }
+.panier__quantite output { min-width: 1.4rem; text-align: center; font-weight: 600; }
+.panier__retirer {
+  min-height: 2.75rem;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.panier__prix { margin: 0; font-weight: 600; white-space: nowrap; }
+.panier__pied { display: grid; gap: 0.6rem; padding: 1.25rem; border-top: 1px solid rgb(255 255 255 / 0.1); }
+.panier__total { display: flex; justify-content: space-between; align-items: baseline; margin: 0; font-weight: 700; }
+.panier__total-valeur { font-size: 1.75rem; }
+.panier__note { margin: 0; font-size: 0.875rem; color: var(--ink-soft); }
+.panier__commander { width: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-bar, .cart-bar__thumb, .cart-bar__count.is-bumping, .panier[open], .panier.is-closing { transition: none; animation: none; }
+}

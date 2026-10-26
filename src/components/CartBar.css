@@ -1,0 +1,119 @@
+/* Barre panier du téléphone (vidéo épicerie) : noire, collée en bas ; la page repose dessus. */
+.cart-bar {
+  display: none;
+}
+
+/* Une miniature s'ajoute en grossissant. */
+@keyframes thumb-in {
+  from {
+    transform: scale(0);
+  }
+}
+
+@media (max-width: 899px) {
+  .cart-bar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 45;
+    display: block;
+    padding: 0 0.75rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+    background: #05050c;
+    transform: translateY(110%);
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  /* Coins arrondis du bas de la page, posés sur la barre noire : deux angles noirs découpés en quart de
+     cercle, transparents au centre, pour aller avec n'importe quel fond de page. */
+  .cart-bar::before {
+    content: '';
+    position: absolute;
+    inset: -1.5rem 0 auto;
+    height: 1.5rem;
+    background:
+      radial-gradient(circle at 100% 0, transparent 1.5rem, #05050c 1.5rem) left / 1.5rem 1.5rem no-repeat,
+      radial-gradient(circle at 0 0, transparent 1.5rem, #05050c 1.5rem) right / 1.5rem 1.5rem no-repeat;
+    pointer-events: none;
+  }
+
+  /* Elle monte depuis le bas au premier article. */
+  .cart-bar.is-visible {
+    transform: none;
+  }
+
+  /* La page laisse la place à la barre ; la pastille « Mode démo » passe au-dessus. */
+  body:has(.cart-bar.is-visible) {
+    padding-bottom: 5.5rem;
+  }
+
+  body:has(.cart-bar.is-visible) .toast-zone {
+    bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  body:has(.cart-bar.is-visible) .demo-banner {
+    bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .cart-bar__button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 4rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border: 0;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .cart-bar__label {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .cart-bar__thumbs {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    min-height: 2.5rem;
+  }
+
+  .cart-bar__thumb {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: -0.6rem;
+    border: 2px solid #05050c;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #fff;
+    animation: thumb-in 0.45s var(--ease-bounce) both;
+  }
+
+  .cart-bar__more {
+    margin-left: 0.9rem;
+    font-size: var(--step--1);
+    color: #bcb7c6;
+  }
+
+  .cart-bar__count {
+    display: grid;
+    place-items: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.6rem;
+    border-radius: 999px;
+    background: var(--glow);
+    color: var(--on-primary);
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 899px) and (prefers-reduced-motion: reduce) {
+  .cart-bar,
+  .cart-bar__thumb {
+    transition: none;
+    animation: none;
+  }
+}

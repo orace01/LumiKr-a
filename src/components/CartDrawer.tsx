@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { product } from '../config/product'
 import { Link } from './Link'
 import { useCart } from '../shop/useCart'
@@ -7,21 +7,64 @@ import { QuantityStepper } from './QuantityStepper'
 import { VARIANT_PHOTOS } from './variantPhotos'
 import './CartDrawer.css'
 
+// Durée de l'animation de fermeture (CartDrawer.css, `cart-out` et `sheet-out`).
+const CLOSE_MS = 280
+// Glissé vers le bas au-delà duquel le panneau du téléphone se ferme.
+const DRAG_CLOSE_PX = 90
+
 /**
- * Panier en panneau latéral. Une boîte de dialogue native (<dialog>) gère le
+ * Panier : panneau latéral sur ordinateur, panneau qui monte depuis le bas sur
+ * téléphone (vidéo épicerie). Une boîte de dialogue native (<dialog>) gère le
  * piège du focus, la touche Échap et l'arrière-plan inerte.
  */
 export function CartDrawer() {
   const cart = useCart()
   const { info, money, priceOf, saleOpen, status } = useShop()
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [closing, setClosing] = useState(false)
+  const drag = useRef<{ startY: number; dy: number } | null>(null)
 
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
-    if (cart.isOpen && !dialog.open) dialog.showModal()
-    if (!cart.isOpen && dialog.open) dialog.close()
+    if (cart.isOpen && !dialog.open) {
+      setClosing(false)
+      dialog.showModal()
+    }
+    if (!cart.isOpen && dialog.open) {
+      // Le panneau glisse avant de disparaître.
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      setClosing(true)
+      const timer = window.setTimeout(
+        () => {
+          dialog.close()
+          setClosing(false)
+          if (panelRef.current) panelRef.current.style.transform = ''
+        },
+        reduced ? 0 : CLOSE_MS,
+      )
+      return () => window.clearTimeout(timer)
+    }
   }, [cart.isOpen])
+
+  // Téléphone : on peut tirer le panneau vers le bas pour le fermer.
+  const onDragStart = (event: PointerEvent<HTMLElement>) => {
+    drag.current = { startY: event.clientY, dy: 0 }
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+  const onDragMove = (event: PointerEvent<HTMLElement>) => {
+    if (!drag.current || !panelRef.current) return
+    drag.current.dy = Math.max(0, event.clientY - drag.current.startY)
+    panelRef.current.style.transform = `translateY(${drag.current.dy}px)`
+  }
+  const onDragEnd = () => {
+    if (!drag.current || !panelRef.current) return
+    const { dy } = drag.current
+    drag.current = null
+    if (dy > DRAG_CLOSE_PX) cart.close()
+    else panelRef.current.style.transform = ''
+  }
 
   const lines = cart.lines.flatMap((line) => {
     const variant = product.variants.find((candidate) => candidate.id === line.variantId)
@@ -34,13 +77,26 @@ export function CartDrawer() {
   return (
     <dialog
       ref={dialogRef}
-      className="cart"
+      className={closing ? 'cart is-closing' : 'cart'}
       aria-labelledby="cart-title"
       onClose={cart.close}
+      // Échap : fermeture animée plutôt qu'immédiate.
+      onCancel={(event) => {
+        event.preventDefault()
+        cart.close()
+      }}
       // Un clic sur le fond assombri (hors du panneau) ferme le panier.
       onClick={(event) => event.target === event.currentTarget && cart.close()}
     >
-      <div className="cart__panel">
+      <div className="cart__panel" ref={panelRef}>
+        <span
+          className="cart__handle"
+          aria-hidden="true"
+          onPointerDown={onDragStart}
+          onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}
+          onPointerCancel={onDragEnd}
+        />
         <header className="cart__header">
           <h2 id="cart-title" className="cart__title">
             Votre panier {cart.count > 0 && <span className="cart__count">({cart.count})</span>}
@@ -55,8 +111,8 @@ export function CartDrawer() {
         {lines.length === 0 ? (
           <div className="cart__empty">
             <p>Votre panier est vide.</p>
-            <Link to="/#formats" className="btn btn--primary" onClick={cart.close}>
-              Choisir un format
+            <Link to="/boutique" transition className="btn btn--primary" onClick={cart.close}>
+              Voir la boutique
             </Link>
           </div>
         ) : (

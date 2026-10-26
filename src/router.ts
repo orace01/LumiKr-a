@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { flushSync } from 'react-dom'
 
 // Navigation entre les pages du site sans bibliothèque : l'adresse est lue dans
 // window.location et mise à jour avec l'API History. Le serveur renvoie
@@ -29,14 +30,35 @@ export function scrollToHash(hash: string) {
   requestAnimationFrame(() => document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView())
 }
 
-export function navigate(to: string, options: { replace?: boolean } = {}) {
+// Les pages de la boutique passent de l'une à l'autre avec une transition de vue
+// (la photo d'une carte s'agrandit jusqu'à la fiche) quand le navigateur sait le faire.
+export function withTransition(update: () => void) {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduced || !('startViewTransition' in document)) {
+    update()
+    return
+  }
+  const transition = document.startViewTransition(() => flushSync(update))
+  // Onglet caché ou transition interrompue : le navigateur l'annule, la page change quand même.
+  transition.ready.catch(() => {})
+  transition.finished.catch(() => {})
+}
+
+export function navigate(to: string, options: { replace?: boolean; transition?: boolean } = {}) {
   const url = new URL(to, window.location.href)
   if (url.origin !== window.location.origin || url.pathname === '/') {
     window.location.assign(url)
     return
   }
-  window.history[options.replace ? 'replaceState' : 'pushState'](null, '', url)
-  window.dispatchEvent(new Event(NAVIGATE_EVENT))
-  if (url.hash) scrollToHash(url.hash)
-  else window.scrollTo(0, 0)
+  const update = () => {
+    window.history[options.replace ? 'replaceState' : 'pushState'](null, '', url)
+    window.dispatchEvent(new Event(NAVIGATE_EVENT))
+    if (url.hash) scrollToHash(url.hash)
+    else window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+  if (options.transition) withTransition(update)
+  else update()
 }
+
+/** Vrai pour les adresses de la boutique, où les changements de page sont animés. */
+export const isShopPath = (pathname: string) => pathname === '/boutique' || pathname.startsWith('/boutique/')

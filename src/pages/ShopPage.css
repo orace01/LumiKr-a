@@ -1,0 +1,294 @@
+/* Boutique : grille des formats (vidéo épicerie sur téléphone, vidéo KVIST sur ordinateur). */
+
+.shop {
+  padding-block: calc(var(--header-height) + clamp(1.25rem, 3vw, 2.5rem)) var(--section);
+  animation: page-in 0.6s var(--ease-out) both;
+}
+
+/* Arrivée sur une page de la boutique : léger zoom arrière en fondu (vidéo KVIST). */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+.shop__intro {
+  position: relative;
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: clamp(1.25rem, 3vw, 2rem);
+}
+
+.shop__eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+
+.shop__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.3em;
+  font-size: var(--step-4);
+  line-height: 0.95;
+}
+
+.shop__title-caps {
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+}
+
+.shop__title-script {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 1.15em;
+  letter-spacing: 0;
+  color: var(--glow);
+  text-shadow: 0 0 0.5em rgb(255 210 63 / 0.45);
+}
+
+/* Badge circulaire qui tourne (vidéo KVIST). */
+.shop__badge {
+  position: absolute;
+  top: -0.5rem;
+  right: var(--gutter);
+  width: clamp(4.5rem, 9vw, 7rem);
+  fill: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  animation: badge-turn 18s linear infinite;
+}
+
+.shop__badge-star {
+  fill: var(--glow);
+  transform-origin: center;
+  animation: badge-turn 18s linear infinite reverse;
+}
+
+@keyframes badge-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* Filtres : la pastille claire glisse sous le choix actif. */
+.shop__filters {
+  position: relative;
+  display: inline-flex;
+  justify-self: start;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--paper);
+}
+
+.shop__filter-pill {
+  position: absolute;
+  top: 0.3rem;
+  bottom: 0.3rem;
+  left: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  transition:
+    transform 0.4s var(--ease-out),
+    width 0.4s var(--ease-out);
+}
+
+.shop__filter {
+  position: relative;
+  min-height: 2.5rem;
+  padding: 0 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.shop__filter[aria-pressed='true'] {
+  color: var(--night);
+}
+
+/* Grille : deux colonnes sur téléphone, quatre sur ordinateur. */
+.shop__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+@media (min-width: 900px) {
+  .shop__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.shop-card {
+  position: relative;
+  display: grid;
+  gap: 0.15rem;
+  height: 100%;
+  padding: 0.75rem 0.85rem 1rem;
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--tint) 16%, var(--paper));
+  text-decoration: none;
+  animation: card-in 0.6s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 80ms + 120ms);
+  transition:
+    transform 0.25s var(--ease-out),
+    box-shadow 0.25s;
+}
+
+/* Cartes en cascade au premier affichage. */
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+  }
+}
+
+.shop-card:hover {
+  box-shadow: 0 1rem 2.5rem rgb(5 5 15 / 0.35);
+}
+
+/* Au toucher, la carte s'enfonce légèrement (vidéo épicerie). */
+.shop-card:active {
+  transform: scale(0.97);
+}
+
+.shop-card__tag {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(15 16 36 / 0.7);
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+}
+
+.shop-card__media {
+  display: block;
+  margin: 0 -0.35rem 0.6rem;
+  overflow: hidden;
+  border-radius: 1.1rem;
+  aspect-ratio: 4 / 3;
+}
+
+.shop-card__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.shop-card:hover .shop-card__photo {
+  transform: scale(1.06);
+}
+
+.shop-card__price {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  color: var(--glow);
+}
+
+.shop-card__name {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.shop-card__shape {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+/* Bandeau défilant en continu (vidéo KVIST). */
+.shop__ticker {
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+  overflow: hidden;
+  border-block: 1px solid var(--line);
+  padding-block: 1rem;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.shop__ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 28s linear infinite;
+}
+
+.shop__ticker-item {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.shop__ticker-item::after {
+  content: '✦';
+  margin-inline: 1.25rem;
+  color: var(--glow);
+  font-size: 0.7em;
+  vertical-align: middle;
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Apparition en montant quand l'élément arrive à l'écran (useReveal). */
+.reveal {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.7s var(--ease-out),
+    transform 0.7s var(--ease-out);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Transitions de vue : les cartes filtrées glissent à leur nouvelle place. */
+::view-transition-group(*) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop,
+  .shop-card,
+  .shop__badge,
+  .shop__badge-star,
+  .shop__ticker-track {
+    animation: none;
+  }
+
+  .shop__filter-pill,
+  .shop-card,
+  .shop-card__photo {
+    transition: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

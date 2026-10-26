@@ -75,9 +75,6 @@
     fin.classList.toggle("is-lisible", a > 0.4);
   }
 
-  // Lignes de « Dans la boîte » : soulignées l'une après l'autre.
-  document.querySelectorAll(".lignes div").forEach((d, i) => d.style.setProperty("--i", i));
-
   // Positions dans la page mesurées une fois (et quand la mise en page change), jamais à chaque image : lire une
   // position juste après les écritures de styles du hero forcerait le navigateur à recalculer toute la page.
   let vh = innerHeight;
@@ -173,26 +170,20 @@
 
   // ---------- Ouverture : « dès … » suit le prix le plus bas lu sur la boutique (mis à jour par boutique.js) ----------
   const prixMin = document.querySelectorAll(".prix-min");   // ouverture et dernier écran
-  const listeFormats = document.querySelector(".formats-liste");
+  const collage = document.querySelector(".collage");
   const majPrix = () => {
-    const prix = [...listeFormats.querySelectorAll(".f-prix")].map((el) => ({ txt: el.textContent.trim(), n: parseFloat(el.textContent.replace(/[^\d,.]/g, "").replace(",", ".")) }))
+    const prix = [...collage.querySelectorAll("[data-prix-variante]")].map((el) => ({ txt: el.textContent.trim(), n: parseFloat(el.textContent.replace(/[^\d,.]/g, "").replace(",", ".")) }))
       .filter((p) => !isNaN(p.n));
     if (prix.length) { const min = prix.reduce((a, b) => (b.n < a.n ? b : a)).txt; prixMin.forEach((el) => { el.textContent = min; }); }
   };
-  new MutationObserver(majPrix).observe(listeFormats, { subtree: true, childList: true, characterData: true });
+  new MutationObserver(majPrix).observe(collage, { subtree: true, childList: true, characterData: true });
   majPrix();
 
-  // ---------- Formats : le format choisi s'allume sur l'échelle ----------
-  const choisi = document.getElementById("formatChoisi");
-  const plaques = [...document.querySelectorAll(".plaque-f")];
-  const choisir = (input) => {
-    plaques.forEach((r) => r.classList.toggle("is-choisi", r.dataset.f === input.value));
-    choisi.textContent = input.parentElement.querySelector(".f-taille").textContent;
-  };
-  document.querySelectorAll('.formats-liste input').forEach((input) => {
-    input.addEventListener("change", () => choisir(input));
-    if (input.checked) choisir(input);
-  });
+  // ---------- Votre format : les photos du collage entrent en cascade quand la section arrive à l'écran ----------
+  if (reduced || !("IntersectionObserver" in window)) collage.classList.add("is-ouverte");
+  else new IntersectionObserver((entrees, obs) => {
+    if (entrees.some((e) => e.isIntersecting)) { collage.classList.add("is-ouverte"); obs.disconnect(); }
+  }, { rootMargin: "0px 0px -15% 0px" }).observe(collage);
 
   // ---------- Questions ----------
   const QUESTIONS = [

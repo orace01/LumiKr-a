@@ -197,7 +197,7 @@ a { color: inherit; }
 /* ---------- Sections après la tablette : même univers que le hero ----------
    Titres : capitales Onest + mot écrit au feutre lumineux (--s, réglé au scroll par sections.js).
    Chaque [data-station] est allumé (.is-allumee) quand la boule passe par son centre. */
-.usages, .formats, .boite, .questions, .fin { position: relative; z-index: 1; padding: 14svh var(--gutter) 6svh; }
+.usages, .formats, .questions, .fin { position: relative; z-index: 1; padding: 14svh var(--gutter) 6svh; }
 .bloc-titre { margin: 0 0 6svh; font-weight: 400; }
 .bloc-titre .caps { font-size: 11.5vw; }
 .bloc-titre .script { font-size: 15vw; }
@@ -232,46 +232,51 @@ a { color: inherit; }
 .u-texte .sub { max-width: 34ch; margin-top: .8em; }
 
 /* Formats : les quatre plaques à l'échelle d'une feuille A4, tracées par la lumière ; la liste des prix. */
-.formats-intro { max-width: 34ch; margin: -2svh 0 6svh; }
-.formats-corps { display: grid; gap: 5svh; }
-.echelle { margin: 0; }
-.echelle svg { display: block; width: 100%; height: auto; overflow: visible; }
-.echelle rect { fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s ease, fill .5s ease, stroke-width .3s ease; }
-.echelle .a4 { stroke: rgba(244, 239, 230, .35); stroke-width: .08; }
-.echelle .a4-nom { font: 600 1.1px/1 var(--caps); fill: rgba(244, 239, 230, .5); text-anchor: end; letter-spacing: .06px; }
-.echelle .plaque-f { stroke: var(--halo); stroke-width: .12; }
-.echelle .plaque-f.is-choisi { stroke-width: .24; fill: rgba(255, 210, 63, .1); filter: drop-shadow(0 0 .35px rgba(255, 200, 60, .9)); }
-.echelle.is-allumee rect { stroke-dashoffset: 0; }
-.echelle.is-allumee .plaque-f:nth-of-type(3) { transition-delay: .2s, 0s, 0s; }
-.echelle.is-allumee .plaque-f:nth-of-type(4) { transition-delay: .4s, 0s, 0s; }
-.echelle.is-allumee .plaque-f:nth-of-type(5) { transition-delay: .6s, 0s, 0s; }
-.echelle figcaption { margin-top: 1.4em; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
-.formats-liste { margin: 0; padding: 0; border: 0; }
-.formats-liste label { position: relative; display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 14px; padding: 18px 0 18px 22px; border-bottom: 1px solid rgba(244, 239, 230, .14); font: 600 clamp(16px, 4.6vw, 22px)/1 var(--caps); cursor: pointer; color: rgba(244, 239, 230, .7); transition: color .3s ease; }
-.formats-liste input { position: absolute; opacity: 0; pointer-events: none; }
-.formats-liste label::before { content: ""; position: absolute; left: 2px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--halo); box-shadow: 0 0 10px 3px rgba(255, 200, 60, .75); opacity: 0; transform: scale(.3); transition: opacity .3s ease, transform .3s ease; }
-.formats-liste label:has(input:checked) { color: var(--ivoire); }
-.formats-liste label:has(input:checked)::before { opacity: 1; transform: none; }
-.formats-liste label:has(input:focus-visible) { outline: 2px solid var(--halo); outline-offset: 2px; }
-.f-forme { font: 400 13px/1 var(--caps); color: rgba(244, 239, 230, .5); }
-.f-prix { color: var(--halo); font-variant-numeric: tabular-nums; }
-.formats-cta { margin-top: 5svh; }
-.formats-note { margin: 2.2em 0 0; max-width: 46ch; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
+/* ---------- Votre format : collage des quatre formats (inspiration « Gallery ») ----------
+   Un grand cadre arrondi ; au centre le 20 × 20 (station de la boule), autour le 12 × 12, le 15 × 15 et le 30 × 20,
+   un peu de travers (--r) ; chaque photo mène à sa fiche. Téléphone : collage empilé sur deux colonnes. */
+.formats-cadre { position: relative; overflow: hidden; padding: 9svh 18px 7svh; border: 1px solid rgba(244, 239, 230, .1); border-radius: 28px; text-align: center;
+  background: radial-gradient(70% 45% at 50% 38%, rgba(255, 210, 63, .1), rgba(255, 210, 63, 0) 70%), linear-gradient(180deg, #1d2042, #141530); }
+.formats-motif { position: absolute; width: 120px; fill: none; stroke: rgba(255, 210, 63, .14); stroke-width: 1; pointer-events: none; }
+.formats-motif--haut { top: -30px; right: -30px; }
+.formats-motif--bas { bottom: -30px; left: -30px; }
+.formats-titre { margin-bottom: 3.5svh; }
+.formats-titre .script { margin-left: auto; margin-right: auto; }
+.boite-pilule { display: inline-flex; flex-direction: column; align-items: center; gap: 10px; max-width: 100%; padding: 12px 16px; border: 1px solid rgba(244, 239, 230, .18); border-radius: 22px;
+  background: rgba(15, 16, 36, .55); scroll-margin-top: 96px; }
+.boite-pilule__titre { font: 700 11px/1 var(--caps); letter-spacing: .16em; text-transform: uppercase; color: var(--halo); }
+.boite-pilule ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin: 0; padding: 0; list-style: none; }
+.boite-pilule li { display: inline-flex; align-items: center; gap: 6px; font: 500 14px/1.2 var(--caps); color: var(--ivoire); }
+.boite-pilule svg { flex: none; color: var(--halo); }
 
-/* Dans la boîte : les lignes se soulignent au feutre doré, l'une après l'autre (--i). */
-.lignes { margin: 0; }
-.lignes div { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 18px; padding: 15px 0; }
-.lignes div::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: var(--halo); box-shadow: 0 0 8px rgba(255, 200, 60, .8); transform: scaleX(0); transform-origin: 0 50%; transition: transform .7s ease calc(var(--i, 0) * 90ms); }
-.lignes div::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: rgba(244, 239, 230, .12); }
-.boite-corps.is-allumee .lignes div::after { transform: scaleX(1); opacity: .55; }
-.lignes dt { font: 600 clamp(15px, 4.2vw, 19px)/1.25 var(--caps); color: var(--ivoire); }
-.lignes dd { margin: 0; text-align: right; font: 400 clamp(14px, 3.8vw, 17px)/1.3 var(--caps); color: var(--texte); }
-.lignes-titre { margin: 6svh 0 1svh; font: 800 clamp(22px, 6vw, 30px)/1 var(--caps); letter-spacing: -.02em; text-transform: uppercase; color: var(--ivoire); }
-.support { margin: 7svh 0 0; }
-.support ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.support li { display: flex; flex-direction: column; gap: 6px; font: 400 12px/1.2 var(--caps); color: rgba(244, 239, 230, .6); }
-.support img { width: 100%; height: auto; border-radius: 6px; opacity: .85; }
-.support figcaption { margin-top: 1.2em; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
+.collage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 5svh 0 4svh; text-align: left; }
+.collage__carte { --r: 0deg; position: relative; display: block; color: var(--ivoire); text-decoration: none;
+  opacity: 0; transform: translateY(28px) rotate(var(--r)) scale(.96);
+  transition: opacity .7s ease calc(var(--i, 0) * 120ms), transform .8s cubic-bezier(.22, 1, .36, 1) calc(var(--i, 0) * 120ms), box-shadow .3s ease; }
+.collage__carte img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 18px; box-shadow: 0 18px 40px rgba(5, 5, 15, .45); }
+.collage__legende { position: absolute; left: 8px; bottom: 8px; display: inline-flex; gap: 6px; align-items: baseline; padding: 6px 10px; border-radius: 999px;
+  background: rgba(15, 16, 36, .82); font: 400 12px/1 var(--caps); white-space: nowrap; backdrop-filter: blur(6px); }
+.collage__legende b { font-weight: 700; }
+.collage__legende span { color: var(--halo); font-variant-numeric: tabular-nums; }
+.collage__carte--centre { grid-column: 1 / -1; --r: -1deg; }
+.collage__carte--petit { --r: -4deg; margin-top: -18px; z-index: 1; }
+.collage__carte--moyen { --r: 3deg; margin-top: 18px; z-index: 1; }
+.collage__carte--large { grid-column: 1 / -1; --r: 1.5deg; }
+.collage__support { grid-column: 1 / -1; justify-self: center; width: 72%; margin: 6px 0 0; text-align: center;
+  opacity: 0; transform: translateY(28px) rotate(-2deg); transition: opacity .7s ease .5s, transform .8s cubic-bezier(.22, 1, .36, 1) .5s; }
+.collage__support img { width: 100%; height: auto; border-radius: 14px; }
+.collage__support figcaption { margin-top: 8px; font: 400 13px/1.4 var(--caps); color: rgba(244, 239, 230, .65); }
+/* Les photos entrent en cascade quand la section arrive à l'écran (sections.js). */
+.collage.is-ouverte .collage__carte { opacity: 1; transform: rotate(var(--r)); }
+.collage.is-ouverte .collage__support { opacity: 1; transform: rotate(-2deg); }
+.collage.is-ouverte .collage__carte:hover, .collage__carte:focus-visible { transform: translateY(-6px) rotate(0deg) scale(1.02); transition-delay: 0s; z-index: 2; }
+.collage__carte:focus-visible { outline: 2px solid var(--halo); outline-offset: 4px; border-radius: 18px; }
+/* La boule allume la photo centrale à son passage. */
+.collage__carte--centre.is-allumee img { box-shadow: 0 0 0 2px rgba(255, 210, 63, .55), 0 0 60px rgba(255, 200, 60, .35), 0 18px 40px rgba(5, 5, 15, .45); }
+
+.formats-pastilles { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 4svh; padding: 0; list-style: none; }
+.formats-pastilles li { padding: 7px 14px; border: 1px solid rgba(244, 239, 230, .16); border-radius: 999px; font: 500 13px/1 var(--caps); color: var(--texte); }
+.formats-note { margin: 1.6em auto 0; max-width: 46ch; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
 
 /* Questions : la réponse s'écrit mot à mot en néon, dans la couleur de feutre de la question (--pen). */
 .q-corps { display: grid; gap: 5svh; }
@@ -330,7 +335,6 @@ a { color: inherit; }
   font: 700 15px/1 var(--caps); letter-spacing: .02em; text-decoration: none; box-shadow: 0 0 34px rgba(255, 200, 60, .32); transition: transform .2s ease, box-shadow .2s ease; }
 .btn-or:hover { transform: translateY(-1px); box-shadow: 0 0 44px rgba(255, 200, 60, .5); }
 .btn-or:focus-visible { outline: 2px solid var(--ivoire); outline-offset: 4px; }
-.formats-cta[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
 
 /* ---------- Paysage (16:9) : textes sur le côté libre ---------- */
 @media (orientation: landscape) {
@@ -338,10 +342,11 @@ a { color: inherit; }
   /* Ouverture : même composition, centrée, à l'échelle de l'écran large. */
   .ouverture { gap: 2.6svh; padding-bottom: calc(var(--barres, 0px) + 14svh); }
   .ouverture::before { background: radial-gradient(ellipse 42% 38% at 50% 44%, rgba(8, 7, 14, .6) 0%, rgba(8, 7, 14, .32) 52%, rgba(8, 7, 14, 0) 100%); }
-  /* Ordinateur : composition de page produit, titre géant centré, sous-titre court, prix, deux actions côte à côte. */
-  .ouverture { gap: 2svh; }
-  .o-titre .caps { font-size: min(13vw, 24svh); letter-spacing: -.04em; line-height: .84; }
-  .o-titre .script { font-size: min(7.6vw, 14svh); max-width: 70vw; margin-top: -.12em; }
+  /* Ordinateur : composition de page produit, titre géant centré, sous-titre court, prix, deux actions côte à côte.
+     Le bloc est centré dans l'espace sous l'en-tête fixe (72 px), au-dessus de « Faites défiler ». */
+  .ouverture { gap: 1.6svh; padding-top: calc(env(safe-area-inset-top, 0px) + 72px); padding-bottom: calc(var(--barres, 0px) + 11svh); }
+  .o-titre .caps { font-size: min(11vw, 19svh); letter-spacing: -.04em; line-height: .84; }
+  .o-titre .script { font-size: min(6.4vw, 11.5svh); max-width: 70vw; margin-top: -.12em; }
   .o-sous { max-width: 44ch; font-size: clamp(17px, 1.5vw, 22px); }
   .o-prix { font-size: 15px; }
   .o-actions { flex-direction: row; gap: 40px; margin-top: 1.4svh; }
@@ -358,14 +363,11 @@ a { color: inherit; }
   .tablette, .outils { width: 100%; }
   .outils { grid-column: 2; }
   /* Sections : deux colonnes, la photo alterne à gauche et à droite. */
-  .usages, .formats, .boite, .questions { padding-top: 16svh; }
+  .usages, .formats, .questions { padding-top: 16svh; }
   .bloc-titre .caps { font-size: min(6.4vw, 13svh); }
   .bloc-titre .script { font-size: min(8.4vw, 17svh); }
   .usage-titre .script { font-size: min(5.6vw, 12svh); }
   .usage-titre .caps { font-size: min(2.8vw, 6svh); }
-  .formats-corps { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; column-gap: 6vw; }
-  .boite-corps { max-width: 860px; }
-  .support ul { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 900px; }
   .q-corps { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; column-gap: 6vw; }
   .fin-carte { --ix: 17vw; --iy: 14lvh; }
   /* Paysage : le texte en bas à gauche, sur l'étagère sombre, pour laisser voir le tableau au centre. */
@@ -399,6 +401,20 @@ a { color: inherit; }
   .pos-4 { left: auto; right: var(--gutter); top: calc(var(--entete) + 2svh); }
   .pos-4 .sub { left: auto; right: 0; top: 68svh; width: 30vw; text-align: right; }
   .formats { padding-top: 16svh; }
+  /* Votre format, ordinateur : collage libre comme « Gallery » ; le 20 × 20 au centre, les autres le chevauchent. */
+  .formats-cadre { padding: 9svh 4vw 7svh; border-radius: 40px; }
+  .formats-motif { width: 200px; }
+  .formats-titre .caps { font-size: min(6.4vw, 12svh); }
+  .formats-titre .script { font-size: min(8.4vw, 15svh); }
+  .boite-pilule { flex-direction: row; gap: 18px; padding: 12px 22px; border-radius: 999px; }
+  .collage { position: relative; display: block; max-width: 1100px; aspect-ratio: 16 / 8.6; margin: 5svh auto 4svh; }
+  .collage__carte, .collage__support { position: absolute; margin: 0; }
+  .collage__carte--centre { left: 27%; top: 6%; width: 46%; z-index: 1; }
+  .collage__carte--petit { left: 3%; top: 3%; width: 27%; z-index: 2; }
+  .collage__carte--moyen { right: 1%; top: 0; width: 29%; z-index: 2; }
+  .collage__carte--large { right: 4%; bottom: 0; width: 36%; z-index: 2; }
+  .collage__support { left: 6%; bottom: 2%; width: 23%; z-index: 2; text-align: left; }
+  .collage__legende { font-size: 14px; }
 }
 
 /* ---------- Mouvement réduit : images fixes, textes visibles ---------- */
@@ -412,6 +428,7 @@ a { color: inherit; }
 .reduced .pos-4 .sub { position: static; width: auto; }
 .reduced .fin-bloc { position: relative; left: auto; right: auto; top: auto; transform: none; margin-top: 4svh; }
 .reduced .titre .l { clip-path: none; }
+.reduced .collage__carte, .reduced .collage__support { transition: none; }
 .reduced .photo img { filter: none; }
 .reduced .usages { height: auto; }
 .reduced .u-scene { position: relative; height: auto; display: block; padding: 14svh var(--gutter) 6svh; }
@@ -426,8 +443,6 @@ a { color: inherit; }
 .reduced .o-titre .caps, .reduced .o-sous, .reduced .o-cta, .reduced .o-prix, .reduced .o-decouvrir { opacity: 1; transform: none; filter: none; transition: none; }
 .reduced .o-titre .script { clip-path: none; transition: none; }
 .reduced .o-cta .cta-trait path { stroke-dashoffset: 0; transition: none; }
-.reduced .echelle rect { stroke-dashoffset: 0; }
-.reduced .lignes div::after { transform: scaleX(1); opacity: .55; }
 .reduced .q-reponse { opacity: 1; }
 .reduced .q-reponse .mot { animation: none; opacity: 1; }
 

@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="entete-pied.css">
+<link rel="stylesheet" href="panier.css">
 <link rel="preload" as="image" href="media/hero-9x16.webp" media="(orientation: portrait)">
 <link rel="preload" as="image" href="media/hero-16x9.webp" media="(orientation: landscape)">
 </head>
@@ -40,7 +41,20 @@
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8zM9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
         <span class="header__cart-count" id="panierNombre" aria-hidden="true" hidden></span>
       </a>
-      <a class="btn btn--primary btn--small header__cta" href="#formats">Choisir mon format</a>
+      <button type="button" class="header__burger" id="menuBouton" aria-expanded="false" aria-controls="menu-mobile" aria-label="Ouvrir le menu">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path id="menuIcone" d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <nav class="header__menu" id="menu-mobile" aria-label="Menu" hidden>
+        <ul>
+          <li><a href="#usages">Usages</a></li>
+          <li><a href="#formats">Formats</a></li>
+          <li><a href="#boite">Dans la boîte</a></li>
+          <li><a href="#questions">Questions</a></li>
+          <li><a href="/commande">Panier<span class="header__menu-count" id="menuNombre" hidden></span></a></li>
+          <li><a href="/suivi">Suivre ma commande</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--primary btn--small header__cta" href="/boutique">Choisir mon format</a>
     </div>
   </div>
 </header>
@@ -59,7 +73,7 @@
         <p class="o-sous">Le tableau lumineux à dessiner : une plaque transparente, une base LED, un feutre.</p>
         <p class="o-prix">À partir de <span class="prix-min" id="prixMin">24,90 €</span> · livraison offerte</p>
         <div class="o-actions">
-          <a class="cta o-cta" href="#formats">
+          <a class="cta o-cta" href="/boutique">
             <span>Choisir mon format</span>
             <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
           </a>
@@ -117,7 +131,7 @@
       <h2 class="bloc-titre g-titre" id="galerie-titre" data-ecrit><span class="caps">Vos dessins,</span><span class="script">en vrai.</span></h2>
       <p class="g-sous">Une plaque d'acrylique sur une base LED : déco de fête, mot doux, menu du jour ou dessin d'enfant. On l'écrit au feutre, la lumière le révèle, on efface et on recommence.</p>
     </div>
-    <a class="btn-or g-cta" href="#formats">Choisir votre format</a>
+    <a class="btn-or g-cta" href="/boutique">Choisir votre format</a>
     <div class="g-piste" id="gPiste">
       <figure class="g-carte g-bas" style="--i: 0">
         <img src="media/galerie-bonne-nuit.webp" width="1200" height="1500" loading="lazy" decoding="async" alt="Le tableau allumé sur une table de chevet d'une chambre d'enfant, « Bonne nuit » écrit en jaune.">
@@ -190,67 +204,54 @@
     </div>
   </section>
 
-  <!-- Formats : la liste des prix, et les quatre plaques à l'échelle d'une feuille A4, tracées par la lumière. -->
+  <!-- Votre format : collage des quatre formats (inspiration « Gallery »), chacun mène à sa fiche dans la boutique ;
+       le contenu de la boîte en pilule, le support en photo flottante. Prix remplis par boutique.js depuis le serveur.
+       La boule passe par la photo centrale (20 × 20) et l'allume. -->
   <section class="formats" id="formats" aria-labelledby="formats-titre">
-    <h2 class="bloc-titre" id="formats-titre" data-ecrit><span class="caps">Votre</span><span class="script">format.</span></h2>
-    <p class="sub formats-intro" data-mots>Un tableau en acrylique transparent, effaçable et éclairé par LED, pour dessiner, laisser un mot ou décorer.</p>
-    <div class="formats-corps">
-      <figure class="echelle" data-station>
-        <svg viewBox="-0.6 -0.6 31.2 22.2" role="img" aria-labelledby="echelle-legende">
-          <rect class="a4" x="0" y="0" width="29.7" height="21" pathLength="1"/>
-          <text class="a4-nom" x="28.9" y="1.6">A4</text>
-          <rect class="plaque-f" data-f="30x20" x="0" y="1" width="30" height="20" pathLength="1"/>
-          <rect class="plaque-f" data-f="20x20" x="0" y="1" width="20" height="20" pathLength="1"/>
-          <rect class="plaque-f" data-f="15x15" x="0" y="6" width="15" height="15" pathLength="1"/>
-          <rect class="plaque-f" data-f="12x12" x="0" y="9" width="12" height="12" pathLength="1"/>
-        </svg>
-        <figcaption id="echelle-legende">Les quatre plaques à l'échelle, posées sur une feuille A4 couchée.</figcaption>
-      </figure>
-      <fieldset class="formats-liste">
-        <legend class="visually-hidden">Dimensions de la plaque</legend>
-        <label><input type="radio" name="format" value="12x12" data-prix="24,90 €"><span class="f-taille">12 × 12 cm</span><span class="f-forme">Carré</span><span class="f-prix">24,90 €</span></label>
-        <label><input type="radio" name="format" value="15x15" data-prix="27,90 €"><span class="f-taille">15 × 15 cm</span><span class="f-forme">Carré</span><span class="f-prix">27,90 €</span></label>
-        <label><input type="radio" name="format" value="20x20" data-prix="32,90 €" checked><span class="f-taille">20 × 20 cm</span><span class="f-forme">Carré</span><span class="f-prix">32,90 €</span></label>
-        <label><input type="radio" name="format" value="30x20" data-prix="36,90 €"><span class="f-taille">30 × 20 cm</span><span class="f-forme">Paysage</span><span class="f-prix">36,90 €</span></label>
-      </fieldset>
-    </div>
-    <a class="cta cta-static formats-cta" id="commander" href="/commande">
-      <span>Commander le <span id="formatChoisi">20 × 20 cm</span></span>
-      <svg class="cta-trait" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 70 5, 135 17, 205 9 S 285 8, 297 12" pathLength="1"/></svg>
-    </a>
-    <!-- Prix, livraison et état de la vente : remplis par boutique.js depuis le serveur. -->
-    <p class="formats-note" id="formatsNote">Prix TTC · livraison offerte en France métropolitaine, en 10 jours ouvrés.</p>
-  </section>
-
-  <!-- Dans la boîte : les lignes se soulignent au feutre quand la boule arrive. -->
-  <section class="boite" id="boite" aria-labelledby="boite-titre">
-    <h2 class="bloc-titre" id="boite-titre" data-ecrit><span class="caps">Dans la</span><span class="script">boîte.</span></h2>
-    <div class="boite-corps" data-station>
-      <dl class="lignes">
-        <div><dt>Plaque en acrylique transparent</dt><dd>Au format choisi</dd></div>
-        <div><dt>Base lumineuse LED</dt><dd>Branchement USB direct</dd></div>
-        <div><dt>Support</dt><dd>Réglable</dd></div>
-        <div><dt>Feutre</dt><dd>1 fourni</dd></div>
-      </dl>
-      <h3 class="lignes-titre">Caractéristiques</h3>
-      <dl class="lignes">
-        <div><dt>Matériau</dt><dd>Acrylique transparent</dd></div>
-        <div><dt>Éclairage</dt><dd>LED, par la base</dd></div>
-        <div><dt>Alimentation</dt><dd>USB ; adaptateur secteur non fourni</dd></div>
-        <div><dt>Surface</dt><dd>Effaçable à sec, réutilisable</dd></div>
-        <div><dt>Usages</dt><dd>Dessin, messages, décoration, veilleuse</dd></div>
-      </dl>
-    </div>
-    <figure class="support">
-      <ul>
-        <li><img src="media/support-face.webp" width="274" height="146" loading="lazy" decoding="async" alt=""><span>De face</span></li>
-        <li><img src="media/support-dos.webp" width="274" height="150" loading="lazy" decoding="async" alt=""><span>De dos</span></li>
-        <li><img src="media/support-profil.webp" width="274" height="152" loading="lazy" decoding="async" alt=""><span>De profil</span></li>
-        <li><img src="media/support-tablette.webp" width="310" height="215" loading="lazy" decoding="async" alt="Une tablette tenue à l'horizontale par le support."><span>Porte-tablette</span></li>
-        <li><img src="media/support-telephone.webp" width="310" height="215" loading="lazy" decoding="async" alt="Un téléphone tenu à l'horizontale par le support."><span>Porte-téléphone</span></li>
+    <div class="formats-cadre">
+      <svg class="formats-motif formats-motif--haut" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L96 50 L50 96 L4 50 Z M50 24 L76 50 L50 76 L24 50 Z"/></svg>
+      <svg class="formats-motif formats-motif--bas" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L96 50 L50 96 L4 50 Z M50 24 L76 50 L50 76 L24 50 Z"/></svg>
+      <h2 class="bloc-titre formats-titre" id="formats-titre" data-ecrit><span class="caps">Votre</span><span class="script">format.</span></h2>
+      <div class="boite-pilule" id="boite">
+        <span class="boite-pilule__titre">Dans la boîte</span>
+        <ul>
+          <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M5 4h14v16H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Plaque en acrylique</li>
+          <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M4 17h16v3H4zM8 17V9a4 4 0 0 1 8 0v8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Base LED USB</li>
+          <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 20l6-14 6 14M9 14h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Support réglable</li>
+          <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M15 4l5 5L9 20H4v-5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>1 feutre</li>
+        </ul>
+      </div>
+      <div class="collage">
+        <a class="collage__carte collage__carte--centre" href="/boutique/20x20" style="--i: 0" data-station>
+          <img src="media/format-20x20.webp" width="400" height="300" loading="lazy" decoding="async" alt="Le format 20 × 20 cm allumé, une sirène dessinée dessus.">
+          <span class="collage__legende"><b>20 × 20 cm</b><span data-prix-variante="20x20">32,90 €</span></span>
+        </a>
+        <a class="collage__carte collage__carte--petit" href="/boutique/12x12" style="--i: 1">
+          <img src="media/format-12x12.webp" width="400" height="300" loading="lazy" decoding="async" alt="Le format 12 × 12 cm allumé, une fusée dessinée dessus.">
+          <span class="collage__legende"><b>12 × 12 cm</b><span data-prix-variante="12x12">24,90 €</span></span>
+        </a>
+        <a class="collage__carte collage__carte--moyen" href="/boutique/15x15" style="--i: 2">
+          <img src="media/format-15x15.webp" width="400" height="300" loading="lazy" decoding="async" alt="Le format 15 × 15 cm allumé, des fleurs dessinées dessus.">
+          <span class="collage__legende"><b>15 × 15 cm</b><span data-prix-variante="15x15">27,90 €</span></span>
+        </a>
+        <a class="collage__carte collage__carte--large" href="/boutique/30x20" style="--i: 3">
+          <img src="media/format-30x20.webp" width="400" height="300" loading="lazy" decoding="async" alt="Le format paysage 30 × 20 cm allumé, « Good Morning » écrit dessus.">
+          <span class="collage__legende"><b>30 × 20 cm</b><span data-prix-variante="30x20">36,90 €</span></span>
+        </a>
+        <figure class="collage__support" style="--i: 4">
+          <img src="media/support-tablette.webp" width="310" height="215" loading="lazy" decoding="async" alt="Une tablette tenue à l'horizontale par le support.">
+          <figcaption>Le support tient aussi une tablette ou un téléphone.</figcaption>
+        </figure>
+      </div>
+      <ul class="formats-pastilles">
+        <li>Acrylique transparent</li>
+        <li>Éclairé par LED</li>
+        <li>Branchement USB</li>
+        <li>Effaçable à sec</li>
       </ul>
-      <figcaption>Le support, vu de face, de dos et de profil ; il tient aussi une tablette ou un téléphone (photos du fournisseur).</figcaption>
-    </figure>
+      <a class="btn-or formats-cta" href="/boutique">Voir les 4 formats</a>
+      <p class="formats-note" id="formatsNote">Prix TTC · livraison offerte en France métropolitaine, en 10 jours ouvrés.</p>
+    </div>
   </section>
 
   <!-- Questions : la réponse s'écrit en néon sur une petite plaque, dans la couleur de feutre de la question. -->
@@ -282,7 +283,7 @@
           <p class="fin-soustitre">Un feutre, un peu de lumière :<br> le reste, c'est vous.</p>
           <p class="fin-prix">À partir de <span class="prix-min">24,90 €</span><span class="fin-livraison"><span class="fin-point" aria-hidden="true"> · </span>livraison offerte</span></p>
           <div class="fin-actions">
-            <a class="btn-or" href="#formats">Choisir mon format</a>
+            <a class="btn-or" href="/boutique">Choisir mon format</a>
             <a class="o-decouvrir" href="#formats">Voir les formats <span aria-hidden="true">›</span></a>
           </div>
         </div>
@@ -324,6 +325,33 @@
   </footer>
   </div>
 </main>
+
+<!-- Téléphone : barre panier et panneau du panier, comme sur les autres pages (src/components/CartBar.tsx et
+     CartDrawer.tsx). Remplis par boutique.js. -->
+<div class="cart-bar" id="barrePanier" aria-hidden="true" inert>
+  <button type="button" class="cart-bar__button" id="barrePanierBouton" aria-label="Panier, vide">
+    <span class="cart-bar__label">Panier</span>
+    <span class="cart-bar__thumbs" id="barreMiniatures"></span>
+    <span class="cart-bar__count" id="barreNombre">0</span>
+  </button>
+</div>
+<dialog class="panier" id="panneauPanier" aria-labelledby="panierTitre">
+  <div class="panier__panel">
+    <span class="panier__poignee" aria-hidden="true"></span>
+    <div class="panier__entete">
+      <h2 class="panier__titre" id="panierTitre">Votre panier <span class="panier__compte" id="panierCompte"></span></h2>
+      <button type="button" class="panier__fermer" id="panierFermer" aria-label="Fermer le panier">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <ul class="panier__lignes" id="panierLignes"></ul>
+    <div class="panier__pied">
+      <p class="panier__total"><span>Sous-total</span><span class="panier__total-valeur" id="panierTotal">—</span></p>
+      <p class="panier__note" id="panierNote">Prix TTC.</p>
+      <a class="btn btn--primary panier__commander" href="/commande">Commander</a>
+    </div>
+  </div>
+</dialog>
 
 <script src="app.js"></script>
 <script src="dessin.js"></script>

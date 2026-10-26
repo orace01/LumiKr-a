@@ -1,0 +1,573 @@
+/* Fiche d'un format : maquette « Glow Rituals » sur téléphone, vidéo KVIST sur ordinateur. */
+
+.product {
+  padding-bottom: var(--section);
+  animation: page-in 0.6s var(--ease-out) both;
+}
+
+.product__crumbs {
+  display: none;
+  gap: 0.5rem;
+  align-items: center;
+  padding-top: calc(var(--header-height) + 1.25rem);
+  padding-bottom: 1rem;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+.product__crumbs a {
+  text-decoration: none;
+}
+
+.product__crumbs a:hover {
+  color: var(--glow);
+}
+
+.product__crumbs [aria-current] {
+  color: var(--ink);
+}
+
+/* --- Photo ---------------------------------------------------------------- */
+
+.product__media {
+  position: relative;
+}
+
+.product__stage {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 55% at 50% 45%, color-mix(in srgb, var(--tint) 38%, transparent), transparent 75%),
+    color-mix(in srgb, var(--tint) 14%, var(--night));
+}
+
+.product__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  animation: photo-in 0.7s var(--ease-out) both;
+}
+
+/* Photo qui change (galerie) : fondu croisé avec un léger zoom. */
+@keyframes photo-in {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
+.product__thumbs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.product__thumb {
+  flex: none;
+  width: 3.5rem;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  background: var(--paper);
+  cursor: pointer;
+  opacity: 0.6;
+  transition:
+    opacity 0.25s,
+    border-color 0.25s,
+    transform 0.25s var(--ease-out);
+}
+
+.product__thumb[aria-pressed='true'] {
+  border-color: var(--glow);
+  opacity: 1;
+}
+
+.product__thumb:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.product__thumb img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+/* --- Panneau d'informations ------------------------------------------------ */
+
+.product__panel {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  background: var(--paper);
+}
+
+.product__handle {
+  display: none;
+}
+
+.product__eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+
+.product__title {
+  font-size: var(--step-3);
+  line-height: 1.02;
+}
+
+.product__size {
+  display: block;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.product__lede {
+  color: var(--ink-soft);
+  max-width: 46ch;
+}
+
+.product__price {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 800;
+  color: var(--glow);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 0.6em rgb(255 210 63 / 0.35);
+}
+
+/* Formats en pastilles larges, deux par ligne ; celle affichée est teintée. */
+.product__formats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.product__format {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 3.25rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--ivory-deep);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 0.35s,
+    border-color 0.35s,
+    transform 0.2s var(--ease-out);
+}
+
+.product__format:hover {
+  border-color: color-mix(in srgb, var(--tint) 60%, transparent);
+}
+
+.product__format:active {
+  transform: scale(0.97);
+}
+
+.product__format[aria-current='page'] {
+  border-color: var(--tint);
+  background: color-mix(in srgb, var(--tint) 26%, var(--paper));
+}
+
+.product__format-price {
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.product__format[aria-current='page'] .product__format-price {
+  color: var(--ink);
+}
+
+/* Quantité et ajout au panier sur une ligne. */
+.product__buy {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.product__add {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 3.5rem;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: 0 0 1.5rem rgb(255 210 63 / 0.3);
+  cursor: pointer;
+  transition:
+    transform 0.2s var(--ease-bounce),
+    box-shadow 0.2s,
+    background-color 0.2s;
+}
+
+.product__add:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 0 2.2rem rgb(255 210 63 / 0.45);
+}
+
+/* Ajout : le bouton se presse, le sac saute. */
+.product__add.is-pressed {
+  animation: add-press 0.45s var(--ease-bounce);
+}
+
+.product__add.is-pressed .product__add-bag {
+  animation: bag-jump 0.6s var(--ease-bounce);
+}
+
+@keyframes add-press {
+  30% {
+    transform: scale(0.93);
+  }
+}
+
+@keyframes bag-jump {
+  35% {
+    transform: translateY(-0.55rem) rotate(-12deg);
+  }
+  70% {
+    transform: translateY(0.1rem) rotate(6deg);
+  }
+}
+
+.product__guarantees {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product__guarantees li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+.product__guarantees li::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0.5rem var(--green);
+}
+
+/* Onglets (ordinateur). */
+.product__tabs {
+  display: none;
+}
+
+.product__tablist {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.product__tab {
+  position: relative;
+  padding: 0.6rem 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product__tab::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--glow);
+  transform: scaleX(0);
+  transition: transform 0.35s var(--ease-out);
+}
+
+.product__tab[aria-selected='true'] {
+  color: var(--ink);
+}
+
+.product__tab[aria-selected='true']::after {
+  transform: none;
+}
+
+.product__tabpanel {
+  color: var(--ink-soft);
+  animation: rise 0.4s var(--ease-out) both;
+}
+
+/* Accordéons (téléphone). */
+.product__accordion {
+  border-top: 1px solid var(--line);
+}
+
+.product__accordion summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 3.25rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+}
+
+.product__accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.product__accordion summary::after {
+  content: '+';
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--glow);
+  transition: transform 0.3s var(--ease-out);
+}
+
+.product__accordion[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.product__accordion-body {
+  padding-bottom: 1rem;
+  color: var(--ink-soft);
+  animation: rise 0.35s var(--ease-out) both;
+}
+
+.product__facts {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.product__facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed var(--line);
+}
+
+.product__facts dt {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.product__facts dd {
+  text-align: right;
+}
+
+/* --- Les autres formats ------------------------------------------------------ */
+
+.product__others {
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.product__others-title {
+  margin-bottom: 1rem;
+  font-size: var(--step-2);
+}
+
+.product__others-list {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(11rem, 44%);
+  gap: 0.85rem;
+  margin-inline: calc(-1 * var(--gutter));
+  padding-inline: var(--gutter);
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.product__others-list li {
+  scroll-snap-align: start;
+}
+
+/* Les cartes entrent en cascade quand la section arrive à l'écran. */
+.product__others .shop-card {
+  animation-play-state: paused;
+}
+
+.product__others.is-visible .shop-card {
+  animation-play-state: running;
+}
+
+/* Apparitions successives des éléments de la fiche. */
+.rise {
+  animation: rise 0.6s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 260ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+/* Le panneau monte depuis le bas à l'arrivée sur la fiche (téléphone). */
+@keyframes sheet-up {
+  from {
+    transform: translateY(35%);
+    opacity: 0.4;
+  }
+}
+
+/* --- Téléphone : photo en haut, panneau arrondi par-dessus ------------------ */
+@media (max-width: 899px) {
+  .product__layout {
+    padding-inline: 0;
+  }
+
+  .product__media {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+  }
+
+  .product__stage {
+    min-height: 56svh;
+    padding: calc(var(--header-height) + 0.5rem) 1.25rem 3rem;
+    /* La photo reste collée en haut pendant que le panneau monte par-dessus (parallaxe) ; elle recule un peu. */
+    transform: scale(var(--shrink, 1));
+    transform-origin: center 30%;
+  }
+
+  .product__thumbs {
+    position: absolute;
+    bottom: 2.75rem;
+    left: 50%;
+    z-index: 1;
+    max-width: calc(100% - 2rem);
+    padding: 0.35rem;
+    border-radius: 999px;
+    background: rgb(15 16 36 / 0.55);
+    transform: translateX(-50%);
+    backdrop-filter: blur(8px);
+  }
+
+  .product__thumb {
+    width: 2.6rem;
+    border-radius: 999px;
+  }
+
+  .product__thumb img {
+    aspect-ratio: 1;
+  }
+
+  .product__panel {
+    z-index: 1;
+    margin-top: -2rem;
+    padding: 0.75rem var(--gutter) 1.5rem;
+    border-radius: 2rem 2rem 0 0;
+    box-shadow: 0 -1rem 2.5rem rgb(5 5 15 / 0.45);
+    animation: sheet-up 0.6s var(--ease-out) 0.12s both;
+  }
+
+  .product__handle {
+    display: block;
+    justify-self: center;
+    width: 2.75rem;
+    height: 0.3rem;
+    border-radius: 999px;
+    background: var(--glow);
+  }
+
+  .product__others {
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+    padding-top: 1.5rem;
+    background: var(--paper);
+  }
+}
+
+/* --- Ordinateur : deux colonnes ---------------------------------------------- */
+@media (min-width: 900px) {
+  .product__crumbs {
+    display: flex;
+  }
+
+  .product__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+    align-items: start;
+  }
+
+  .product__media {
+    position: sticky;
+    top: calc(var(--header-height) + 1rem);
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .product__stage {
+    border-radius: 1.75rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .product__panel {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 1px solid var(--border);
+    border-radius: 1.75rem;
+  }
+
+  .product__tabs {
+    display: block;
+  }
+
+  .product__accordions {
+    display: none;
+  }
+
+  .product__others-list {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product,
+  .product__photo,
+  .product__panel,
+  .rise,
+  .product__tabpanel,
+  .product__accordion-body,
+  .product__add.is-pressed,
+  .product__add.is-pressed .product__add-bag {
+    animation: none;
+  }
+
+  .product__stage {
+    transform: none;
+  }
+}

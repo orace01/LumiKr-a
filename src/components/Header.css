@@ -8,7 +8,15 @@
   backdrop-filter: blur(14px) saturate(1.4);
   transition:
     background-color 0.3s,
-    box-shadow 0.3s;
+    box-shadow 0.3s,
+    backdrop-filter 0.3s;
+}
+
+/* Page défilée : l'en-tête s'efface, seuls le logo, le menu et les boutons restent. */
+.header--transparent {
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .header__inner {
@@ -107,9 +115,134 @@
   font-weight: 700;
 }
 
+/* Téléphone : bouton menu à la place du panier (le panier est dans le menu). */
+.header__burger {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.header__burger:hover {
+  background: var(--glow);
+  color: var(--on-primary);
+}
+
+.header .header__cart {
+  display: none;
+}
+
+/* Panneau du menu : sous la barre, avec son propre fond (la barre peut être transparente). */
+.header__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 0.5rem var(--gutter) 1.25rem;
+  background: rgb(23 24 45 / 0.97);
+  box-shadow:
+    0 1px 0 var(--line),
+    0 1.25rem 2.5rem rgb(5 5 15 / 0.45);
+}
+
+.header__menu[hidden] {
+  display: none;
+}
+
+.header__menu a,
+.header__menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.85rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.header__menu li:last-child a {
+  border-bottom: 0;
+}
+
+.header__menu a:hover,
+.header__menu button:hover {
+  color: var(--glow);
+}
+
+.header__menu-count {
+  display: grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--glow);
+  color: var(--on-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.header__back {
+  display: none;
+}
+
+/* Fiche produit sur téléphone : retour et menu en boutons ronds posés sur la photo (maquette « Glow Rituals »). */
+@media (max-width: 899px) {
+  .header--over {
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .header--over .header__brand,
+  .header--over .header__cta {
+    display: none;
+  }
+
+  .header--over .header__back,
+  .header--over .header__burger {
+    display: grid;
+    place-items: center;
+    width: 2.9rem;
+    height: 2.9rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--night);
+    box-shadow: 0 0.5rem 1.25rem rgb(5 5 15 / 0.35);
+  }
+
+  .header--over .header__inner {
+    justify-content: space-between;
+  }
+}
+
 @media (min-width: 900px) {
   .header__nav {
     display: block;
+  }
+
+  .header .header__cart {
+    display: grid;
+  }
+
+  .header__burger,
+  .header__menu {
+    display: none;
   }
 }
 
