@@ -17,24 +17,32 @@
 <link rel="preload" as="font" type="font/woff2" href="fonts/onest-latin-wght-normal.woff2" crossorigin>
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="entete-pied.css">
 <link rel="preload" as="image" href="media/hero-9x16.webp" media="(orientation: portrait)">
 <link rel="preload" as="image" href="media/hero-16x9.webp" media="(orientation: landscape)">
 </head>
-<body class="is-intro">
+<body>
 
-<!-- Intro : le logo s'écrit, puis boucle pendant le chargement, puis se ferme sur le site -->
-<div class="intro" id="intro" aria-hidden="true">
-  <video class="intro-video" id="introVideo" muted playsinline preload="auto"></video>
-  <div class="loader" id="loader">
-    <div class="loader-track"><div class="loader-fill" id="loaderFill"></div></div>
-    <span class="loader-pct" id="loaderPct">0 %</span>
+<!-- En-tête : le même que sur les autres pages du site (src/components/Header.tsx). Le panier mène à la commande. -->
+<header class="header">
+  <div class="container header__inner">
+    <a class="header__brand" href="#hero" aria-label="Lumikréa, retour en haut"><img class="header__logo" src="media/logo.svg" alt="Lumikréa" width="140" height="40"></a>
+    <nav class="header__nav" aria-label="Sections de la page d’accueil">
+      <ul>
+        <li><a href="#usages">Usages</a></li>
+        <li><a href="#formats">Formats</a></li>
+        <li><a href="#boite">Dans la boîte</a></li>
+        <li><a href="#questions">Questions</a></li>
+      </ul>
+    </nav>
+    <div class="header__actions">
+      <a class="header__cart" id="panier" href="/commande" aria-label="Panier, vide">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8zM9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <span class="header__cart-count" id="panierNombre" aria-hidden="true" hidden></span>
+      </a>
+      <a class="btn btn--primary btn--small header__cta" href="#formats">Choisir mon format</a>
+    </div>
   </div>
-  <div class="veil" id="veil"></div>
-</div>
-
-<header class="top">
-  <a class="top-logo" href="#hero" aria-label="Lumikréa, retour en haut"><img src="media/logo.svg" alt="Lumikréa" width="140" height="40"></a>
-  <a class="top-cta" href="#formats">Choisir mon format</a>
 </header>
 
 <main>
@@ -282,17 +290,37 @@
     </div>
   </section>
 
-  <footer class="pied">
-    <img src="media/logo.svg" alt="Lumikréa" width="120" height="34">
-    <p>Tableau lumineux à dessiner · livraison offerte en France métropolitaine</p>
-    <nav class="pied-liens" aria-label="Informations">
-      <a href="/suivi">Suivre ma commande</a>
-      <a href="/livraison-retours">Livraison et retours</a>
-      <a href="/cgv">Conditions générales de vente</a>
-      <a href="/mentions-legales">Mentions légales</a>
-      <a href="/confidentialite">Confidentialité</a>
-      <a href="mailto:contact@lumikrea.store">contact@lumikrea.store</a>
-    </nav>
+  <!-- Pied de page : le même que sur les autres pages du site (src/components/Footer.tsx). -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img class="footer__logo" src="media/logo.svg" alt="Lumikréa" width="180" height="52">
+        <p class="footer__tagline">Vos idées, en pleine lumière.</p>
+      </div>
+      <nav aria-label="Pied de page">
+        <h2 class="footer__title">L’accueil</h2>
+        <ul class="footer__links">
+          <li><a href="#usages">Usages</a></li>
+          <li><a href="#formats">Formats</a></li>
+          <li><a href="#boite">Dans la boîte</a></li>
+          <li><a href="#questions">Questions</a></li>
+          <li><a href="/suivi">Suivre ma commande</a></li>
+        </ul>
+      </nav>
+      <div>
+        <h2 class="footer__title">Informations</h2>
+        <ul class="footer__links">
+          <li><a href="/mentions-legales">Mentions légales</a></li>
+          <li><a href="/cgv">Conditions générales de vente</a></li>
+          <li><a href="/confidentialite">Politique de confidentialité</a></li>
+          <li><a href="/livraison-retours">Livraison et retours</a></li>
+          <li><a href="mailto:contact@lumikrea.store">contact@lumikrea.store</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer__bottom">
+      <p>© <span id="annee">2026</span> Lumikréa</p>
+    </div>
   </footer>
   </div>
 </main>

@@ -69,5 +69,25 @@
     location.href = "/commande";
   });
 
+  // En-tête : nombre d'articles du panier, comme sur les autres pages (src/components/Header.tsx).
+  function majPanier() {
+    let total = 0;
+    try {
+      const lignes = JSON.parse(localStorage.getItem(PANIER) || "[]");
+      if (Array.isArray(lignes)) total = lignes.reduce((n, ligne) => n + (Number(ligne.quantity) || 0), 0);
+    } catch {
+      // Stockage illisible : panier affiché vide.
+    }
+    const nombre = document.getElementById("panierNombre");
+    nombre.hidden = total === 0;
+    nombre.textContent = String(total);
+    document.getElementById("panier").setAttribute("aria-label", total === 0 ? "Panier, vide" : `Panier, ${total} article${total > 1 ? "s" : ""}`);
+  }
+  majPanier();
+  addEventListener("pageshow", majPanier);   // retour depuis la commande : le panier a pu changer
+  addEventListener("storage", (evenement) => { if (evenement.key === PANIER) majPanier(); });
+
+  document.getElementById("annee").textContent = String(new Date().getFullYear());
+
   charger();
 })();

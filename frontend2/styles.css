@@ -2,12 +2,10 @@
    Couleurs du moodboard 01 ; capitales Onest, mot lumineux Sacramento. */
 :root {
   --nuit: #17182D;
-  --intro-fond: #0B0A1B;
   --indigo: #30385B;
   --ivoire: #F4EFE6;
   --texte: #D9D4CB;
   --halo: #FFD23F;
-  --voile: rgb(252, 224, 137);
   --caps: "Onest", "Arial Narrow", system-ui, sans-serif;
   --script: "Sacramento", "Brush Script MT", cursive;
   --gutter: max(16px, 7.8vw);
@@ -22,35 +20,6 @@ html { background: var(--nuit); -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--nuit); color: var(--ivoire); font-family: var(--caps); }
 img, video { display: block; max-width: 100%; }
 a { color: inherit; }
-.is-intro { overflow: hidden; }
-
-/* ---------- Intro et écran de chargement ---------- */
-.intro { position: fixed; inset: 0; z-index: 50; background: var(--intro-fond); }
-.intro-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* La barre se place en % de la hauteur de la VIDÉO (recadrée en cover), pas de la fenêtre :
-   hauteur affichée = max(écran, largeur × ratio). Logo : 47–52 % en 9:16, 42–58 % en 16:9. */
-.loader { position: absolute; left: 50%; top: calc(50svh + .09 * max(100svh, 177.78vw)); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transition: opacity .6s ease; }
-.loader.is-on { opacity: 1; }
-.loader.is-off { opacity: 0; transition-duration: .35s; }
-.loader-track { width: min(34vw, 260px); height: 2px; background: rgba(244, 239, 230, .14); border-radius: 2px; overflow: hidden; }
-.loader-fill { height: 100%; width: calc(var(--p, 0) * 100%); background: var(--halo); box-shadow: 0 0 10px rgba(255, 200, 60, .9); transition: width .25s linear; }
-.loader-pct { font: 600 11px/1 var(--caps); letter-spacing: .22em; color: rgba(244, 239, 230, .7); font-variant-numeric: tabular-nums; }
-.veil { position: absolute; inset: 0; background: var(--voile); opacity: 0; pointer-events: none; }
-.intro.is-revealing { background: transparent; pointer-events: none; }
-.intro.is-revealing .intro-video, .intro.is-revealing .loader { display: none; }
-.intro.is-revealing .veil { opacity: 1; animation: voile 1s cubic-bezier(.4, 0, .2, 1) .15s forwards; }
-@keyframes voile { to { opacity: 0; } }
-.is-revealing-site .stage { animation: net 1.15s cubic-bezier(.4, 0, .2, 1) forwards; }
-@keyframes net { from { filter: blur(14px); } to { filter: blur(0); } }
-
-/* ---------- Header ---------- */
-.top { position: fixed; z-index: 20; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
-  padding: calc(env(safe-area-inset-top, 0px) + 14px) max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px));
-  pointer-events: none; transition: opacity .6s ease; }
-.top > * { pointer-events: auto; }
-.is-intro .top { opacity: 0; }
-.top-logo img { height: 32px; width: auto; }
-.top-cta { font: 700 11px/1 var(--caps); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; padding: 12px 0; border-bottom: 1px solid rgba(255, 210, 63, .7); text-shadow: var(--ombre); }
 
 /* ---------- Hero piloté par le scroll ---------- */
 .hero { position: relative; height: var(--hero-h, 1000svh); }
@@ -182,7 +151,7 @@ a { color: inherit; }
 .cta-static { --t: 1; }
 .cta:hover .cta-trait path, .cta:focus-visible .cta-trait path { animation: trait .7s ease forwards; }
 @keyframes trait { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-.cta:focus-visible, .top-cta:focus-visible { outline: 2px solid var(--halo); outline-offset: 4px; }
+.cta:focus-visible { outline: 2px solid var(--halo); outline-offset: 4px; }
 
 /* ---------- Suite du site : fil lumineux en arrière-plan ---------- */
 .suite { position: relative; background: var(--nuit); }
@@ -361,17 +330,11 @@ a { color: inherit; }
   font: 700 15px/1 var(--caps); letter-spacing: .02em; text-decoration: none; box-shadow: 0 0 34px rgba(255, 200, 60, .32); transition: transform .2s ease, box-shadow .2s ease; }
 .btn-or:hover { transform: translateY(-1px); box-shadow: 0 0 44px rgba(255, 200, 60, .5); }
 .btn-or:focus-visible { outline: 2px solid var(--ivoire); outline-offset: 4px; }
-.pied { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6svh var(--gutter) calc(6svh + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(244, 239, 230, .1); text-align: center; font: 400 13px/1.5 var(--caps); color: rgba(244, 239, 230, .55); }
-.pied img { height: 26px; width: auto; }
-.pied-liens { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; max-width: 760px; }
-.pied a { color: rgba(244, 239, 230, .78); text-decoration: underline; text-decoration-color: rgba(255, 210, 63, .45); text-underline-offset: 3px; }
-.pied a:hover, .pied a:focus-visible { color: var(--halo); }
 .formats-cta[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
 
 /* ---------- Paysage (16:9) : textes sur le côté libre ---------- */
 @media (orientation: landscape) {
   :root { --gutter: max(24px, 6.5vw); --entete: calc(env(safe-area-inset-top, 0px) + 88px); }
-  .top-logo img { height: 38px; }
   /* Ouverture : même composition, centrée, à l'échelle de l'écran large. */
   .ouverture { gap: 2.6svh; padding-bottom: calc(var(--barres, 0px) + 14svh); }
   .ouverture::before { background: radial-gradient(ellipse 42% 38% at 50% 44%, rgba(8, 7, 14, .6) 0%, rgba(8, 7, 14, .32) 52%, rgba(8, 7, 14, 0) 100%); }
@@ -383,9 +346,6 @@ a { color: inherit; }
   .o-prix { font-size: 15px; }
   .o-actions { flex-direction: row; gap: 40px; margin-top: 1.4svh; }
   .o-decouvrir { font-size: 16px; }
-  .top { padding-top: calc(env(safe-area-inset-top, 0px) + 20px); padding-bottom: 20px; }
-  .loader { top: calc(50svh + .16 * max(100svh, 56.25vw)); }
-  .loader-track { width: min(22vw, 320px); }
   .caps { font-size: min(8.4vw, 15svh); }
   .chapter .caps { font-size: min(6.4vw, 12svh); max-width: 40vw; }
   .script { font-size: min(10.2vw, 18svh); }
@@ -442,8 +402,6 @@ a { color: inherit; }
 }
 
 /* ---------- Mouvement réduit : images fixes, textes visibles ---------- */
-.reduced .intro { display: none; }
-.reduced .top { opacity: 1; }
 .reduced .hero { height: auto; }
 .reduced .stage { position: relative; height: auto; min-height: 100svh; padding: 18svh var(--gutter) 10svh; display: flex; flex-direction: column; gap: 10svh; }
 .reduced .hero-video { position: absolute; }

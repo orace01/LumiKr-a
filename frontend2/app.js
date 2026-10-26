@@ -1,4 +1,4 @@
-// Lumikréa — prototype : intro en écran de chargement, hero vidéo piloté par le scroll, textes de chapitres.
+// Lumikréa — prototype : hero vidéo piloté par le scroll, textes de chapitres.
 // Toutes les animations dépendent du « temps du récit » t (0 à 30,5 s), calculé depuis la position du scroll.
 (() => {
   "use strict";
@@ -13,15 +13,10 @@
     dark: [28.0, 30.0], ball: [29.3, 29.9], toLine: [29.9, 30.2], write: [30.2, 32.4], toPoint: [32.4, 32.8],
     sub: [33.2, 33.6], words: [33.4, 35.6], down: [34.0, 36.3], handoff: [36.42, 36.5],
   };
-  const INTRO = {                       // repères de l'intro, en secondes de la vidéo
-    "9x16": { src: "media/intro-9x16.mp4", written: 3.0, loopStart: 3.5, loopEnd: 5.1667 },
-    "16x9": { src: "media/intro-16x9.mp4", written: 3.0, loopStart: 3.5, loopEnd: 5.1667 },
-  };
   const AV1 = 'video/mp4; codecs="av01.0.08M.08"';
 
   const $ = (s) => document.querySelector(s);
   const body = document.body;
-  const intro = $("#intro"), introVideo = $("#introVideo"), loader = $("#loader"), loaderFill = $("#loaderFill"), loaderPct = $("#loaderPct");
   const hero = $("#hero"), heroVideo = $("#heroVideo"), eteint = $("#eteint");
   const stage = $(".stage"), titre = $("#titre"), lignes = [...titre.querySelectorAll(".l")], boule = $("#boule");
   const trace = $("#trace"), tracePaths = [...trace.querySelectorAll("path")];
@@ -35,18 +30,14 @@
   const mix = (a, b, k) => a + (b - a) * k;
 
   const params = new URLSearchParams(location.search);
-  // L'intro du logo se joue à chaque arrivée sur le site (première visite, ou retour après être parti), mais pas quand
-  // on actualise la page. La page repart du haut ; une page restaurée par « retour » depuis un autre site est
-  // rechargée comme une arrivée (replace : le navigateur la compte comme une navigation, pas une actualisation).
+  // La page repart toujours du haut : le récit du hero commence au début.
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   window.scrollTo(0, 0);
-  addEventListener("pageshow", (e) => { if (e.persisted) location.replace(location.href); });
-  const actualisation = performance.getEntriesByType("navigation")[0]?.type === "reload";
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const portraitQuery = matchMedia("(orientation: portrait)");
   const fmt = portraitQuery.matches ? "9x16" : "16x9";
-  // Changement d'orientation : on recharge sans rejouer l'intro, avec l'autre format.
-  portraitQuery.addEventListener("change", () => location.replace(`${location.pathname}?sans-intro`));
+  // Changement d'orientation : on recharge avec l'autre format de vidéo.
+  portraitQuery.addEventListener("change", () => location.reload());
 
   // Même vitesse de scroll qu'avant l'ajout de la fin (1000svh / 900vh pour 30,5 s).
   document.documentElement.style.setProperty("--hero-h", `${Math.round(STORY_END * (fmt === "9x16" ? 1000 : 900) / 30.5)}${fmt === "9x16" ? "svh" : "vh"}`);
@@ -307,9 +298,7 @@
 
   // ---------- Mouvement réduit : pas de vidéo pilotée ----------
   if (reduced) {
-    body.classList.remove("is-intro");
     body.classList.add("reduced", "is-ouvert");
-    intro.remove();
     heroVideo.poster = `media/hero-${fmt}-fin.webp`;
     stations.forEach((st) => st.classList.add("is-allumee"));   // tout est allumé, sans boule
     document.fonts.ready.then(buildFil);
@@ -336,20 +325,12 @@
     return h264;
   }
 
-  // Télécharge le fichier pour mesurer la progression et remplir le cache HTTP.
+  // Télécharge le fichier en entier pour remplir le cache HTTP : le scrub n'attend ensuite plus le réseau.
   // La vidéo lit ensuite l'adresse directe : WebKit (iPhone) lit mal une vidéo passée en URL blob.
-  async function download(url, onProgress) {
+  async function download(url) {
     const res = await fetch(url);
-    if (!res.ok || !res.body) throw new Error(`Téléchargement impossible (${res.status})`);
-    const total = Number(res.headers.get("content-length")) || 0;
-    const reader = res.body.getReader();
-    let got = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      got += value.length;
-      if (total) onProgress(got / total);
-    }
+    if (!res.ok) throw new Error(`Téléchargement impossible (${res.status})`);
+    await res.blob();
   }
 
   // Charge la vidéo par son adresse directe ; vrai si une image est prête.
@@ -376,34 +357,19 @@
     });
   }
 
-  // La barre affiche le vrai téléchargement, mais met toujours au moins MIN_FILL secondes à se remplir :
-  // même si la vidéo est déjà en cache, l'arrivée montre le logo, la barre et la boucle.
-  const MIN_FILL = 1.6;
-  let realProgress = 0, shownProgress = 0;
-  const setProgress = (p) => { realProgress = Math.max(realProgress, p); };
-  function drawProgress(now) {
-    if (!loaderShownAt) return;
-    const p = Math.min(realProgress, (now - loaderShownAt) / (MIN_FILL * 1000));
-    if (p > shownProgress) {
-      shownProgress = p;
-      loaderFill.style.setProperty("--p", p.toFixed(3));
-      loaderPct.textContent = `${Math.round(p * 100)} %`;
-    }
-  }
-
+  // L'image d'attente (poster) s'affiche tout de suite ; la vidéo prend le relais dès qu'elle est chargée.
   let heroSrc = "";
-  const heroReady = (async () => {
+  (async () => {
     heroSrc = await pickHeroSource();
     try {
-      await download(heroSrc, (p) => setProgress(p * 0.95));
+      await download(heroSrc);
     } catch { /* la vidéo se chargera directement */ }
     await document.fonts.ready;
-    let ok = await loadHero(heroSrc);
+    const ok = await loadHero(heroSrc);
     if (!ok && heroSrc.includes(".av1.")) {        // AV1 refusé par l'appareil : repli H.264
       heroSrc = heroUrl("h264");
-      ok = await loadHero(heroSrc);
+      await loadHero(heroSrc);
     }
-    setProgress(1);
   })();
 
   // ?debug : état de la vidéo affiché à l'écran (pour diagnostiquer sur téléphone).
@@ -436,46 +402,8 @@
     }, 500);
   }
 
-  // ---------- Intro : écriture, boucle d'attente, fermeture ----------
-  const cfg = INTRO[fmt];
-  let loaded = false, loaderShownAt = 0, closing = false;
-  heroReady.then(() => { loaded = true; });
-
-  function revealSite() {
-    intro.classList.add("is-revealing");
-    body.classList.remove("is-intro");
-    body.classList.add("is-revealing-site", "is-ouvert");   // l'ouverture se joue pendant que le site apparaît
-    window.scrollTo(0, 0);
-    setTimeout(() => { intro.remove(); body.classList.remove("is-revealing-site"); }, 1300);
-  }
-
-  if (params.has("sans-intro") || actualisation) {
-    intro.remove();
-    body.classList.remove("is-intro");
-    setTimeout(() => body.classList.add("is-ouvert"), 80);   // l'ouverture se joue dès l'affichage
-  } else {
-    introVideo.src = cfg.src;
-    introVideo.addEventListener("ended", revealSite, { once: true });
-    const tick = (now, meta) => {
-      const time = meta ? meta.mediaTime : introVideo.currentTime;
-      if (!loaderShownAt && time >= cfg.written) { loaderShownAt = performance.now(); loader.classList.add("is-on"); }
-      drawProgress(performance.now());
-      if (!closing && loaded && shownProgress >= 1) {
-        closing = true;                              // à 100 % : on laisse la vidéo continuer vers la fermeture
-        loader.classList.add("is-off");
-      }
-      if (!closing && time >= cfg.loopEnd - 0.5 / FPS) introVideo.currentTime = cfg.loopStart;   // boucle d'attente
-      if (!introVideo.ended) schedule();
-    };
-    const schedule = () => ("requestVideoFrameCallback" in introVideo)
-      ? introVideo.requestVideoFrameCallback(tick)
-      : requestAnimationFrame((n) => tick(n));
-    introVideo.play().then(schedule).catch(() => {
-      // Lecture automatique refusée : logo fixe, puis site dès que le hero est prêt.
-      loader.classList.add("is-on");
-      heroReady.then(revealSite);
-    });
-  }
+  // ---------- Ouverture : se joue dès l'affichage ----------
+  setTimeout(() => body.classList.add("is-ouvert"), 80);
 
   // ---------- Scroll → temps du récit → vidéo et textes ----------
   let target = 0, current = 0, pendingSeek = null, last = 0;

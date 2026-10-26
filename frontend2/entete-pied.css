@@ -1,0 +1,182 @@
+/* En-tête et pied de page de l'accueil : copie de src/components/Header.css et Footer.css (et des classes communes
+   de src/styles/global.css qu'ils utilisent), pour que l'accueil ait exactement les mêmes que les autres pages.
+   À modifier en même temps que ces fichiers. Les variables sont limitées à ces blocs : elles ne touchent pas l'accueil. */
+.header, .footer {
+  --ink: #f4efe6;
+  --line: rgba(244, 239, 230, 0.12);
+  --border: rgba(244, 239, 230, 0.24);
+  --night: #0f1024;
+  --on-night: #f4efe6;
+  --on-night-soft: #bcb7c6;
+  --primary: #ffd23f;
+  --primary-dark: #ffe27a;
+  --on-primary: #17182d;
+  --glow: #ffd23f;
+  --pink: #ff6fb1;
+  --font-display: "Onest", "Arial Narrow", system-ui, sans-serif;
+  --font-script: "Sacramento", "Brush Script MT", cursive;
+  --step--1: 0.875rem;
+  --gutter: clamp(1.25rem, 0.6rem + 3vw, 3rem);
+  --header-height: 4.5rem;
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+.header ul, .footer ul { margin: 0; padding: 0; list-style: none; }
+.header h2, .footer h2, .footer p { margin: 0; }
+.header a:focus-visible, .header__cart:focus-visible, .footer a:focus-visible { outline: 3px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
+
+.container {
+  width: 100%;
+  max-width: calc(1200px + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0.7rem 1.6rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-bounce), box-shadow 0.2s var(--ease-bounce), background-color 0.2s;
+}
+.btn:hover { transform: translateY(-0.1rem); }
+.btn:active { transform: translateY(0.1rem); }
+.btn--primary { border-color: var(--primary); background: var(--primary); color: var(--on-primary); box-shadow: 0 0 1.5rem rgba(255, 210, 63, 0.25); }
+.btn--primary:hover { border-color: var(--primary-dark); background: var(--primary-dark); box-shadow: 0 0 2rem rgba(255, 210, 63, 0.4); }
+.btn--small { min-height: 2.75rem; padding: 0.45rem 1.15rem; font-size: 1rem; }
+
+/* ---------- En-tête ---------- */
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  /* Encoche des téléphones : la barre descend sous la zone système (le reste du site garde sa hauteur). */
+  padding-top: env(safe-area-inset-top, 0px);
+  background: rgb(23 24 45 / 0.88);
+  color: var(--ink);
+  box-shadow: 0 1px 0 var(--line);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+.header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; height: var(--header-height); }
+.header__brand { display: inline-flex; align-items: center; text-decoration: none; }
+.header__logo { width: auto; height: 2.25rem; }
+.header__nav { display: none; }
+.header__nav ul { display: flex; gap: clamp(0.25rem, 1vw, 0.75rem); }
+.header__nav a {
+  display: block;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+.header__nav a:hover { background: var(--glow); color: var(--on-primary); }
+.header__actions { display: flex; align-items: center; gap: 0.6rem; }
+.header__cart {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.header__cart:hover { background: var(--glow); color: var(--on-primary); }
+.header__cart-count {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  display: grid;
+  place-items: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--glow);
+  color: var(--on-primary);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.header__cart-count[hidden] { display: none; }
+@media (min-width: 900px) { .header__nav { display: block; } }
+.header__cta { white-space: nowrap; }
+@media (max-width: 520px) {
+  .header__cta { min-height: 2.5rem; padding: 0.4rem 0.85rem; font-size: 0.75rem; letter-spacing: 0.06em; }
+}
+@media (max-width: 420px) {
+  .header__inner { gap: 0.75rem; }
+  .header__logo { height: 1.9rem; }
+}
+/* Très petit écran : le panier reste, le bouton « Choisir » laisse la place. */
+@media (max-width: 349px) { .header__cta { display: none; } }
+
+/* ---------- Pied de page ---------- */
+.footer {
+  position: relative;
+  z-index: 1;
+  padding-top: clamp(3.5rem, 7vw, 6rem);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--night);
+  color: var(--on-night);
+}
+.footer__inner { display: grid; gap: 2.5rem; }
+@media (min-width: 820px) {
+  .footer__inner { grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(0, 3fr); }
+}
+.footer__logo { width: auto; height: clamp(2.5rem, 2rem + 2vw, 3.5rem); }
+.footer .footer__tagline {
+  margin-top: 1rem;
+  max-width: 24ch;
+  font-family: var(--font-script);
+  font-size: clamp(1.9rem, 1.6rem + 1vw, 2.4rem);
+  line-height: 1.1;
+  color: var(--glow);
+  text-shadow: 0 0 0.6em rgba(255, 210, 63, 0.45);
+}
+.footer .footer__title {
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+.footer__links { display: grid; gap: 0.6rem; color: var(--on-night-soft); }
+.footer__links a { color: var(--on-night); text-decoration: none; text-underline-offset: 0.25em; }
+.footer__links a:hover { color: var(--glow); text-decoration: underline; }
+.footer__bottom {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  padding-block: 1.5rem;
+  border-top: 2px dashed rgb(255 255 255 / 0.18);
+  font-size: var(--step--1);
+  color: var(--on-night-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header, .header__nav a, .btn { transition: none; }
+  .btn:hover, .btn:active { transform: none; }
+}
