@@ -243,9 +243,9 @@ npm run media     # scripts/build-media.sh, nécessite ffmpeg (libwebp)
 
 ## Reste à faire avant mise en ligne
 
-- Confirmer le nom de marque. Prix fixés le 7 octobre 2026 : 24,90 € à 36,90 € selon le
-  format, livraison offerte, annoncée en 10 jours ouvrés (à ajuster d'après les
-  premières commandes).
+- Confirmer le nom de marque. Prix fixés le 7 octobre 2026 à 24,90 € – 36,90 €, relevés
+  de 10 € le 27 octobre 2026 : 34,90 € à 46,90 € selon le format. Livraison offerte,
+  annoncée en 10 jours ouvrés (à ajuster d'après les premières commandes).
 - Contenu et caractéristiques repris de la fiche CJ le 8 octobre 2026 ; ce qu'elle ne dit
   pas (couleur de la lumière, interrupteur, âge, sécurité) n'est pas affiché. La fiche
   annonce un seul feutre alors que certaines photos en montrent sept : à vérifier sur un

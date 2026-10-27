@@ -72,7 +72,7 @@ export const site = {
     { label: 'Questions', href: '/#questions' },
   ],
   // La boutique : grille des formats, puis fiche de chacun (docs/plan-page-produit.md).
-  primaryCta: { label: 'Choisir mon format', href: '/boutique' },
+  primaryCta: { label: 'Commander maintenant', href: '/boutique' },
 
   /** Adresse de contact du service client (boîte LWS, créée le 13 octobre 2026). */
   contactEmail: 'contact@lumikrea.store' as string | null,
