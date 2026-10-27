@@ -107,9 +107,11 @@ rien sur le compte CJ.
    que le prix et le délai annoncés au client (`price`, `delay`). Ce n'est qu'une
    estimation : le port réellement facturé peut être plus élevé (au premier test, 12,97 $
    facturés pour 9,47 $ estimés). Fixer les prix d'après une commande de test (étape 6).
-5. Approvisionner le solde CJ : avec `CJ_PAY_TYPE=2` (par défaut), chaque commande est
-   payée sur ce solde. Avec `CJ_PAY_TYPE=3`, elle est seulement créée et se paie à la main
-   dans le tableau de bord CJ.
+5. Choisir comment CJ est payé. Avec `CJ_PAY_TYPE=2` (par défaut), chaque commande est
+   payée sur le solde CJ, à approvisionner. Avec `CJ_PAY_TYPE=3` (réglage en production
+   depuis le 26 octobre 2026), elle est seulement créée et se paie à la main dans le
+   tableau de bord CJ : le vendeur reçoit un e-mail « À payer chez CJ » à l'adresse de
+   contact pour chaque commande, et CJ n'expédie qu'après ce paiement.
 6. Tester de bout en bout avec `CJ_SANDBOX=1` et `npm run dev` : le paiement est simulé et
    les commandes partent chez CJ en commandes de test, ni débitées ni expédiées.
    `npm run cj -- commande LK-XXXXXX` montre ensuite leur état chez CJ.
@@ -124,6 +126,9 @@ Fonctionnement :
   chez CJ passe en `fulfillment_error`.
 - Les refus de CJ (solde insuffisant, variante ou mode d'envoi invalide, adresse…) sont
   traduits en consignes dans le champ `fulfillment.error` de la commande.
+- Le vendeur est prévenu par e-mail (adresse de contact, `contactEmail`) de chaque
+  commande à payer chez CJ (`CJ_PAY_TYPE=3`), refusée par CJ ou annulée chez CJ. Sans
+  serveur d'envoi réglé, l'alerte n'est écrite que dans le journal.
 - Le jeton d'accès CJ est conservé dans `data/cj-token.json` (lisible par le seul
   propriétaire) et renouvelé automatiquement. Les appels sont espacés d'au moins
   1,1 s (limite d'un compte CJ gratuit, réglable par `CJ_MIN_INTERVAL_MS`).
@@ -254,8 +259,10 @@ npm run media     # scripts/build-media.sh, nécessite ffmpeg (libwebp)
   SIREN, TVA, téléphone, hébergeur, médiateur) n'apparaissent qu'une fois renseignées : à
   remplir dès que l'activité est déclarée. Les textes sont dans `src/content/legal/` ; les
   faire relire par un professionnel du droit.
-- Garder le solde CJ approvisionné : sans lui, une commande payée reste en
-  `fulfillment_error` jusqu'à sa relance (voir « Commandes et administration »).
+- Avec `CJ_PAY_TYPE=3`, payer chaque commande dans CJ dès l'e-mail « À payer chez CJ » :
+  le délai annoncé au client court déjà. Avec `CJ_PAY_TYPE=2`, garder le solde CJ
+  approvisionné : sans lui, une commande payée reste en `fulfillment_error` jusqu'à sa
+  relance (voir « Commandes et administration »).
 - Sur Vercel : créer la base Upstash for Redis et renseigner les variables (voir « Mise en
   ligne sur Vercel »).
 - Passer `og:image` en URL absolue et ajouter les données structurées produit une fois le

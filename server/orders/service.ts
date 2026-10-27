@@ -105,6 +105,12 @@ export function createOrderService(deps: OrderServiceDeps) {
   const { store, payment, fulfillment, notifier } = deps
   const trackingSyncMs = deps.trackingSyncMs ?? (deps.mode === 'demo' ? 10_000 : 30 * 60_000)
 
+  /** Prévient le vendeur ; un e-mail qui ne part pas ne bloque pas la commande. */
+  async function alertSeller(order: Order) {
+    await notifier.orderNeedsAttention(order).catch((error) => console.error('[notification]', error))
+    return order
+  }
+
   const catalog = () =>
     buildCatalog(deps.mode, {
       payment: payment.isConfigured(),
@@ -207,25 +213,30 @@ export function createOrderService(deps: OrderServiceDeps) {
   /** Transmet une commande payée au fournisseur. */
   async function fulfill(order: Order) {
     if (!fulfillment.isConfigured()) {
-      return store.update(order.id, (current) => ({
-        ...withStatus(current, 'fulfillment_error', 'Fournisseur non raccordé'),
-        fulfillment: { ...current.fulfillment, error: 'Fournisseur non raccordé' },
-      }))
+      return alertSeller(
+        await store.update(order.id, (current) => ({
+          ...withStatus(current, 'fulfillment_error', 'Fournisseur non raccordé'),
+          fulfillment: { ...current.fulfillment, error: 'Fournisseur non raccordé' },
+        })),
+      )
     }
     try {
-      const { supplierOrderId } = await fulfillment.createOrder(order)
-      console.info(`[fournisseur] ${order.id} transmise (${supplierOrderId})`)
-      return store.update(order.id, (current) => ({
+      const { supplierOrderId, awaitingPayment } = await fulfillment.createOrder(order)
+      console.info(`[fournisseur] ${order.id} transmise (${supplierOrderId})${awaitingPayment ? ', à payer chez le fournisseur' : ''}`)
+      const sent = await store.update(order.id, (current) => ({
         ...withStatus(current, 'sent_to_supplier'),
         fulfillment: { ...current.fulfillment, supplierOrderId, error: null },
       }))
+      return awaitingPayment ? alertSeller(sent) : sent
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       console.error(`[fournisseur] ${order.id} non transmise : ${message}`)
-      return store.update(order.id, (current) => ({
-        ...withStatus(current, 'fulfillment_error', 'Transmission au fournisseur impossible'),
-        fulfillment: { ...current.fulfillment, error: message },
-      }))
+      return alertSeller(
+        await store.update(order.id, (current) => ({
+          ...withStatus(current, 'fulfillment_error', 'Transmission au fournisseur impossible'),
+          fulfillment: { ...current.fulfillment, error: message },
+        })),
+      )
     }
   }
 
@@ -279,8 +290,10 @@ export function createOrderService(deps: OrderServiceDeps) {
     try {
       const tracking = await fulfillment.getTracking(order)
       let shippedNow = false
+      let cancelledNow = false
       const updated = await store.update(order.id, (current) => {
         shippedNow = false
+        cancelledNow = false
         let next: Order = { ...current, fulfillment: { ...current.fulfillment, lastSyncAt: new Date().toISOString() } }
         if (!tracking) return next
         next = {
@@ -296,6 +309,7 @@ export function createOrderService(deps: OrderServiceDeps) {
           // Annulée chez le fournisseur : le client a payé, c'est à l'administrateur
           // de décider (nouvelle commande chez CJ ou remboursement).
           const error = 'Commande annulée chez le fournisseur : passer une nouvelle commande dans CJ ou rembourser le client.'
+          cancelledNow = true
           return {
             ...withStatus(next, 'fulfillment_error', 'Annulée chez le fournisseur'),
             fulfillment: { ...next.fulfillment, error },
@@ -309,7 +323,7 @@ export function createOrderService(deps: OrderServiceDeps) {
         return next
       })
       if (shippedNow) await notifier.orderShipped(updated).catch((error) => console.error('[notification]', error))
-      return updated
+      return cancelledNow ? alertSeller(updated) : updated
     } catch (error) {
       console.warn(`[fournisseur] suivi indisponible pour ${order.id}`, error)
       return order

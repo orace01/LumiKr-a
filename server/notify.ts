@@ -5,13 +5,19 @@ import type { Order } from './orders/types'
 
 /**
  * Messages envoyés au client à chaque étape : confirmation de commande une
- * fois le paiement reçu, puis numéro de suivi à l'expédition. Par e-mail quand
- * le serveur d'envoi est réglé (variables SMTP_*, voir .env.example), sinon
- * seulement écrits dans le journal du serveur.
+ * fois le paiement reçu, puis numéro de suivi à l'expédition. Et une alerte au
+ * vendeur (adresse de contact) quand une commande attend une action de sa part.
+ * Par e-mail quand le serveur d'envoi est réglé (variables SMTP_*, voir
+ * .env.example), sinon seulement écrits dans le journal du serveur.
  */
 export interface Notifier {
   orderPaid(order: Order): Promise<void>
   orderShipped(order: Order): Promise<void>
+  /**
+   * Alerte au vendeur : commande à payer chez le fournisseur (CJ_PAY_TYPE=3),
+   * ou non transmise (état `fulfillment_error`, raison dans `fulfillment.error`).
+   */
+  orderNeedsAttention(order: Order): Promise<void>
 }
 
 export const consoleNotifier: Notifier = {
@@ -20,6 +26,9 @@ export const consoleNotifier: Notifier = {
   },
   async orderShipped(order) {
     console.info(`[commande] ${order.id} expédiée — suivi ${order.fulfillment.trackingNumber ?? 'inconnu'} à envoyer à ${order.customer.email}`)
+  },
+  async orderNeedsAttention(order) {
+    console.warn(`[commande] ${order.id} à traiter : ${order.fulfillment.error ?? 'à payer chez le fournisseur'}`)
   },
 }
 
@@ -129,6 +138,37 @@ export function orderShippedMail(order: Order, siteUrl: string): Mail {
 }
 
 /**
+ * Alerte au vendeur, avec ce qu'il faut pour agir : commande CJ à payer à la
+ * main, ou commande payée par le client mais refusée par CJ.
+ */
+export function sellerAlertMail(order: Order, siteUrl: string, to: string): Mail {
+  const { customer, shippingAddress: address, fulfillment } = order
+  const failed = order.status === 'fulfillment_error'
+  const details = [
+    ...order.lines.map((line) => `• ${line.label} × ${line.quantity}`),
+    `Payé par le client : ${money(order.totalCents, order.currency)}`,
+    `Livraison à : ${customer.firstName} ${customer.lastName}, ${address.postalCode} ${address.city}`,
+  ]
+  const { text, html } = layout(
+    failed
+      ? [
+          `La commande ${order.id} est payée par le client mais n’est pas partie chez CJ.`,
+          `Raison : ${fulfillment.error ?? 'inconnue'}`,
+          details,
+          `Une fois le problème réglé, relance-la : POST ${siteUrl}/api/admin/orders/${order.id}/fulfill avec le jeton d’administration (voir le README, « Commandes et administration »).`,
+        ]
+      : [
+          `Nouvelle commande ${order.id} : le client a payé et la commande est créée chez CJ${fulfillment.supplierOrderId ? ` (n° ${fulfillment.supplierOrderId})` : ''}, mais elle n’est pas encore payée à CJ.`,
+          'CJ ne l’expédiera qu’une fois payée : dans ton compte CJ, ouvre les commandes en attente de paiement et règle celle-ci.',
+          details,
+        ],
+    [{ label: 'Compte CJ', url: 'https://cjdropshipping.com' }],
+  )
+  const subject = failed ? `À traiter : commande ${order.id} non transmise à CJ` : `À payer chez CJ : commande ${order.id}`
+  return { to, subject, text, html }
+}
+
+/**
  * Envoi par le serveur SMTP de la boîte de contact. `send` est remplaçable
  * pour les tests ; `siteUrl` est l'adresse publique du site, pour les liens.
  */
@@ -154,6 +194,7 @@ export function createEmailNotifier(
     deliver = (mail) => transport.sendMail({ from: settings.from, replyTo: site.contactEmail ?? settings.user, ...mail })
   }
   const url = siteUrl.replace(/\/+$/, '')
+  const seller = site.contactEmail ?? settings.user
   return {
     async orderPaid(order) {
       await deliver(orderPaidMail(order, url))
@@ -162,6 +203,11 @@ export function createEmailNotifier(
     async orderShipped(order) {
       await deliver(orderShippedMail(order, url))
       console.info(`[e-mail] avis d’expédition de ${order.id} envoyé`)
+    },
+    async orderNeedsAttention(order) {
+      console.warn(`[commande] ${order.id} à traiter : ${order.fulfillment.error ?? 'à payer chez le fournisseur'}`)
+      await deliver(sellerAlertMail(order, url, seller))
+      console.info(`[e-mail] alerte vendeur pour ${order.id} envoyée`)
     },
   }
 }

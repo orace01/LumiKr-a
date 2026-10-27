@@ -214,7 +214,7 @@ export class CjFulfillmentProvider implements FulfillmentProvider {
     return this.client
   }
 
-  async createOrder(order: Order): Promise<{ supplierOrderId: string }> {
+  async createOrder(order: Order): Promise<{ supplierOrderId: string; awaitingPayment: boolean }> {
     const payload = toCjOrder(order, this.settings, this.mapping)
     try {
       const created = await this.api().call<CjCreatedOrder>('POST', '/shopping/order/createOrderV2', { body: payload })
@@ -225,7 +225,7 @@ export class CjFulfillmentProvider implements FulfillmentProvider {
           `Commande CJ ${created.orderId} créée mais non payée (état ${status}) : vérifier le solde CJ, puis relancer.`,
         )
       }
-      return { supplierOrderId: created.orderId }
+      return { supplierOrderId: created.orderId, awaitingPayment: this.settings.payType === 3 }
     } catch (error) {
       if (error instanceof CjApiError && error.code === CJ_ERRORS.duplicateOrder) {
         // Déjà transmise lors d'une tentative précédente : on reprend celle-ci.
@@ -236,13 +236,16 @@ export class CjFulfillmentProvider implements FulfillmentProvider {
   }
 
   /** Reprend une commande déjà créée chez CJ et la paie si elle ne l'est pas encore. */
-  private async resume(orderNumber: string): Promise<{ supplierOrderId: string }> {
+  private async resume(orderNumber: string): Promise<{ supplierOrderId: string; awaitingPayment: boolean }> {
     try {
       const existing = await this.getOrderDetail(orderNumber)
       if (this.settings.payType === 2 && UNPAID_STATUSES.has(existing.orderStatus)) {
         await this.api().call('POST', '/shopping/balance/payBalance', { body: { orderId: existing.orderId } })
       }
-      return { supplierOrderId: existing.orderId }
+      return {
+        supplierOrderId: existing.orderId,
+        awaitingPayment: this.settings.payType === 3 && UNPAID_STATUSES.has(existing.orderStatus),
+      }
     } catch (error) {
       throw new Error(describeCjError(error))
     }

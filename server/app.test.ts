@@ -10,7 +10,7 @@ import { MemoryOrderStore } from './orders/store'
 import { MepayePaymentProvider, readMepayeSettings } from './payment/mepaye'
 import { DemoPaymentProvider } from './payment/demo'
 
-const silentNotifier = { orderPaid: async () => {}, orderShipped: async () => {} } satisfies typeof consoleNotifier
+const silentNotifier = { orderPaid: async () => {}, orderShipped: async () => {}, orderNeedsAttention: async () => {} } satisfies typeof consoleNotifier
 
 // Montant attendu d'un 12 × 12 livré, d'après le catalogue de démonstration.
 const demoCatalog = buildCatalog('demo', { payment: true, fulfillment: true })

@@ -117,7 +117,7 @@ describe('RedisOrderStore', () => {
         store: new RedisOrderStore(redis()),
         payment,
         fulfillment,
-        notifier: { orderPaid: async () => {}, orderShipped: async () => {} },
+        notifier: { orderPaid: async () => {}, orderShipped: async () => {}, orderNeedsAttention: async () => {} },
         trackingSyncMs: 0,
       })
     const [first, second] = [instance(), instance()]

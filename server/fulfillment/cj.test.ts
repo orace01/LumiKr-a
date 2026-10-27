@@ -113,7 +113,7 @@ describe('CjFulfillmentProvider', () => {
     const { cj, calls } = provider({
       '/shopping/order/createOrderV2': () => ok({ orderId: 'CJ-1', orderStatus: 'UNSHIPPED' }),
     })
-    expect(await cj.createOrder(order())).toEqual({ supplierOrderId: 'CJ-1' })
+    expect(await cj.createOrder(order())).toEqual({ supplierOrderId: 'CJ-1', awaitingPayment: false })
     expect(calls.find((call) => call.endpoint === '/shopping/order/createOrderV2')?.body).toMatchObject({ orderNumber: 'LK-ABC234', payType: 2 })
   })
 
@@ -122,9 +122,9 @@ describe('CjFulfillmentProvider', () => {
     await expect(cj.createOrder(order())).rejects.toThrow(/non payée/)
   })
 
-  it('accepte une commande impayée quand le paiement CJ est manuel (payType 3)', async () => {
+  it('accepte une commande impayée quand le paiement CJ est manuel (payType 3), à payer par le vendeur', async () => {
     const { cj } = provider({ '/shopping/order/createOrderV2': () => ok({ orderId: 'CJ-1', orderStatus: 'UNPAID' }) }, { payType: 3 })
-    expect(await cj.createOrder(order())).toEqual({ supplierOrderId: 'CJ-1' })
+    expect(await cj.createOrder(order())).toEqual({ supplierOrderId: 'CJ-1', awaitingPayment: true })
   })
 
   it('à la relance, reprend la commande déjà créée et la paie', async () => {
@@ -133,7 +133,7 @@ describe('CjFulfillmentProvider', () => {
       '/shopping/order/getOrderDetail': () => ok({ orderId: 'CJ-1', orderStatus: 'UNPAID' }),
       '/shopping/balance/payBalance': () => ok(true),
     })
-    expect(await cj.createOrder(order())).toEqual({ supplierOrderId: 'CJ-1' })
+    expect(await cj.createOrder(order())).toEqual({ supplierOrderId: 'CJ-1', awaitingPayment: false })
     expect(calls.find((call) => call.endpoint === '/shopping/order/getOrderDetail')?.body).toEqual({ orderId: 'LK-ABC234' })
     expect(calls.find((call) => call.endpoint === '/shopping/balance/payBalance')?.body).toEqual({ orderId: 'CJ-1' })
   })
@@ -200,7 +200,7 @@ describe('chaîne complète avec CJ', () => {
       store,
       payment,
       fulfillment: cj,
-      notifier: { orderPaid: async () => {}, orderShipped: async (sent) => void shipped.push(sent.id) },
+      notifier: { orderPaid: async () => {}, orderShipped: async (sent) => void shipped.push(sent.id), orderNeedsAttention: async () => {} },
       trackingSyncMs: 0,
     })
 

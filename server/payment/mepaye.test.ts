@@ -142,7 +142,7 @@ describe('notification de paiement', () => {
       store,
       payment: new DemoPaymentProvider(),
       fulfillment,
-      notifier: { orderPaid: async () => {}, orderShipped: async () => {} },
+      notifier: { orderPaid: async () => {}, orderShipped: async () => {}, orderNeedsAttention: async () => {} },
     })
     await store.create({ ...order(), payment: { provider: 'mepaye', reference: 'pay_1', paidAt: null } })
 

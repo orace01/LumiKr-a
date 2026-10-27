@@ -15,8 +15,11 @@ export interface TrackingInfo {
 export interface FulfillmentProvider {
   readonly id: string
   isConfigured(): boolean
-  /** Transmet la commande au fournisseur ; renvoie son numéro de commande. */
-  createOrder(order: Order): Promise<{ supplierOrderId: string }>
+  /**
+   * Transmet la commande au fournisseur ; renvoie son numéro de commande, et
+   * `awaitingPayment` si elle reste à payer à la main chez lui.
+   */
+  createOrder(order: Order): Promise<{ supplierOrderId: string; awaitingPayment?: boolean }>
   /** État d'expédition et numéro de suivi ; `null` si rien de nouveau. */
   getTracking(order: Order): Promise<TrackingInfo | null>
 }

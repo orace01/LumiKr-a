@@ -27,7 +27,7 @@ const catalog = buildCatalog('demo', { payment: true, fulfillment: true })
 const priceOf = (variantId: string) => catalog.variants.find((variant) => variant.id === variantId)!.priceCents!
 const shippingCents = catalog.shippingMethods[0].priceCents!
 
-function setup(options: { fulfillmentFails?: boolean } = {}) {
+function setup(options: { fulfillmentFails?: boolean; awaitingPayment?: boolean } = {}) {
   const store = new MemoryOrderStore()
   const payment = new DemoPaymentProvider()
   const fulfillment: FulfillmentProvider = {
@@ -35,11 +35,15 @@ function setup(options: { fulfillmentFails?: boolean } = {}) {
     isConfigured: () => true,
     createOrder: vi.fn(async (order) => {
       if (options.fulfillmentFails) throw new Error('stock épuisé')
-      return { supplierOrderId: `CJ-${order.id}` }
+      return { supplierOrderId: `CJ-${order.id}`, awaitingPayment: options.awaitingPayment ?? false }
     }),
     getTracking: vi.fn(async () => ({ status: 'shipped' as const, carrier: 'Colissimo', trackingNumber: 'XY123', trackingUrl: null })),
   }
-  const notifier: Notifier = { orderPaid: vi.fn(async () => {}), orderShipped: vi.fn(async () => {}) }
+  const notifier: Notifier = {
+    orderPaid: vi.fn(async () => {}),
+    orderShipped: vi.fn(async () => {}),
+    orderNeedsAttention: vi.fn(async () => {}),
+  }
   const service = createOrderService({ mode: 'demo', store, payment, fulfillment, notifier, trackingSyncMs: 0 })
   return { store, payment, fulfillment, notifier, service }
 }
@@ -102,6 +106,26 @@ describe('commande', () => {
     expect(order.fulfillment.supplierOrderId).toBe(`CJ-${orderId}`)
     expect(env.fulfillment.createOrder).toHaveBeenCalledTimes(1)
     expect(env.notifier.orderPaid).toHaveBeenCalledTimes(1)
+    expect(env.notifier.orderNeedsAttention).not.toHaveBeenCalled()
+  })
+
+  it('prévient le vendeur quand la commande est à payer chez le fournisseur', async () => {
+    env = setup({ awaitingPayment: true })
+    const { orderId, reference } = await placeOrder(env)
+    await env.service.handlePaymentEvent({ reference, outcome: 'paid' })
+    expect((await env.store.get(orderId))!.status).toBe('sent_to_supplier')
+    expect(env.notifier.orderNeedsAttention).toHaveBeenCalledTimes(1)
+    expect(env.notifier.orderNeedsAttention).toHaveBeenCalledWith(expect.objectContaining({ id: orderId, status: 'sent_to_supplier' }))
+  })
+
+  it('une alerte qui ne part pas ne bloque pas la commande', async () => {
+    env = setup({ awaitingPayment: true })
+    vi.mocked(env.notifier.orderNeedsAttention).mockRejectedValueOnce(new Error('SMTP indisponible'))
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const { orderId, reference } = await placeOrder(env)
+    await env.service.handlePaymentEvent({ reference, outcome: 'paid' })
+    expect((await env.store.get(orderId))!.status).toBe('sent_to_supplier')
+    errors.mockRestore()
   })
 
   it('un paiement refusé ne déclenche aucun envoi', async () => {
@@ -118,6 +142,7 @@ describe('commande', () => {
     const order = (await env.store.get(orderId))!
     expect(order.status).toBe('fulfillment_error')
     expect(order.fulfillment.error).toBe('stock épuisé')
+    expect(env.notifier.orderNeedsAttention).toHaveBeenCalledWith(expect.objectContaining({ id: orderId, status: 'fulfillment_error' }))
 
     const seen = await env.service.getForCustomer(orderId, order.accessKey)
     expect(seen?.status).toBe('confirmed')
@@ -141,6 +166,7 @@ describe('commande', () => {
     const order = (await env.store.get(orderId))!
     expect(order.status).toBe('fulfillment_error')
     expect(order.fulfillment.error).toMatch(/annulée/)
+    expect(env.notifier.orderNeedsAttention).toHaveBeenCalledTimes(1)
     expect((await env.service.lookup(orderId, customer.email))?.status).toBe('confirmed')
   })
 

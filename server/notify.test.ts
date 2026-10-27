@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createDefaultDeps } from './app'
 import { readConfig } from './config'
-import { consoleNotifier, createEmailNotifier, orderPaidMail, orderShippedMail, readMailSettings, type Mail } from './notify'
+import { consoleNotifier, createEmailNotifier, orderPaidMail, orderShippedMail, readMailSettings, sellerAlertMail, type Mail } from './notify'
 import type { Order } from './orders/types'
 
 function order(overrides: Partial<Order> = {}): Order {
@@ -64,6 +64,33 @@ describe('e-mails au client', () => {
       'Votre commande LK-ABC234 est expédiée',
     ])
     expect(send.mock.calls[0][0].text).toContain('https://lumikrea.store/suivi')
+  })
+
+  it('alerte le vendeur d’une commande à payer chez CJ', () => {
+    const mail = sellerAlertMail(order({ status: 'sent_to_supplier' }), SITE, 'contact@lumikrea.store')
+    expect(mail.to).toBe('contact@lumikrea.store')
+    expect(mail.subject).toBe('À payer chez CJ : commande LK-ABC234')
+    expect(mail.text).toContain('n° CJ-1')
+    expect(mail.text).toContain('20 × 20 cm × 2')
+    expect(mail.text).toMatch(/Payé par le client : 65,80\s€/)
+    expect(mail.html).toContain('Martin &lt;b&gt;')
+  })
+
+  it('alerte le vendeur d’une commande refusée par CJ, avec la raison', () => {
+    const failed = order({ status: 'fulfillment_error', fulfillment: { ...order().fulfillment, supplierOrderId: null, error: 'Solde CJ insuffisant' } })
+    const mail = sellerAlertMail(failed, SITE, 'contact@lumikrea.store')
+    expect(mail.subject).toBe('À traiter : commande LK-ABC234 non transmise à CJ')
+    expect(mail.text).toContain('Raison : Solde CJ insuffisant')
+    expect(mail.text).toContain(`${SITE}/api/admin/orders/LK-ABC234/fulfill`)
+  })
+
+  it('envoie l’alerte vendeur à l’adresse de contact', async () => {
+    const send = vi.fn(async (_mail: Mail) => {})
+    const settings = readMailSettings({ SMTP_HOST: 'mail.test', SMTP_USER: 'envoi@lumikrea.store', SMTP_PASSWORD: 'x' })!
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    await createEmailNotifier(settings, SITE, send).orderNeedsAttention(order({ status: 'sent_to_supplier' }))
+    warn.mockRestore()
+    expect(send.mock.calls[0][0]).toMatchObject({ to: 'contact@lumikrea.store', subject: 'À payer chez CJ : commande LK-ABC234' })
   })
 
   it('n’envoie d’e-mails que si le serveur d’envoi est réglé', () => {
