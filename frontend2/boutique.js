@@ -35,6 +35,29 @@
     }
 
     if (!info.saleOpen && note) note.textContent += " La vente en ligne ouvre bientôt.";
+    afficherAnnonce(info.freeShippingUntil);
+  }
+
+  // Bandeau « Livraison offerte » : date de fin donnée par le serveur (src/config/shop.ts), temps
+  // restant à la minute ; il disparaît à cette date. Même texte que src/components/ShippingOfferBar.tsx.
+  function afficherAnnonce(fin) {
+    const annonce = document.getElementById("annonce");
+    if (!annonce || !fin) return;
+    const date = new Date(fin);
+    const paris = { timeZone: "Europe/Paris" };
+    annonce.querySelector("[data-jour]").textContent = `${new Intl.DateTimeFormat("fr-FR", { ...paris, weekday: "long" }).format(date)} `;
+    annonce.querySelector("[data-date]").textContent = new Intl.DateTimeFormat("fr-FR", { ...paris, day: "numeric", month: "long" }).format(date);
+    const reste = annonce.querySelector("[data-reste]");
+    let minuteur = null;
+    const maj = () => {
+      const minutes = Math.floor((date.getTime() - Date.now()) / 60000);
+      annonce.hidden = minutes < 0;
+      if (minutes < 0) { clearInterval(minuteur); return; }
+      const jours = Math.floor(minutes / 1440), heures = Math.floor((minutes % 1440) / 60), mn = minutes % 60;
+      reste.textContent = jours > 0 ? `${jours} j ${heures} h` : heures > 0 ? `${heures} h ${String(mn).padStart(2, "0")} min` : `${mn} min`;
+    };
+    maj();
+    if (!annonce.hidden) minuteur = setInterval(maj, 30000);
   }
 
   const MAX_QUANTITE = 10;   // src/config/shop.ts, maxQuantityPerLine

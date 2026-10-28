@@ -23,6 +23,8 @@ export interface ShopInfo {
   shippingMethods: { id: string; label: string; priceCents: number | null; delay: string | null }[]
   countries: { code: string; name: string }[]
   paymentProviderName: string | null
+  /** Fin de la livraison offerte (date ISO), à annoncer en bandeau ; `null` une fois passée. */
+  freeShippingUntil: string | null
 }
 
 /** Champs du formulaire de commande. */

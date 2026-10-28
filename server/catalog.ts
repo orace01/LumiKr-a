@@ -11,6 +11,13 @@ import type { ShopInfo, ShopMode } from '../src/shop/types'
 const DEMO_PRICES_CENTS: Record<string, number> = { '12x12': 1000, '15x15': 1500, '20x20': 2000, '30x20': 3000 }
 const DEMO_SHIPPING_CENTS = 500
 
+/** Fin de la livraison offerte à annoncer : seulement si elle est à venir et que la livraison est bien gratuite. */
+export function announcedFreeShipping(until: string | null, shippingCents: (number | null)[], now = Date.now()) {
+  if (!until || shippingCents.length === 0 || shippingCents.some((cents) => cents !== 0)) return null
+  const end = Date.parse(until)
+  return Number.isFinite(end) && end > now ? until : null
+}
+
 /** Catalogue tel que le serveur l'applique : c'est lui qui fait foi pour les montants. */
 export function buildCatalog(mode: ShopMode, ready: { payment: boolean; fulfillment: boolean; storage?: boolean }): ShopInfo {
   const demo = mode === 'demo'
@@ -57,5 +64,9 @@ export function buildCatalog(mode: ShopMode, ready: { payment: boolean; fulfillm
     countries: shop.countries,
     // En démo, le bandeau « paiement simulé » suffit : pas de nom de prestataire.
     paymentProviderName: demo ? null : shop.paymentProviderName,
+    freeShippingUntil: announcedFreeShipping(
+      shop.freeShippingUntil,
+      shippingMethods.map((method) => method.priceCents),
+    ),
   }
 }

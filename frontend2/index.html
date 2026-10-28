@@ -26,6 +26,8 @@
 
 <!-- En-tête : le même que sur les autres pages du site (src/components/Header.tsx). Le panier mène à la commande. -->
 <header class="header">
+  <!-- Livraison offerte jusqu'à la date donnée par le serveur (boutique.js) ; caché sinon. -->
+  <p class="annonce" id="annonce" hidden><strong>Livraison offerte</strong> jusqu’au <span class="annonce__long" data-jour></span><span data-date></span><span class="annonce__long"> inclus</span><span class="annonce__reste"> · <span class="annonce__long">plus que </span><span data-reste></span></span></p>
   <div class="container header__inner">
     <a class="header__brand" href="#hero" aria-label="Lumikréa, retour en haut"><img class="header__logo" src="media/logo.svg" alt="Lumikréa" width="140" height="40"></a>
     <nav class="header__nav" aria-label="Sections de la page d’accueil">

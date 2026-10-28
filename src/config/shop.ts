@@ -47,4 +47,12 @@ export const shop = {
 
   /** Nom du prestataire affiché au paiement et dans les pages légales (server/payment/mepaye.ts). */
   paymentProviderName: 'Mepaye' as string | null,
+
+  /**
+   * Fin annoncée de la livraison offerte (heure de Paris), ou `null`. Tant qu'elle n'est pas
+   * passée et que la livraison est gratuite, un bandeau en haut du site l'annonce avec le temps
+   * restant ; il disparaît de lui-même à cette date. Annoncé le 28 octobre 2026 pour 7 jours,
+   * avant des frais de livraison : penser à les fixer (`price` ci-dessus) pour cette date.
+   */
+  freeShippingUntil: '2026-11-04T23:59:59+01:00' as string | null,
 }

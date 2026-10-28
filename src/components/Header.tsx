@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { site } from '../config/site'
 import { Link } from './Link'
+import { ShippingOfferBar } from './ShippingOfferBar'
 import { useCart } from '../shop/useCart'
 import { useCartBump } from '../shop/useCartBump'
 import './Header.css'
@@ -131,6 +132,7 @@ export function Header({ backTo }: { backTo?: string }) {
     .join(' ')
   return (
     <header className={classes}>
+      <ShippingOfferBar />
       <div className="container header__inner">
         {backTo && (
           <Link className="header__back" to={backTo} transition aria-label="Retour à la boutique">

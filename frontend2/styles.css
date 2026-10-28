@@ -10,10 +10,12 @@
   --script: "Sacramento", "Brush Script MT", cursive;
   --gutter: max(16px, 7.8vw);
   /* Hauteur réservée au header : les textes du hero et des scènes collées commencent en dessous. */
-  --entete: calc(env(safe-area-inset-top, 0px) + 76px);
+  --entete: calc(env(safe-area-inset-top, 0px) + 76px + var(--annonce, 0px));
   --ombre: 0 2px 24px rgba(8, 8, 20, .62), 0 1px 3px rgba(8, 8, 20, .5);
   color-scheme: dark;
 }
+/* Bandeau « Livraison offerte » affiché en haut de l'en-tête : les textes descendent d'autant. */
+:root:has(.annonce:not([hidden])) { --annonce: 2.25rem; }
 
 * { box-sizing: border-box; }
 html { background: var(--nuit); -webkit-text-size-adjust: 100%; }
@@ -364,13 +366,13 @@ a { color: inherit; }
 
 /* ---------- Paysage (16:9) : textes sur le côté libre ---------- */
 @media (orientation: landscape) {
-  :root { --gutter: max(24px, 6.5vw); --entete: calc(env(safe-area-inset-top, 0px) + 88px); }
+  :root { --gutter: max(24px, 6.5vw); --entete: calc(env(safe-area-inset-top, 0px) + 88px + var(--annonce, 0px)); }
   /* Ouverture : même composition, centrée, à l'échelle de l'écran large. */
   .ouverture { gap: 2.6svh; padding-bottom: calc(var(--barres, 0px) + 14svh); }
   .ouverture::before { background: radial-gradient(ellipse 42% 38% at 50% 44%, rgba(8, 7, 14, .6) 0%, rgba(8, 7, 14, .32) 52%, rgba(8, 7, 14, 0) 100%); }
   /* Ordinateur : composition de page produit, titre géant centré, sous-titre court, prix, deux actions côte à côte.
      Le bloc est centré dans l'espace sous l'en-tête fixe (72 px), au-dessus de « Faites défiler ». */
-  .ouverture { gap: 1.6svh; padding-top: calc(env(safe-area-inset-top, 0px) + 72px); padding-bottom: calc(var(--barres, 0px) + 11svh); }
+  .ouverture { gap: 1.6svh; padding-top: calc(env(safe-area-inset-top, 0px) + 72px + var(--annonce, 0px)); padding-bottom: calc(var(--barres, 0px) + 11svh); }
   .o-titre .caps { font-size: min(11vw, 19svh); letter-spacing: -.04em; line-height: .84; }
   .o-titre .script { font-size: min(6.4vw, 11.5svh); max-width: 70vw; margin-top: -.12em; }
   .o-sous { max-width: 44ch; font-size: clamp(17px, 1.5vw, 22px); }
