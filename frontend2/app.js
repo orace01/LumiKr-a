@@ -198,6 +198,31 @@
     return chercher(yE, minL);
   }
   const lit = stations.map(() => false);
+  // Hauteur du tracé tous les 1/600 de sa longueur, calculée morceau par morceau (une courbe ou une ligne) sur
+  // filPaths[1], qui sert de brouillon comme dans buildFil : getPointAtLength reparcourt le tracé depuis son début,
+  // et 600 appels sur le tracé entier coûtaient plus d'une demi-seconde à chaque calcul, page bloquée pendant ce temps.
+  function tableHauteurs(d, total) {
+    const brouillon = filPaths[1], morceaux = [];
+    let depart = d.slice(1, d.search(/[CL]|$/)).trim();  // « x y » du point de départ (après « M »)
+    for (const cmd of d.match(/[CL][^CL]*/g) || []) {
+      const trace = `M ${depart} ${cmd}`;
+      brouillon.setAttribute("d", trace);
+      morceaux.push({ trace, l: brouillon.getTotalLength() });
+      depart = cmd.trim().split(/[\s,]+/).slice(-2).join(" ");
+    }
+    brouillon.setAttribute("d", morceaux.length ? morceaux[0].trace : d);
+    const table = [];
+    let k = 0, debut = 0;                                 // morceau en cours et longueur du tracé à son début
+    for (let i = 0; i <= 600; i++) {
+      const l = total * i / 600;
+      while (k < morceaux.length - 1 && l > debut + morceaux[k].l) {
+        debut += morceaux[k].l; k++;
+        brouillon.setAttribute("d", morceaux[k].trace);
+      }
+      table.push([l, brouillon.getPointAtLength(Math.max(0, Math.min(l - debut, morceaux[k] ? morceaux[k].l : 0))).y]);
+    }
+    return table;
+  }
   function buildFil() {
     const w = suite.clientWidth, h = suite.offsetHeight, portrait = fmt === "9x16";
     const r = suite.getBoundingClientRect();
@@ -256,11 +281,11 @@
     }
     stationLens = ends;
     fil.setAttribute("viewBox", `0 0 ${w} ${h}`);
-    filPaths.forEach((path) => path.setAttribute("d", d));
+    filPaths[0].setAttribute("d", d);
     filLen = filPaths[0].getTotalLength();
+    filTable = tableHauteurs(d, filLen);                 // longueur → hauteur, pour retrouver la tête depuis le scroll
+    filPaths[1].setAttribute("d", d);
     fil.style.setProperty("--len", filLen.toFixed(1));
-    filTable = [];                                       // longueur → hauteur, pour retrouver la tête depuis le scroll
-    for (let i = 0; i <= 600; i++) { const l = filLen * i / 600; filTable.push([l, filPaths[0].getPointAtLength(l).y]); }
     suiteTop = r.top + scrollY;
     lastFil = -1;
   }
