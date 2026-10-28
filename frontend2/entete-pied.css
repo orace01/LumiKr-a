@@ -76,7 +76,7 @@
    pour que le texte de la page ne se mêle jamais au logo et au menu (même règle que src/components/Header.css). */
 .header--transparent { background: rgb(15 16 36 / 0.3); box-shadow: none; -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5); }
 .header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; height: var(--header-height); }
-.header__brand { display: inline-flex; align-items: center; text-decoration: none; }
+.header__brand { display: inline-flex; flex-shrink: 0; align-items: center; text-decoration: none; }
 .header__logo { width: auto; height: 2.25rem; }
 .header__nav { display: none; }
 .header__nav ul { display: flex; gap: clamp(0.25rem, 1vw, 0.75rem); }
@@ -124,7 +124,7 @@
   font-weight: 700;
 }
 .header__cart-count[hidden] { display: none; }
-/* Téléphone : bouton menu à la place du panier (le panier est dans le menu). */
+/* Téléphone : bouton menu à côté du panier (les liens des sections sont dans le menu). */
 .header__burger {
   display: grid;
   place-items: center;
@@ -140,7 +140,6 @@
 }
 .header__burger:hover { background: var(--glow); color: var(--on-primary); }
 .header__burger:focus-visible { outline: 3px solid var(--glow); outline-offset: 3px; }
-.header .header__cart { display: none; }
 /* Panneau du menu : sous la barre, avec son propre fond (la barre peut être transparente). */
 .header__menu {
   position: absolute;
@@ -180,19 +179,24 @@
 .header__menu-count[hidden] { display: none; }
 @media (min-width: 900px) {
   .header__nav { display: block; }
-  .header .header__cart { display: grid; }
   .header__burger, .header__menu { display: none; }
 }
 /* Bouton compact : il guide vers la boutique sans écraser l'en-tête. */
 .header__cta { min-height: 2.4rem; padding: 0.35rem 1rem; font-size: 0.8rem; letter-spacing: 0.07em; white-space: nowrap; }
+/* Téléphone : le bouton d'achat passe avant le panier et le menu, regroupés au bord. */
+@media (max-width: 899px) { .header__cta { order: -1; } }
 @media (max-width: 520px) {
+  .header__inner { gap: 0.75rem; }
   .header__cta { min-height: 2.15rem; padding: 0.3rem 0.75rem; font-size: 0.68rem; letter-spacing: 0.05em; }
+  .header__actions { gap: 0.45rem; }
+  .header__cart, .header__burger { width: 2.4rem; height: 2.4rem; }
 }
 @media (max-width: 420px) {
-  .header__inner { gap: 0.75rem; }
   .header__logo { height: 1.9rem; }
 }
-/* Très petit écran : le panier reste, le bouton « Choisir » laisse la place. */
+/* « Commander maintenant » ne tient plus à côté du panier et du menu : « Commander ». */
+@media (max-width: 459px) { .header__cta-suite { display: none; } }
+/* Très petit écran : le panier reste, le bouton « Commander » laisse la place. */
 @media (max-width: 349px) { .header__cta { display: none; } }
 
 /* ---------- Pied de page ---------- */

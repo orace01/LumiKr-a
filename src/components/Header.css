@@ -32,6 +32,7 @@
 
 .header__brand {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   text-decoration: none;
 }
@@ -118,7 +119,7 @@
   font-weight: 700;
 }
 
-/* Téléphone : bouton menu à la place du panier (le panier est dans le menu). */
+/* Téléphone : bouton menu à côté du panier (les liens des sections sont dans le menu). */
 .header__burger {
   display: grid;
   place-items: center;
@@ -135,10 +136,6 @@
 .header__burger:hover {
   background: var(--glow);
   color: var(--on-primary);
-}
-
-.header .header__cart {
-  display: none;
 }
 
 /* Panneau du menu : sous la barre, avec son propre fond (la barre peut être transparente). */
@@ -217,6 +214,7 @@
   }
 
   .header--over .header__back,
+  .header--over .header__cart,
   .header--over .header__burger {
     display: grid;
     place-items: center;
@@ -232,15 +230,16 @@
   .header--over .header__inner {
     justify-content: space-between;
   }
+
+  /* Le bouton d'achat passe avant le panier et le menu, regroupés au bord. */
+  .header__cta {
+    order: -1;
+  }
 }
 
 @media (min-width: 900px) {
   .header__nav {
     display: block;
-  }
-
-  .header .header__cart {
-    display: grid;
   }
 
   .header__burger,
@@ -259,26 +258,42 @@
 }
 
 @media (max-width: 520px) {
+  .header__inner {
+    gap: 0.75rem;
+  }
+
   .header__cta {
     min-height: 2.15rem;
     padding: 0.3rem 0.75rem;
     font-size: 0.68rem;
     letter-spacing: 0.05em;
   }
+
+  .header__actions {
+    gap: 0.45rem;
+  }
+
+  .header__cart,
+  .header__burger {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
 }
 
 @media (max-width: 420px) {
-  .header__inner {
-    gap: 0.75rem;
-  }
-
   .header__logo {
     height: 1.9rem;
   }
-
 }
 
-/* Très petit écran : le panier reste, le bouton « Choisir » laisse la place. */
+/* « Commander maintenant » ne tient plus à côté du panier et du menu : « Commander ». */
+@media (max-width: 459px) {
+  .header__cta-suite {
+    display: none;
+  }
+}
+
+/* Très petit écran : le panier reste, le bouton « Commander » laisse la place. */
 @media (max-width: 349px) {
   .header__cta {
     display: none;

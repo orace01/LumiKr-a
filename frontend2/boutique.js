@@ -212,6 +212,12 @@
     evenement.preventDefault();
     ouvrirPanneau();
   });
+  // Panier de l'en-tête sur téléphone : le même panneau ; sur ordinateur, il mène à la commande.
+  document.getElementById("panier").addEventListener("click", (evenement) => {
+    if (!matchMedia("(max-width: 899px)").matches) return;
+    evenement.preventDefault();
+    ouvrirPanneau();
+  });
 
   majPanier();
   addEventListener("pageshow", majPanier);   // retour depuis la commande : le panier a pu changer

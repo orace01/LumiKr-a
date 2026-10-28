@@ -157,7 +157,11 @@ export function Header({ backTo }: { backTo?: string }) {
           <CartButton />
           <MobileMenu open={menuOpen} onToggle={() => setMenuOpen(!menuOpen)} onClose={() => setMenuOpen(false)} />
           <Link className="btn btn--primary btn--small header__cta" to={site.primaryCta.href}>
-            {site.primaryCta.label}
+            {/* Un seul bloc de texte : le bouton espace ses éléments (gap), pas les mots. */}
+            <span>
+              {site.primaryCta.label}
+              <span className="header__cta-suite"> {site.primaryCta.labelEnd}</span>
+            </span>
           </Link>
         </div>
       </div>
