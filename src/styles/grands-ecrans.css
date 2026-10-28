@@ -1,0 +1,41 @@
+/* Grands écrans (règle R-009 de vibe-brain) : MacBook Pro, Full HD, iMac, Mac Retina et 4K.
+   Rien ne change jusqu'à 1440 × 900 : tout vit dans la requête ci-dessous. Chaque palier pose un facteur --z
+   (largeur ET hauteur exigées, pour ne pas grossir un écran large mais bas). Le zoom est posé sur les conteneurs,
+   jamais sur la racine (un zoom racine casserait les vw, les éléments collants et les mesures de défilement), et leur
+   largeur est compensée. Feuille chargée en dernier (src/main.tsx) : elle passe après le CSS des composants. */
+@media (min-width: 1680px) and (min-height: 900px) {
+  :root {
+    --z: 1.15;
+    --container: max(1240px, min(86vw, 138svh));
+    /* L'en-tête fixe suit l'échelle ; dans les blocs zoomés, la base est remise (le zoom l'agrandit déjà). */
+    --header-bar: calc(4.5rem * var(--z));
+    --offer-base: 0px;
+  }
+  /* Bandeau « Livraison offerte » : sa hauteur à l'échelle (src/styles/global.css la pose sur :root:has(.offer-bar)). */
+  html:root:has(.offer-bar) {
+    --offer-base: 2.25rem;
+    --offer-bar-height: calc(2.25rem * var(--z));
+  }
+
+  /* Conteneurs : en-tête, pied de page et toutes les pages (boutique, fiche produit, commande, suivi, légal). */
+  html .container {
+    zoom: var(--z);
+    max-width: calc((var(--container) + var(--gutter) * 2) / var(--z));
+    --header-bar: 4.5rem;
+    --header-height: calc(4.5rem + var(--offer-base));
+  }
+
+  /* Hauteurs d'écran posées sur des conteneurs zoomés : divisées par --z (sinon 2,35 écrans en 4K). */
+  html .order-page { min-height: calc(70vh / var(--z)); }
+  html .checkout-empty { min-height: calc(60vh / var(--z)); }
+
+  /* Éléments fixés à l'écran, hors des conteneurs. */
+  html .offer-bar { zoom: var(--z); --offer-bar-height: 2.25rem; }
+  html .cart { zoom: var(--z); height: calc(100dvh / var(--z)); }
+  html .toast-zone, html .demo-banner { zoom: var(--z); }
+}
+
+@media (min-width: 1920px) and (min-height: 1000px) { :root { --z: 1.3; } }
+@media (min-width: 2400px) and (min-height: 1250px) { :root { --z: 1.6; } }
+@media (min-width: 2880px) and (min-height: 1500px) { :root { --z: 1.95; } }
+@media (min-width: 3600px) and (min-height: 1900px) { :root { --z: 2.35; } }

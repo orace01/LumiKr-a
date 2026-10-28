@@ -1,0 +1,66 @@
+/* Accueil sur grands écrans (règle R-009 de vibe-brain) : MacBook Pro, Full HD, iMac, Mac Retina et 4K.
+   Rien ne change jusqu'à 1440 × 900 : tout vit dans la requête ci-dessous. Feuille chargée en dernier (index.html).
+   - Facteur --z par paliers (largeur ET hauteur), posé sur :root.
+   - Zoom sur les conteneurs de l'en-tête, du pied de page, du bandeau et du panier, largeur compensée ; jamais sur la
+     racine (la boule, les scènes collées et les mesures de défilement en dépendent).
+   - Les sections immersives (hero, galerie, dessin, usages, formats, questions, fin) sont déjà en vw / svh : elles ne
+     sont pas zoomées (elles contiennent les stations de la boule, mesurées au pixel) ; leurs textes, boutons et largeurs
+     plafonnés en px suivent --z, et la galerie et la carte de fin occupent tout l'espace. */
+@media (min-width: 1680px) and (min-height: 900px) {
+  :root {
+    --z: 1.15;
+    /* Alias résolu sur la racine : la carte de fin pose son propre --z (progression du zoom, sections.js). */
+    --ecran: var(--z);
+    --container: max(1240px, min(86vw, 138svh));
+    /* Hauteur réservée sous l'en-tête fixe (barre + bandeau), à l'échelle. */
+    --entete: calc(env(safe-area-inset-top, 0px) + 88px * var(--ecran) + var(--annonce, 0px));
+  }
+  html:root:has(.annonce:not([hidden])) { --annonce: calc(2.25rem * var(--ecran)); }
+
+  /* ---------- En-tête, pied de page, bandeau, panier : zoom par conteneur ---------- */
+  html .container { zoom: var(--ecran); max-width: calc((var(--container) + var(--gutter) * 2) / var(--ecran)); }
+  html .annonce { zoom: var(--ecran); }
+  html .footer { padding-top: calc(clamp(3.5rem, 7vw, 6rem) * var(--ecran)); }
+  html .panier { zoom: var(--ecran); max-height: calc(85dvh / var(--ecran)); }
+  html .panier__panel { max-height: calc(85dvh / var(--ecran)); }
+
+  /* ---------- Hero ---------- */
+  html .ouverture { padding-top: calc(env(safe-area-inset-top, 0px) + 72px * var(--ecran) + var(--annonce, 0px)); }
+  html .o-sous { font-size: clamp(16px, 1.25vw, calc(19px * var(--ecran))); }
+  html .o-prix, html .o-actions, html .o-defiler { zoom: var(--ecran); }
+  html .sub { font-size: clamp(16px, 1.45vw, calc(22px * var(--ecran))); }
+  html .boule { width: calc(22px * var(--ecran)); height: calc(22px * var(--ecran)); margin: calc(-11px * var(--ecran)) 0 0 calc(-11px * var(--ecran)); }
+  html .tete { width: calc(14px * var(--ecran)); height: calc(14px * var(--ecran)); margin: calc(-7px * var(--ecran)) 0 0 calc(-7px * var(--ecran)); }
+
+  /* ---------- Galerie : mosaïque à la taille de l'écran ---------- */
+  html .galerie { max-width: calc(var(--container) + var(--gutter) * 2); height: clamp(640px, 94svh, calc(960px * var(--ecran))); gap: calc(16px * var(--ecran)); }
+  html .g-sous { font-size: calc(15px * var(--ecran)); }
+  html .g-cta, html .g-carte figcaption { zoom: var(--ecran); }
+  html .g-carte { --rond: calc(24px * var(--ecran)); }
+
+  /* ---------- Dessin ---------- */
+  html .indice { font-size: clamp(13px, 3.4vw, calc(17px * var(--ecran))); }
+  html .outils { zoom: var(--ecran); }
+  html .socle { height: calc(12px * var(--ecran)); }
+
+  /* ---------- Votre format ---------- */
+  html .formats-lede { font-size: clamp(17px, 1.35vw, calc(20px * var(--ecran))); }
+  html .boite-pilule, html .formats-pastilles, html .formats-actions, html .formats-note, html .collage__legende, html .collage__support figcaption { zoom: var(--ecran); }
+  html .formats-motif { width: calc(200px * var(--ecran)); }
+  html .formats-cadre { border-radius: calc(40px * var(--ecran)); }
+
+  /* ---------- Questions ---------- */
+  html .q-liste { zoom: var(--ecran); }
+  html .q-plaque { min-height: calc(13rem * var(--ecran)); padding: calc(22px * var(--ecran)) calc(20px * var(--ecran)); }
+  html .q-reponse { font-size: clamp(16px, 4.4vw, calc(21px * var(--ecran))); }
+
+  /* ---------- Dernier écran ---------- */
+  html .fin-texte { width: min(44vw, calc(640px * var(--ecran))); }
+  html .fin-soustitre { font-size: min(1.5vw, calc(19px * var(--ecran))); }
+  html .fin-prix, html .fin-actions { zoom: var(--ecran); }
+}
+
+@media (min-width: 1920px) and (min-height: 1000px) { :root { --z: 1.3; } }
+@media (min-width: 2400px) and (min-height: 1250px) { :root { --z: 1.6; } }
+@media (min-width: 2880px) and (min-height: 1500px) { :root { --z: 1.95; } }
+@media (min-width: 3600px) and (min-height: 1900px) { :root { --z: 2.35; } }
