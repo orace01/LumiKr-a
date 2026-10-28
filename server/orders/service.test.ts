@@ -128,6 +128,17 @@ describe('commande', () => {
     errors.mockRestore()
   })
 
+  it('garde la raison d’un paiement impossible à créer, pour l’administrateur seulement', async () => {
+    vi.spyOn(env.payment, 'createPayment').mockRejectedValueOnce(new Error('Mepaye : kyc_required'))
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    await expect(env.service.checkout({ customer, lines: [{ variantId: '20x20', quantity: 1 }] }, ORIGIN)).rejects.toMatchObject({ status: 502 })
+    errors.mockRestore()
+    const [order] = await env.store.list()
+    expect(order.status).toBe('payment_failed')
+    expect(order.history.at(-1)?.note).toBe('Création du paiement impossible : Mepaye : kyc_required')
+    expect(JSON.stringify(await env.service.lookup(order.id, customer.email))).not.toContain('kyc_required')
+  })
+
   it('un paiement refusé ne déclenche aucun envoi', async () => {
     const { orderId, reference } = await placeOrder(env)
     await env.service.handlePaymentEvent({ reference, outcome: 'failed' })

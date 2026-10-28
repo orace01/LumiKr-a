@@ -205,7 +205,10 @@ export function createOrderService(deps: OrderServiceDeps) {
       return { orderId: id, redirectUrl: session.redirectUrl, confirmationPath: `${returnUrl.pathname}${returnUrl.search}` }
     } catch (error) {
       console.error(`[paiement] création impossible pour ${id}`, error)
-      await store.update(id, (current) => withStatus(current, 'payment_failed', 'Création du paiement impossible'))
+      // La raison (refus du prestataire, réseau) reste lisible dans la commande pour l'administrateur ;
+      // l'historique n'est jamais montré au client (toPublicOrder n'en garde que les dates).
+      const reason = error instanceof Error ? error.message : String(error)
+      await store.update(id, (current) => withStatus(current, 'payment_failed', `Création du paiement impossible : ${reason}`))
       throw new CheckoutError(502, 'Le service de paiement ne répond pas. Réessayez dans quelques instants.')
     }
   }

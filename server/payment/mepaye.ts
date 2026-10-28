@@ -48,6 +48,11 @@ interface MepayeWebhook {
   data?: { id?: string; externalReference?: string; amount?: number; currency?: string; test?: boolean }
 }
 
+// Une clé ou un secret ne contient que des caractères ASCII visibles. Un « … » trahit la version
+// masquée affichée par Mepaye dans la liste des clés : la requête ne pourrait même pas partir.
+const PRINTABLE_ASCII = /^[\x21-\x7e]+$/
+const TRUNCATED = 'la valeur contient « … » ou un caractère invalide (version masquée recopiée ?)'
+
 /** Consignes pour l'administrateur selon le code d'erreur Mepaye. */
 const ERROR_HINTS: Record<string, string> = {
   unauthenticated: 'clé API refusée : vérifier MEPAYE_API_KEY',
@@ -88,17 +93,19 @@ export class MepayePaymentProvider implements PaymentProvider {
   }
 
   isConfigured() {
-    const { apiKey, webhookSecret } = this.settings
-    if (!apiKey || !webhookSecret) return false
-    return this.testMode ? this.allowTestKey : apiKey.startsWith('mp_live_')
+    return this.missing().length === 0
   }
 
   /** Ce qui manque encore, en clair (journal de démarrage). */
   missing(): string[] {
+    const { apiKey, webhookSecret } = this.settings
     const missing: string[] = []
-    if (!this.settings.apiKey) missing.push('MEPAYE_API_KEY')
+    if (!apiKey) missing.push('MEPAYE_API_KEY')
+    else if (!PRINTABLE_ASCII.test(apiKey)) missing.push(`MEPAYE_API_KEY complète : ${TRUNCATED}`)
     else if (this.testMode && !this.allowTestKey) missing.push('MEPAYE_API_KEY de production (mp_live_…) : la clé actuelle est une clé de test')
-    if (!this.settings.webhookSecret) missing.push('MEPAYE_WEBHOOK_SECRET')
+    else if (!this.testMode && !apiKey.startsWith('mp_live_')) missing.push('MEPAYE_API_KEY : une clé Mepaye commence par mp_live_ ou mp_test_')
+    if (!webhookSecret) missing.push('MEPAYE_WEBHOOK_SECRET')
+    else if (!PRINTABLE_ASCII.test(webhookSecret)) missing.push(`MEPAYE_WEBHOOK_SECRET complet : ${TRUNCATED}`)
     return missing
   }
 

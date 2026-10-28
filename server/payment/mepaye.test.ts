@@ -112,6 +112,11 @@ describe('MepayePaymentProvider', () => {
     expect(new MepayePaymentProvider(TEST).missing()).toEqual([expect.stringMatching(/clé de test/)])
     expect(new MepayePaymentProvider(TEST, { allowTestKey: true }).isConfigured()).toBe(true)
     expect(new MepayePaymentProvider({ ...LIVE, webhookSecret: '' }).isConfigured()).toBe(false)
+    // Version masquée de la liste des clés Mepaye, recopiée à la place de la clé complète.
+    const truncated = new MepayePaymentProvider({ ...LIVE, apiKey: 'mp_live_ab12…yz89' })
+    expect(truncated.isConfigured()).toBe(false)
+    expect(truncated.missing()).toEqual([expect.stringMatching(/MEPAYE_API_KEY complète.*«\s…\s»/)])
+    expect(new MepayePaymentProvider({ ...LIVE, webhookSecret: 'whsec_ab…' }).missing()).toEqual([expect.stringMatching(/MEPAYE_WEBHOOK_SECRET complet/)])
   })
 
   it('met le téléphone au format international quand c’est possible', () => {
