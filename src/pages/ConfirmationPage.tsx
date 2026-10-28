@@ -47,7 +47,7 @@ export function ConfirmationPage() {
 
   const order = state.kind === 'ready' ? state.order : null
   const paid = order !== null && PAID.has(order.status)
-  useDocumentTitle(paid ? 'Commande confirmée' : 'Votre commande')
+  useDocumentTitle(paid ? 'Commande confirmée' : 'Votre commande', { noindex: true })
 
   useEffect(() => {
     if (!orderId || !key) return

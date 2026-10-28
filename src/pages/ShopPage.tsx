@@ -45,7 +45,9 @@ export function ProductCard({ variant, index }: { variant: Variant; index: numbe
 }
 
 export function ShopPage() {
-  useDocumentTitle('Boutique')
+  useDocumentTitle('Boutique', {
+    description: 'La boutique Lumikréa : quatre formats de tableau lumineux à dessiner, de 12 × 12 à 30 × 20 cm. Plaque en acrylique sur une base LED, livraison offerte.',
+  })
   const [filter, setFilter] = useState<Filter>('Tous')
   const filtersRef = useRef<HTMLDivElement>(null)
   const [pill, setPill] = useState({ left: 0, width: 0 })

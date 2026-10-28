@@ -29,6 +29,25 @@ await json(`${FUNCTION}/.vc-config.json`, {
 await json(`${OUT}/config.json`, {
   version: 3,
   routes: [
+    // Sécurité (R-008) : HTTPS imposé (HSTS, en plus de la redirection de Vercel), pas de devinette de type, pas
+    // d'affichage dans le cadre d'un autre site, adresse d'origine réduite, caméra, micro et position refusés.
+    {
+      src: '^/(.*)$',
+      headers: {
+        'Strict-Transport-Security': 'max-age=63072000',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'SAMEORIGIN',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+      },
+      continue: true,
+    },
+    // Pages privées (commande, suivi, paiement) : jamais indexées, même sans exécuter le JavaScript.
+    {
+      src: '^/(commande|suivi|paiement-demo)(/.*)?$',
+      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
+      continue: true,
+    },
     // Fichiers à nom unique (assets/…-hash.js) : mis en cache longtemps.
     {
       src: '^/assets/(.*)$',

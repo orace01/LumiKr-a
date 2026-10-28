@@ -23,4 +23,4 @@ Les textes, visuels, logos et éléments graphiques du site sont protégés par 
 
 ## Données personnelles
 
-Le traitement de vos données est décrit dans notre [politique de confidentialité](/confidentialite). Le site n’utilise aucun cookie publicitaire ni outil de mesure d’audience.
+Le traitement de vos données est décrit dans notre [politique de confidentialité](/confidentialite). Le site n’utilise aucun cookie publicitaire ni cookie de mesure d’audience ; la fréquentation est mesurée de façon anonyme et sans cookie.

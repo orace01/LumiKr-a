@@ -38,7 +38,7 @@ Seules les personnes chargées des commandes et du service client ont accès à 
 
 - notre fournisseur et partenaire logistique, situé en Chine, qui prépare et expédie votre commande, et les transporteurs qui la livrent : nom, adresse de livraison, téléphone et e-mail ;
 - {paiement}, pour le paiement : nom, adresse e-mail, téléphone, pays et montant de la commande ;
-- l’hébergeur du site, qui stocke les données de commande.
+- l’hébergeur du site (Vercel), qui stocke les données de commande et fournit la mesure d’audience anonyme décrite plus bas.
 
 Nous ne vendons ni ne louons vos données.
 
@@ -54,7 +54,11 @@ Votre commande étant expédiée depuis la Chine, les données nécessaires à l
 
 ## Stockage dans votre navigateur
 
-Le site n’utilise ni cookie publicitaire, ni outil de mesure d’audience, ni réseau social intégré. Il enregistre seulement dans votre navigateur :
+Le site n’utilise ni cookie publicitaire, ni cookie de mesure d’audience, ni réseau social intégré.
+
+Pour savoir quelles pages sont consultées, il utilise Vercel Web Analytics, une mesure d’audience **sans cookie** : elle compte les visites de façon agrégée et anonyme (page vue, pays, type d’appareil et de navigateur), ne dépose rien sur votre appareil et ne permet pas de vous suivre d’un site à l’autre ni d’une visite à l’autre. Elle ne requiert donc pas votre consentement.
+
+Le site enregistre seulement dans votre navigateur :
 
 - votre panier, pour le retrouver lors de votre prochaine visite ;
 - les informations saisies dans le formulaire de commande, le temps de votre visite, pour ne pas les perdre si vous revenez en arrière.

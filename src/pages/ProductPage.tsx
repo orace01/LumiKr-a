@@ -91,7 +91,7 @@ const SECTIONS = [
 ]
 
 function ProductNotFound() {
-  useDocumentTitle('Produit introuvable')
+  useDocumentTitle('Produit introuvable', { noindex: true })
   return (
     <div className="container order-page order-page--center">
       <h1 className="order-page__title">Produit introuvable</h1>
@@ -111,7 +111,9 @@ export function ProductPage({ variantId }: { variantId: string }) {
 
 function ProductDetails({ variantId }: { variantId: string }) {
   const variant = product.variants.find((candidate) => candidate.id === variantId)!
-  useDocumentTitle(`Tableau lumineux ${variant.label}`)
+  useDocumentTitle(`Tableau lumineux ${variant.label}`, {
+    description: `Tableau lumineux ${variant.label} (${variant.shape.toLowerCase()}) : une plaque en acrylique sur une base LED, à dessiner au feutre et à effacer. Livraison offerte.`,
+  })
   const cart = useCart()
   const { info, money, priceOf } = useShop()
   const priceLabel = usePriceLabel()

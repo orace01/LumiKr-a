@@ -6,6 +6,9 @@
 <title>Lumikréa · La nuit s'allume de leurs idées</title>
 <meta name="description" content="Lumikréa, le tableau lumineux à dessiner : une plaque d'acrylique sur une base LED. On écrit au feutre, la lumière le révèle.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://www.lumikrea.store/">
+<meta property="og:url" content="https://www.lumikrea.store/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Lumikréa">
@@ -363,6 +366,8 @@
 </dialog>
 
 <!-- Défilement fluide (Lenis) : avant app.js, qui s'en sert pour « Découvrir ». -->
+<!-- Mesure d'audience sans cookie (Vercel Web Analytics, à activer dans le projet Vercel) : R-008. -->
+<script defer src="/_vercel/insights/script.js"></script>
 <script src="vendor/lenis.min.js"></script>
 <script src="defilement.js"></script>
 <script src="app.js"></script>

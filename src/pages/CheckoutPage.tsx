@@ -48,7 +48,7 @@ const FIELD_LABELS: [keyof FieldErrors, string][] = [
 ]
 
 export function CheckoutPage() {
-  useDocumentTitle('Votre commande')
+  useDocumentTitle('Votre commande', { noindex: true })
   const { search } = useLocation()
   const cancelled = new URLSearchParams(search).has('annule')
   const cart = useCart()

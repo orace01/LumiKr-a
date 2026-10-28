@@ -22,7 +22,7 @@ const STATUS_TEXT: Record<PublicOrder['status'], string> = {
 }
 
 export function TrackingPage() {
-  useDocumentTitle('Suivre ma commande')
+  useDocumentTitle('Suivre ma commande', { noindex: true })
   const { search } = useLocation()
   const { money } = useShop()
   const [orderId, setOrderId] = useState(() => new URLSearchParams(search).get('commande') ?? '')

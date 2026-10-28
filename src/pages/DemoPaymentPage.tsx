@@ -15,7 +15,7 @@ type Session = { orderId: string; amountCents: number; currency: string }
  * cette page n'a plus de session à afficher.
  */
 export function DemoPaymentPage() {
-  useDocumentTitle('Paiement simulé')
+  useDocumentTitle('Paiement simulé', { noindex: true })
   const { search } = useLocation()
   const reference = new URLSearchParams(search).get('ref') ?? ''
   const [session, setSession] = useState<Session | null>(null)

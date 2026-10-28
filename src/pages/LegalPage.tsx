@@ -89,7 +89,7 @@ function Blocks({ blocks }: { blocks: Block[] }) {
  * les autres valeurs {…} viennent de la configuration (site.ts, shop.ts).
  */
 export function LegalPage({ page }: { page: LegalPageConfig }) {
-  useDocumentTitle(page.title)
+  useDocumentTitle(page.title, { description: `${page.title} de ${site.brand}, le tableau lumineux à dessiner.` })
   const source = legalTexts[page.path]
   const blocks = useMemo(() => (source ? parseLegal(source, legalFields(window.location.host)) : null), [source])
   return (
@@ -117,7 +117,7 @@ export function LegalPage({ page }: { page: LegalPageConfig }) {
 }
 
 export function NotFoundPage() {
-  useDocumentTitle('Page introuvable')
+  useDocumentTitle('Page introuvable', { noindex: true })
   return (
     <section className="container order-page order-page--center">
       <h1 className="order-page__title">Page introuvable</h1>

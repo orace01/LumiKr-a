@@ -61,6 +61,8 @@ const seller: Seller = {
 export const site = {
   /** À CONFIRMER : nom de marque provisoire. */
   brand: 'Lumikréa',
+  /** Adresse officielle (lumikrea.store sans www redirige ici) : URL canoniques et Open Graph (R-008). */
+  url: 'https://www.lumikrea.store',
   locale: 'fr-FR',
   tagline: 'Vos idées, en pleine lumière.',
 

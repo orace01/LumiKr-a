@@ -1,0 +1,9 @@
+# Lumikréa — règles pour les robots (R-008). Les pages privées (commande, suivi, paiement) ne sont pas indexées.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /commande
+Disallow: /suivi
+Disallow: /paiement-demo
+
+Sitemap: https://www.lumikrea.store/sitemap.xml
