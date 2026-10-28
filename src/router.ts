@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { flushSync } from 'react-dom'
+import { lenis } from './defilement'
 
 // Navigation entre les pages du site sans bibliothèque : l'adresse est lue dans
 // window.location et mise à jour avec l'API History. Le serveur renvoie
@@ -27,7 +28,13 @@ export function useLocation() {
 /** Fait défiler jusqu'à l'ancre de l'adresse, une fois la page affichée. */
 export function scrollToHash(hash: string) {
   if (!hash) return
-  requestAnimationFrame(() => document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView())
+  requestAnimationFrame(() => {
+    const cible = document.getElementById(decodeURIComponent(hash.slice(1)))
+    if (!cible) return
+    // Défilement fluide : arrêt sous l'en-tête fixe (même marge que scroll-padding-top, src/styles/global.css).
+    if (lenis) lenis.scrollTo(cible, { offset: -parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop || '0') })
+    else cible.scrollIntoView()
+  })
 }
 
 // Les pages de la boutique passent de l'une à l'autre avec une transition de vue
@@ -54,6 +61,7 @@ export function navigate(to: string, options: { replace?: boolean; transition?: 
     window.history[options.replace ? 'replaceState' : 'pushState'](null, '', url)
     window.dispatchEvent(new Event(NAVIGATE_EVENT))
     if (url.hash) scrollToHash(url.hash)
+    else if (lenis) lenis.scrollTo(0, { immediate: true, force: true })   // coupe aussi l'élan de la page précédente
     else window.scrollTo({ top: 0, behavior: 'instant' })
   }
   if (options.transition) withTransition(update)

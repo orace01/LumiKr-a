@@ -89,6 +89,11 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Défilement fluide par Lenis (src/defilement.ts) : le lissage natif se battrait avec le sien. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
 body {
   margin: 0;
   background: var(--ivory);

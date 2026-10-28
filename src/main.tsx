@@ -6,6 +6,8 @@ import './styles/global.css'
 import App from './App.tsx'
 // Grands écrans (R-009) : en dernier, après le CSS des composants importé par App.
 import './styles/grands-ecrans.css'
+// Défilement fluide (Lenis).
+import './defilement'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

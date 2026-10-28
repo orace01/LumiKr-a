@@ -481,7 +481,9 @@
   // « Découvrir › » : descend en douceur jusqu'au premier chapitre du hero.
   $("#decouvrir").addEventListener("click", (e) => {
     e.preventDefault();
-    scrollTo({ top: heroTop + (1.6 / STORY_END) * run, behavior: "smooth" });
+    const top = heroTop + (1.6 / STORY_END) * run;
+    if (window.lenis) window.lenis.scrollTo(top, { duration: 1.6 });   // défilement fluide (defilement.js)
+    else scrollTo({ top, behavior: "smooth" });
   });
 
   // ?t=33.5 ouvre la page directement à ce moment du récit ; ?t=dessin, usages, formats, boite, questions ou fin :
