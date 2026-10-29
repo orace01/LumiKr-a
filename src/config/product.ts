@@ -39,7 +39,7 @@ export interface PenColor {
 // 14,50 € (12 × 12) à 17,36 € (30 × 20). Relevés de 10 € puis remis le 27 octobre 2026.
 // Identifiants CJ relevés avec `npm run cj -- produit`.
 const variants: Variant[] = [
-  { id: '12x12', label: '12 × 12 cm', shape: 'Carré', widthCm: 12, heightCm: 12, price: 3, cjVariantId: '2503201410581618700' }, // TEMPORAIRE (28/10/2026) : prix de la commande test, remettre 24.9
+  { id: '12x12', label: '12 × 12 cm', shape: 'Carré', widthCm: 12, heightCm: 12, price: 24.9, cjVariantId: '2503201410581618700' },
   { id: '15x15', label: '15 × 15 cm', shape: 'Carré', widthCm: 15, heightCm: 15, price: 27.9, cjVariantId: '2503201410581619100' },
   { id: '20x20', label: '20 × 20 cm', shape: 'Carré', widthCm: 20, heightCm: 20, price: 32.9, cjVariantId: '2503201410581619300' },
   { id: '30x20', label: '30 × 20 cm', shape: 'Paysage', widthCm: 30, heightCm: 20, price: 36.9, cjVariantId: '2503201410581619500' },
